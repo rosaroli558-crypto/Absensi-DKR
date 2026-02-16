@@ -47,21 +47,43 @@ window.absen = function() {
 // =======================================
 document.addEventListener("DOMContentLoaded", () => {
   const daftarRef = ref(db, "absensi/");
-  const daftar = document.getElementById("daftar");
+  const daftarBody = document.querySelector("#daftar tbody");
 
   onValue(daftarRef, (snapshot) => {
     const data = snapshot.val();
-    daftar.innerHTML = ""; // reset daftar
+    daftarBody.innerHTML = ""; // reset tabel
 
     if (!data) return;
 
-    // Urutkan data berdasarkan waktu (terbaru di atas)
+    // Urutkan data berdasarkan waktu terbaru di atas
     const sortedData = Object.values(data).sort((a, b) => new Date(b.waktu) - new Date(a.waktu));
 
     sortedData.forEach((peserta) => {
-      const li = document.createElement("li");
-      li.textContent = `${peserta.nama} | ${peserta.kegiatan} | ${peserta.waktu}`;
-      daftar.appendChild(li);
+      const tr = document.createElement("tr");
+
+      // Warna baris berdasarkan status
+      let bgColor = "";
+      switch (peserta.kegiatan) {
+        case "Hadir":
+          bgColor = "#d4edda"; // hijau
+          break;
+        case "Izin":
+          bgColor = "#fff3cd"; // kuning
+          break;
+        case "Sakit":
+        case "Alfa":
+          bgColor = "#f8d7da"; // merah
+          break;
+      }
+      tr.style.backgroundColor = bgColor;
+
+      tr.innerHTML = `
+        <td>${peserta.nama}</td>
+        <td>${peserta.kegiatan}</td>
+        <td>${peserta.waktu}</td>
+      `;
+
+      daftarBody.appendChild(tr);
     });
   });
 });
