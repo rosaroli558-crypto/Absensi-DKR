@@ -17,9 +17,8 @@ body {
   background: linear-gradient(135deg, #4e73df, #1cc88a);
   display: flex;
   justify-content: center;
-  align-items: center;
-  flex-direction: column;
-  text-align: center;
+  align-items: flex-start;
+  padding-top: 20px;
 }
 
 /* ===== CONTAINER ===== */
@@ -30,6 +29,7 @@ body {
   background: rgba(255,255,255,0.95);
   border-radius: 12px;
   box-shadow: 0 6px 15px rgba(0,0,0,0.1);
+  text-align: center;
 }
 
 /* ===== LOGO ===== */
@@ -38,10 +38,12 @@ body {
 }
 
 .logo-container img {
-  width: 100%;
-  max-width: 150px;
+  width: 150px; /* versi sebelumnya kecil, sekarang lebih besar */
+  max-width: 200px;
   height: auto;
   object-fit: contain;
+  display: block;
+  margin: 0 auto 10px auto; /* center */
 }
 
 /* ===== JUDUL ===== */
@@ -65,7 +67,7 @@ h3 {
 #daftarAdmin {
   width: 100%;
   border-collapse: collapse;
-  min-width: 500px; /* scrollable di layar kecil */
+  min-width: 500px; /* tetap scrollable di layar kecil */
 }
 
 #daftarAdmin thead th {
@@ -102,24 +104,23 @@ h3 {
 
 /* ===== RESPONSIVE HP ===== */
 @media (max-width: 768px) {
+
+  .logo-container img {
+    width: 180px; /* lebih besar di HP juga */
+    max-width: 220px;
+  }
+
+  #daftarAdmin {
+    min-width: 100%;
+  }
+
+  /* Buat tetap terlihat seperti tabel di HP */
   #daftarAdmin, #daftarAdmin thead, #daftarAdmin tbody, #daftarAdmin th, #daftarAdmin td, #daftarAdmin tr {
-    display: block;
+    display: table; /* jangan block, agar tetap tabel */
   }
 
-  #daftarAdmin thead {
-    display: none;
-  }
-
-  #daftarAdmin tbody td {
-    display: flex;
-    justify-content: space-between;
-    padding: 8px;
-    border-bottom: 1px solid #ccc;
-  }
-
-  #daftarAdmin tbody td::before {
-    content: attr(data-label);
-    font-weight: bold;
+  #daftarAdmin thead th, #daftarAdmin tbody td {
+    display: table-cell;
   }
 
   .table-container {
