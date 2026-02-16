@@ -17,7 +17,7 @@ html, body {
   padding-top: 20px;
 }
 
-/* ===== LOGO DI LUAR CONTAINER PUTIH ===== */
+/* ===== LOGO ===== */
 .logo-container {
   margin-bottom: 20px;
 }
@@ -52,11 +52,23 @@ h3 {
   color: #333;
 }
 
+/* ===== FILTER ===== */
+.filter-container {
+  margin-bottom: 10px;
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.filter-container label {
+  font-weight: 500;
+}
+
 /* ===== TABEL ===== */
 .table-container {
   width: 100%;
   overflow-x: auto;
-  margin-top: 10px;
 }
 
 #daftarAdmin {
@@ -97,7 +109,7 @@ h3 {
   background-color: #c0392b;
 }
 
-/* ===== RESPONSIVE HP ===== */
+/* ===== RESPONSIVE ===== */
 @media (max-width: 768px) {
 
   .logo-container img {
@@ -110,7 +122,7 @@ h3 {
   }
 
   #daftarAdmin, #daftarAdmin thead, #daftarAdmin tbody, #daftarAdmin th, #daftarAdmin td, #daftarAdmin tr {
-    display: table; /* tetap tabel di HP */
+    display: table; 
   }
 
   #daftarAdmin thead th, #daftarAdmin tbody td {
