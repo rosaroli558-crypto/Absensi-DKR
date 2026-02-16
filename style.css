@@ -1,73 +1,90 @@
+/* Reset dasar */
 html, body {
   height: 100%;
   margin: 0;
+  padding: 0;
 }
 
+/* Body utama */
 body {
   font-family: Arial, sans-serif;
   background: linear-gradient(135deg, #4e73df, #1cc88a);
+  background-attachment: fixed;
   min-height: 100vh;
+
   display: flex;
   flex-direction: column;
   align-items: center;
-  padding: 40px;
+  padding: 40px 20px;
+  box-sizing: border-box;
 }
 
+/* Judul */
 h2 {
   color: white;
   margin-bottom: 20px;
+  text-align: center;
 }
 
+/* Form input & select */
 input, select {
-  padding: 10px;
-  margin: 8px;
-  border-radius: 8px;
+  padding: 12px;
+  margin: 8px 0;
+  border-radius: 10px;
   border: none;
-  width: 220px;
+  width: 250px;
+  max-width: 100%;
   font-size: 14px;
+  box-sizing: border-box;
 }
 
+/* Tombol */
 button {
-  padding: 10px 18px;
-  border-radius: 8px;
+  padding: 12px 20px;
+  border-radius: 10px;
   border: none;
   background-color: #f6c23e;
   cursor: pointer;
   font-weight: bold;
-  transition: 0.3s;
+  transition: 0.3s ease;
+  margin-top: 8px;
 }
 
 button:hover {
   background-color: #dda20a;
+  transform: scale(1.05);
 }
 
+/* Daftar hadir */
 ul {
   list-style: none;
   padding: 0;
-  width: 300px;
+  margin-top: 20px;
+  width: 320px;
+  max-width: 100%;
 }
 
+/* Item list */
 li {
   background: white;
   margin-top: 10px;
-  padding: 10px;
-  border-radius: 8px;
+  padding: 12px;
+  border-radius: 10px;
   font-size: 14px;
-  box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+  word-wrap: break-word;
 }
 
+/* Responsif untuk HP */
 @media (max-width: 600px) {
+
   body {
-    padding: 20px;
+    padding: 25px 15px;
   }
 
   input, select {
     width: 100%;
-    max-width: 300px;
   }
 
   ul {
-    width: 100%;
-    max-width: 300px;
-  }
-}
+    width:
