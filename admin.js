@@ -1,7 +1,7 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
 import { getDatabase, ref, onValue, push, remove } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
 
-// Konfigurasi Firebase
+// Firebase config
 const firebaseConfig = {
   apiKey: "AIzaSyC88eNtWMuOQ4eezVriirq_sjjVOkfl8K8",
   authDomain: "absensi-dkr.firebaseapp.com",
@@ -15,26 +15,28 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 const db = getDatabase(app);
 
-const daftarRef = ref(db,"absensi/");
-const userRef = ref(db,"userList/");
+// Elements
 const daftarBody = document.getElementById("daftarAdmin");
 const totalSpan = document.getElementById("total");
 const bulanSelect = document.getElementById("bulan");
 const addUserBtn = document.getElementById("addUserBtn");
 const newUserInput = document.getElementById("newUser");
 
-// Tambah nama user ke userList
+// References
+const absensiRef = ref(db,"absensi/");
+const userRef = ref(db,"userList/");
+
+// Tambah user
 addUserBtn.onclick = ()=>{
   const nama = newUserInput.value.trim();
   if(!nama){ alert("Nama kosong"); return; }
-  push(userRef, nama);
-  newUserInput.value = "";
+  push(userRef, nama).then(()=> newUserInput.value="");
 };
 
-// Ambil semua absensi realtime
-let data = {};
-onValue(daftarRef,snapshot=>{
-  data = snapshot.val()||{};
+// Ambil data realtime
+let allData = {};
+onValue(absensiRef, snapshot=>{
+  allData = snapshot.val() || {};
   tampilkanDaftar();
 });
 
@@ -43,7 +45,7 @@ bulanSelect.addEventListener("change", tampilkanDaftar);
 
 function tampilkanDaftar(){
   daftarBody.innerHTML="";
-  let dataArray = Object.entries(data).map(([id, p])=>({id,...p, date:new Date(p.waktu)}));
+  let dataArray = Object.entries(allData).map(([id, p])=>({id,...p, date:new Date(p.waktu)}));
 
   // Filter bulan
   const selBulan = bulanSelect.value;
@@ -51,17 +53,17 @@ function tampilkanDaftar(){
     dataArray = dataArray.filter(p=>p.date.getMonth()===parseInt(selBulan));
   }
 
-  // Urut terbaru di atas
+  // Urut terbaru
   dataArray.sort((a,b)=>b.date-a.date);
 
-  // Hitung total
+  // Total respons
   totalSpan.textContent = dataArray.length;
 
-  // Tampilkan
+  // Render tabel
   dataArray.forEach(p=>{
     const tr = document.createElement("tr");
 
-    // warna baris sesuai status
+    // Warna baris sesuai status
     let bgColor="";
     switch(p.kegiatan){
       case "Hadir": bgColor="#d4edda"; break;
@@ -69,12 +71,12 @@ function tampilkanDaftar(){
       case "Sakit": bgColor="#fff3cd"; break;
       case "Alfa": bgColor="#f8d7da"; break;
     }
-    tr.style.backgroundColor=bgColor;
+    tr.style.backgroundColor = bgColor;
 
     tr.innerHTML=`
       <td>${p.nama}</td>
       <td>${p.kegiatan}</td>
-      <td>${new Date(p.waktu).toLocaleDateString('id-ID')} ${new Date(p.waktu).toLocaleTimeString('id-ID',{hour:'2-digit',minute:'2-digit'})}</td>
+      <td>${p.date.toLocaleDateString('id-ID')} ${p.date.toLocaleTimeString('id-ID',{hour:'2-digit',minute:'2-digit'})}</td>
       <td><button class="delete-btn">Hapus</button></td>
     `;
 
