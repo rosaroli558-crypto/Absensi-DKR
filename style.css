@@ -106,4 +106,32 @@ h2 {
   button {
     padding: 8px 20px;
   }
+
+  /* ===== TABEL DAFTAR HADIR ===== */
+  #daftar {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 10px;
+    background: white;
+    border-radius: 10px;
+    overflow: hidden;
+  }
+
+  #daftar thead th {
+    background-color: #4e73df; /* cocok dengan CSS awal */
+    color: white;
+    padding: 12px;
+    text-align: left;
+  }
+
+  #daftar tbody td {
+    padding: 10px;
+    border-bottom: 1px solid #ddd;
+    font-weight: 500;
+  }
+
+  #daftar tbody tr:hover {
+    background-color: #f6f6f6;
+  }
+
 }
