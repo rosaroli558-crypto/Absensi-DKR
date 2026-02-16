@@ -20,7 +20,7 @@ const bulanSelect = document.getElementById("bulan");
 
 let dataGlobal = {};
 
-onValue(ref(db, "absensi/"), snapshot => {
+onValue(ref(db,"absensi/"), snapshot => {
   dataGlobal = snapshot.val() || {};
   tampilkanRekap();
 });
@@ -31,61 +31,44 @@ function tampilkanRekap(){
   daftarBody.innerHTML = "";
   const selectedBulan = bulanSelect.value;
 
-  let dataArray = Object.entries(dataGlobal).map(([id,p])=>({
-    id,...p,date:new Date(p.waktu)
+  let dataArray = Object.entries(dataGlobal).map(([id,p]) => ({
+    id, ...p, date:new Date(p.waktu)
   }));
 
-  if(selectedBulan!=="all"){
+  if(selectedBulan !== "all"){
     dataArray = dataArray.filter(p=>p.date.getMonth()===parseInt(selectedBulan));
   }
 
-  // Rekap per user
-  const rekapPerUser = {};
+  totalSpan.textContent = dataArray.length;
+
+  // Sort terbaru di atas
+  dataArray.sort((a,b)=>b.date - a.date);
+
   dataArray.forEach(p=>{
-    if(!rekapPerUser[p.nama]){
-      rekapPerUser[p.nama]={
-        nama:p.nama,
-        total:0,
-        statusTerakhir:p.kegiatan,
-        semuaKegiatan:[],
-        semuaWaktu:[],
-        ids:[]
-      };
-    }
-    rekapPerUser[p.nama].total++;
-    rekapPerUser[p.nama].statusTerakhir=p.kegiatan;
-    rekapPerUser[p.nama].semuaKegiatan.push(p.kegiatan);
-    rekapPerUser[p.nama].semuaWaktu.push(p.waktu);
-    rekapPerUser[p.nama].ids.push(p.id);
-  });
+    const tr = document.createElement("tr");
 
-  const rekapArray = Object.values(rekapPerUser);
-  totalSpan.textContent = rekapArray.length;
-
-  rekapArray.forEach(user=>{
-    const tr=document.createElement("tr");
     let bgColor="";
-    switch(user.statusTerakhir){
-      case "Hadir": bgColor="#d4edda";break;
-      case "Izin": bgColor="#fff3cd";break;
-      case "Sakit": bgColor="#fff3cd";break;
-      case "Alfa": bgColor="#f8d7da";break;
+    switch(p.kegiatan){
+      case "Hadir": bgColor="#d4edda"; break;
+      case "Izin": bgColor="#fff3cd"; break;
+      case "Sakit": bgColor="#fff3cd"; break;
+      case "Alfa": bgColor="#f8d7da"; break;
     }
-    tr.style.backgroundColor=bgColor;
+    tr.style.backgroundColor = bgColor;
 
-    const semuaStatus=user.semuaKegiatan.join(", ");
-    const semuaWaktu=user.semuaWaktu.join(", ");
+    const tgl = p.date.toLocaleDateString('id-ID');
+    const jam = p.date.toLocaleTimeString('id-ID',{hour:'2-digit',minute:'2-digit'});
+    const waktuDisplay = `${tgl} ${jam}`;
 
-    tr.innerHTML=`
-      <td>${user.nama}</td>
-      <td>${user.total} / 4</td>
-      <td>${semuaStatus}</td>
-      <td>${semuaWaktu}</td>
+    tr.innerHTML = `
+      <td>${p.nama}</td>
+      <td>${p.kegiatan}</td>
+      <td>${waktuDisplay}</td>
       <td><button class="delete-btn">Hapus</button></td>
     `;
 
-    tr.querySelector(".delete-btn").onclick=()=>{
-      user.ids.forEach(id=>remove(ref(db,"absensi/"+id)));
+    tr.querySelector(".delete-btn").onclick = () => {
+      remove(ref(db,"absensi/"+p.id));
     };
 
     daftarBody.appendChild(tr);
