@@ -42,7 +42,7 @@ document.addEventListener("DOMContentLoaded", () => {
       switch(peserta.kegiatan){
         case "Hadir": bgColor = "#d4edda"; break;
         case "Izin": bgColor = "#fff3cd"; break;
-        case "Sakit":
+        case "Sakit": bgColor = "#fff3cd"; break;
         case "Alfa": bgColor = "#f8d7da"; break;
       }
       tr.style.backgroundColor = bgColor;
