@@ -55,13 +55,12 @@ document.addEventListener("DOMContentLoaded", () => {
 
     if (!data) return;
 
-    // Urutkan data berdasarkan waktu terbaru di atas
     const sortedData = Object.values(data).sort((a, b) => new Date(b.waktu) - new Date(a.waktu));
 
     sortedData.forEach((peserta) => {
       const tr = document.createElement("tr");
 
-      // Warna baris berdasarkan status
+      // warna baris berdasarkan status
       let bgColor = "";
       switch (peserta.kegiatan) {
         case "Hadir":
