@@ -9,24 +9,12 @@ html, body {
   height: 100%;
   font-family: 'Segoe UI', sans-serif;
   overflow-x: hidden;
-}
-
-/* BACKGROUND UTAMA */
-body {
-  min-height: 100vh;
   background: linear-gradient(135deg, #4e73df, #1cc88a);
   display: flex;
   justify-content: center;
-  align-items: center;
   flex-direction: column;
-  text-align: center;
-}
-
-/* CONTAINER UTAMA */
-.container {
-  width: 100%;
-  max-width: 500px;
-  padding: 20px;
+  align-items: center;
+  padding-top: 20px;
 }
 
 /* LOGO */
@@ -35,17 +23,33 @@ body {
 }
 
 .logo-container img {
-  width: 100%;
-  max-width: 500px; /* Laptop */
+  width: 180px;
+  max-width: 220px;
   height: auto;
-  object-fit: contain;
+  display: block;
+  margin: 0 auto;
+}
+
+/* CONTAINER PUTIH */
+.container {
+  width: 100%;
+  max-width: 500px;
+  padding: 20px;
+  background: rgba(255,255,255,0.95);
+  border-radius: 12px;
+  box-shadow: 0 6px 15px rgba(0,0,0,0.1);
+  text-align: center;
 }
 
 /* JUDUL */
 h1 {
-  color: white;
-  margin-bottom: 20px;
-  font-size: 28px;
+  margin-bottom: 15px;
+  color: #333;
+}
+
+h2 {
+  margin-top: 15px;
+  color: #333;
 }
 
 /* INPUT */
@@ -76,23 +80,14 @@ button:hover {
 }
 
 /* DAFTAR HADIR */
-h2 {
-  color: black;
-  margin-top: 10px;
+#daftar li {
+  margin-bottom: 6px;
 }
 
-/* ========================= */
 /* RESPONSIVE HP */
-/* ========================= */
-
 @media (max-width: 768px) {
-
-  body {
-    padding: 20px;
-  }
-
   .logo-container img {
-    max-width: 300px; /* Diperkecil di HP */
+    width: 150px;
   }
 
   h1 {
@@ -105,37 +100,5 @@ h2 {
 
   button {
     padding: 8px 20px;
-  }
-
-  /* ===== TABEL DAFTAR HADIR ===== */
-  .table-container {
-    width: 100%;
-    overflow-x: auto; /* scroll horizontal jika tabel lebar */
-    margin-top: 10px;
-  }
-
-  #daftar {
-    margin: 10px auto; /* center di laptop */
-    width: 100%;
-    max-width: 500px; /* sama dengan container form */
-    border-collapse: collapse;
-    min-width: 400px; /* tetap scrollable jika perlu */
-  }
-
-  #daftar thead th {
-    background-color: #4e73df; /* sesuai CSS awal */
-    color: white;
-    padding: 12px;
-    text-align: left;
-  }
-
-  #daftar tbody td {
-    padding: 10px;
-    border-bottom: 1px solid #ddd;
-    font-weight: 500;
-  }
-
-  #daftar tbody tr:hover {
-    background-color: #f6f6f6;
   }
 }
