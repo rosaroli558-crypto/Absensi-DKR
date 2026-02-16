@@ -133,5 +133,17 @@ h2 {
   #daftar tbody tr:hover {
     background-color: #f6f6f6;
   }
+  /* Container scroll horizontal jika tabel terlalu lebar */
+  .table-container {
+    width: 100%;
+    overflow-x: auto;
+    margin-top: 10px;
+  }
 
+  /* Tabel tetap full-width tapi bisa scroll di laptop */
+  #daftar {
+    width: 100%;
+    border-collapse: collapse;
+    min-width: 400px; /* pastikan ada minimal width untuk scroll */
+  }
 }
