@@ -13,11 +13,12 @@ const firebaseConfig = {
   appId: "1:824325578551:web:3fa855eab199686e5d84b2"
 };
 
+// 🔹 Init Firebase
 const app = initializeApp(firebaseConfig);
 const db = getDatabase(app);
 
 // 🔹 Elements
-const daftarBody = document.getElementById("daftarAdmin");
+const daftarBody = document.querySelector("#daftarAdmin tbody");
 const totalSpan = document.getElementById("total");
 const bulanSelect = document.getElementById("bulan");
 const addUserBtn = document.getElementById("addUserBtn");
@@ -50,7 +51,7 @@ onValue(userRef, snapshot=>{
     const btn = document.createElement("button");
     btn.textContent = "Hapus";
     btn.addEventListener("click", ()=>{
-      showModal(`Hapus user "${nama}"?`, ()=> remove(ref(db,"userList/"+key)));
+      if(confirm(`Hapus user "${nama}"?`)) remove(ref(db,"userList/"+key));
     });
 
     li.appendChild(btn);
@@ -95,7 +96,7 @@ function tampilkanDaftar(){
     let bgColor="";
     switch(p.kegiatan){
       case "Hadir": bgColor="#d4edda"; break;
-      case "Izin":
+      case "Izin": bgColor="#fff3cd"; break;
       case "Sakit": bgColor="#fff3cd"; break;
       case "Alfa": bgColor="#f8d7da"; break;
     }
@@ -110,55 +111,18 @@ function tampilkanDaftar(){
 
     // Hapus per absensi
     tr.querySelector(".delete-btn").addEventListener("click", ()=>{
-      showModal(`Hapus absensi ${p.nama} | ${p.kegiatan}?`, ()=> remove(ref(db,"absensi/"+p.id)));
+      if(confirm(`Hapus absensi ${p.nama} | ${p.kegiatan}?`)){
+        remove(ref(db,"absensi/"+p.id));
+      }
     });
 
     daftarBody.appendChild(tr);
   });
 }
 
-// 🔹 Modal Custom
-function showModal(msg, callback){
-  const modal = document.createElement("div");
-  modal.style.position="fixed";
-  modal.style.top="0";
-  modal.style.left="0";
-  modal.style.width="100%";
-  modal.style.height="100%";
-  modal.style.background="rgba(0,0,0,0.5)";
-  modal.style.display="flex";
-  modal.style.alignItems="center";
-  modal.style.justifyContent="center";
-  modal.style.zIndex="1000";
-
-  const box = document.createElement("div");
-  box.style.background="white";
-  box.style.padding="20px";
-  box.style.borderRadius="10px";
-  box.style.textAlign="center";
-  box.innerHTML=`<p>${msg}</p>`;
-
-  const yesBtn = document.createElement("button");
-  yesBtn.textContent="Ya";
-  yesBtn.style.margin="10px";
-  yesBtn.addEventListener("click", ()=>{
-    callback();
-    document.body.removeChild(modal);
-  });
-
-  const noBtn = document.createElement("button");
-  noBtn.textContent="Batal";
-  noBtn.style.margin="10px";
-  noBtn.addEventListener("click", ()=> document.body.removeChild(modal));
-
-  box.appendChild(yesBtn);
-  box.appendChild(noBtn);
-  modal.appendChild(box);
-  document.body.appendChild(modal);
-}
-
 // 🔹 Ekspor ke Excel
 exportBtn.addEventListener("click", ()=>{
+  if(!daftarBody) return;
   const rows = [["Nama","Kegiatan","Waktu"]];
   const trList = daftarBody.querySelectorAll("tr");
   trList.forEach(tr=>{
