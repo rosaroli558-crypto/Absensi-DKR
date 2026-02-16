@@ -94,6 +94,20 @@ h3 {
   background-color: #f6f6f6;
 }
 
+button.delete-btn {
+  padding: 5px 10px;
+  border: none;
+  border-radius: 6px;
+  background-color: #e74a3b;
+  color: white;
+  cursor: pointer;
+  font-weight: bold;
+}
+
+button.delete-btn:hover {
+  background-color: #c0392b;
+}
+
 /* RESPONSIVE */
 @media (max-width: 768px) {
   .logo-container img {
