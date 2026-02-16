@@ -1,6 +1,8 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
 import { getDatabase, ref, set, onValue } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
 
+console.log("JS jalan");
+
 // 🔥 Konfigurasi Firebase
 const firebaseConfig = {
   apiKey: "AIzaSyC88eNtWMuOQ4eezVriirq_sjjVOkfl8K8",
