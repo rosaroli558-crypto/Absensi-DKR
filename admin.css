@@ -36,6 +36,35 @@ h1,h2{
   margin-bottom:15px;
 }
 
+/* User List */
+#userList{
+  list-style:none;
+  margin-top:10px;
+  padding:0 10px;
+  max-height:150px;
+  overflow-y:auto;
+  text-align:left;
+}
+#userList li{
+  padding:5px 0;
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  border-bottom:1px solid rgba(0,0,0,0.2);
+}
+#userList li button{
+  padding:3px 6px;
+  border:none;
+  border-radius:5px;
+  background-color:#e74a3b;
+  color:white;
+  cursor:pointer;
+  font-size:12px;
+}
+#userList li button:hover{
+  background-color:#c0392b;
+}
+
 /* FORM TAMBAH USER & FILTER */
 .add-user-form, .filter-form{
   margin-bottom:15px;
