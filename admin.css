@@ -1,26 +1,111 @@
-/* RESET & BASE */
+/* RESET */
 * {margin:0;padding:0;box-sizing:border-box;}
-html, body {height:100%;font-family:'Segoe UI',sans-serif;background: linear-gradient(135deg, #4e73df, #1cc88a);display:flex;flex-direction:column;align-items:center;padding-top:20px;overflow-x:hidden;}
-.logo-container {margin-bottom:20px;}
-.logo-container img {width:180px;max-width:220px;height:auto;display:block;margin:0 auto;}
-.container {width:100%;max-width:900px;padding:20px;background:rgba(255,255,255,0.95);border-radius:12px;box-shadow:0 6px 15px rgba(0,0,0,0.1);text-align:center;}
-h1,h3{color:#333;margin-bottom:15px;}
-.filter-container{margin-bottom:15px;display:flex;justify-content:center;gap:10px;flex-wrap:wrap;}
-.filter-container label{font-weight:500;}
-.table-container{width:100%;overflow-x:auto;max-height:70vh;}
-#daftarAdmin{width:100%;border-collapse:collapse;min-width:700px;}
-#daftarAdmin thead th{background-color:#4e73df;color:white;padding:12px;text-align:left;position:sticky;top:0;z-index:1;}
-#daftarAdmin tbody td{padding:10px;border-bottom:1px solid #ddd;font-weight:500;}
-#daftarAdmin tbody tr:hover{background-color:#f6f6f6;}
-button.delete-btn{padding:5px 10px;border:none;border-radius:6px;background-color:#e74a3b;color:white;cursor:pointer;font-weight:bold;transition:0.2s;}
-button.delete-btn:hover{background-color:#c0392b;}
+html,body{
+  height:100%;
+  font-family:'Segoe UI',sans-serif;
+  background: linear-gradient(135deg,#4e73df,#1cc88a);
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  padding-top:20px;
+}
+
+/* LOGO */
+.logo-container{
+  margin-bottom:20px;
+}
+.logo-container img{
+  width:180px;
+  max-width:220px;
+  height:auto;
+  display:block;
+  margin:0 auto;
+}
+
+/* CONTAINER */
+.container{
+  width:100%;
+  max-width:800px;
+  padding:20px;
+  text-align:center;
+}
+
+/* JUDUL */
+h1,h2{
+  color:white;
+  margin-bottom:15px;
+}
+
+/* FORM TAMBAH USER & FILTER */
+.add-user-form, .filter-form{
+  margin-bottom:15px;
+}
+.add-user-form input{
+  padding:10px;
+  border-radius:10px;
+  border:none;
+  font-size:14px;
+}
+.add-user-form button{
+  padding:10px 20px;
+  border-radius:10px;
+  border:none;
+  cursor:pointer;
+  font-weight:bold;
+  background-color:#f6c23e;
+  color:black;
+  transition:0.3s;
+}
+.add-user-form button:hover{
+  background-color:#dda20a;
+}
+.filter-form select{
+  padding:10px;
+  border-radius:10px;
+  border:none;
+}
+
+/* TABLE */
+.table-container{
+  max-height:400px;
+  overflow-y:auto;
+  margin-top:10px;
+}
+table{
+  width:100%;
+  border-collapse:collapse;
+  background-color: rgba(255,255,255,0.95);
+  border-radius:10px;
+  overflow:hidden;
+}
+th,td{
+  padding:10px;
+  border-bottom:1px solid #ddd;
+  text-align:center;
+}
+th{
+  background-color:#f6c23e;
+  font-weight:bold;
+  color:black;
+}
+td button{
+  padding:5px 10px;
+  border:none;
+  border-radius:5px;
+  cursor:pointer;
+  font-weight:bold;
+  background-color:#e74a3b;
+  color:white;
+  transition:0.3s;
+}
+td button:hover{
+  background-color:#c0392b;
+}
 
 /* RESPONSIVE HP */
 @media(max-width:768px){
   .logo-container img{width:150px;}
-  #daftarAdmin{min-width:100%;}
-  h1{font-size:22px;}
-  h3{font-size:16px;}
-  .filter-container label,.filter-container select{font-size:14px;}
-  button.delete-btn{padding:4px 8px;font-size:12px;}
+  h1,h2{font-size:20px;}
+  .add-user-form input,.add-user-form button,.filter-form select{font-size:13px;}
+  th,td{padding:6px;}
 }
