@@ -93,15 +93,11 @@ li {
     width:
     
   .logo {
-    width: 25vw;          /* 25% dari lebar layar */
-    max-width: 120px;     /* maksimal 120px di laptop */
-    min-width: 70px;      /* biar nggak kekecilan */
-    margin-bottom: 20px;
-    filter: drop-shadow(0 6px 15px rgba(0, 0, 0, 0.25));
-    transition: transform 0.3s ease;
+    width: 100%;
+    max-width: 120px;
+    height: auto;
   }
-
-
+    
   .logo:hover {
     transform: scale(1.05);
   }
