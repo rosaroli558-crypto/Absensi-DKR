@@ -1,6 +1,7 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-import { getDatabase, ref, push, onValue } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
+import { getDatabase, ref, onValue, set, push } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
 
+// Konfigurasi Firebase
 const firebaseConfig = {
   apiKey: "AIzaSyC88eNtWMuOQ4eezVriirq_sjjVOkfl8K8",
   authDomain: "absensi-dkr.firebaseapp.com",
@@ -14,73 +15,68 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 const db = getDatabase(app);
 
-const daftarRef = ref(db, "absensi/");
-const daftarNamaRef = ref(db, "userList/");
-const daftar = document.getElementById("daftar");
 const namaSelect = document.getElementById("nama");
+const kegiatanSelect = document.getElementById("kegiatan");
+const daftar = document.getElementById("daftar");
 
-// Ambil daftar nama dari Firebase
-onValue(daftarNamaRef, snapshot=>{
+// Ambil nama user realtime
+const userRef = ref(db,"userList/");
+onValue(userRef, snapshot=>{
   const data = snapshot.val() || {};
   namaSelect.innerHTML = '<option value="">Pilih Nama</option>';
-  Object.keys(data).forEach(key=>{
+  Object.values(data).forEach(nama=>{
     const opt = document.createElement("option");
-    opt.value = key;
-    opt.textContent = data[key];
+    opt.value = nama;
+    opt.textContent = nama;
     namaSelect.appendChild(opt);
   });
 });
 
-// Tampilkan 5 data terakhir
-onValue(daftarRef, snapshot=>{
-  const data = snapshot.val();
-  daftar.innerHTML = "";
-  if(!data) return;
-
-  let dataArray = Object.values(data).sort((a,b)=>new Date(b.waktu)-new Date(a.waktu));
-  dataArray = dataArray.slice(0,5);
-
-  dataArray.forEach(p=>{
-    const li = document.createElement("li");
-    const waktu = new Date(p.waktu);
-    const waktuDisplay = `${waktu.toLocaleDateString('id-ID')} ${waktu.toLocaleTimeString('id-ID',{hour:'2-digit',minute:'2-digit'})}`;
-    li.textContent = `${p.nama} | ${p.kegiatan} | ${waktuDisplay}`;
-    daftar.appendChild(li);
-  });
+// Ambil data absensi realtime
+const absensiRef = ref(db,"absensi/");
+let allData = {};
+onValue(absensiRef, snapshot=>{
+  allData = snapshot.val() || {};
+  tampilkanDaftar();
 });
 
-// Fungsi absen
+// Fungsi absen (limit 4 per bulan per user)
 window.absen = function(){
   const nama = namaSelect.value;
-  const kegiatanInput = document.getElementById("kegiatan");
-  const kegiatan = kegiatanInput.value;
+  const kegiatan = kegiatanSelect.value;
+  if(!nama){ alert("Pilih nama"); return; }
 
-  if(!nama){ alert("Pilih nama dulu"); return; }
+  const sekarang = new Date();
+  const bulanIni = sekarang.getMonth();
+  const tahunIni = sekarang.getFullYear();
 
-  const now = new Date();
-  let count = 0;
+  // Hitung jumlah absensi user di bulan ini
+  const userAbsensi = Object.values(allData).filter(a=>{
+    const dt = new Date(a.waktu);
+    return a.nama===nama && dt.getMonth()===bulanIni && dt.getFullYear()===tahunIni;
+  });
 
-  onValue(daftarRef, snapshot=>{
-    const data = snapshot.val() || {};
-    Object.values(data).forEach(p=>{
-      const date = new Date(p.waktu);
-      if(p.nama === nama &&
-         date.getFullYear()===now.getFullYear() &&
-         date.getMonth()===now.getMonth()){
-           count++;
-      }
-    });
-  }, {onlyOnce:true});
+  if(userAbsensi.length>=4){
+    alert("User sudah melakukan 4 absensi bulan ini");
+    return;
+  }
 
-  setTimeout(()=>{
-    if(count>=4){
-      alert("User sudah absen 4 kali bulan ini");
-      return;
-    }
-    push(daftarRef,{
-      nama: nama,
-      kegiatan: kegiatan,
-      waktu: now.toISOString()
-    });
-  },100);
+  // Simpan
+  const key = push(ref(db,"absensi/")).key;
+  set(ref(db,"absensi/"+key),{
+    nama, kegiatan, waktu: sekarang.toISOString()
+  });
 };
+
+// Tampilkan daftar 5 terakhir
+function tampilkanDaftar(){
+  daftar.innerHTML="";
+  let arr = Object.values(allData).sort((a,b)=>new Date(b.waktu)-new Date(a.waktu));
+  arr = arr.slice(0,5);
+  arr.forEach(a=>{
+    const li = document.createElement("li");
+    const dt = new Date(a.waktu);
+    li.textContent = `${a.nama} | ${a.kegiatan} | ${dt.toLocaleDateString('id-ID')} ${dt.toLocaleTimeString('id-ID',{hour:'2-digit',minute:'2-digit'})}`;
+    daftar.appendChild(li);
+  });
+}
