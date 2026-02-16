@@ -1,7 +1,7 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
 import { getDatabase, ref, onValue, remove } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
 
-// Konfigurasi Firebase
+// 🔥 Konfigurasi Firebase
 const firebaseConfig = {
   apiKey: "AIzaSyC88eNtWMuOQ4eezVriirq_sjjVOkfl8K8",
   authDomain: "absensi-dkr.firebaseapp.com",
@@ -12,49 +12,54 @@ const firebaseConfig = {
   appId: "1:824325578551:web:3fa855eab199686e5d84b2"
 };
 
+// 🔥 Inisialisasi Firebase
 const app = initializeApp(firebaseConfig);
 const db = getDatabase(app);
 
-const daftarRef = ref(db, "absensi/");
+document.addEventListener("DOMContentLoaded", () => {
+  const daftarRef = ref(db, "absensi/");
+  const daftarBody = document.querySelector("#daftarAdmin tbody");
+  const totalSpan = document.getElementById("total");
 
-onValue(daftarRef, (snapshot) => {
+  onValue(daftarRef, (snapshot) => {
+    const data = snapshot.val();
+    daftarBody.innerHTML = "";
 
-  const data = snapshot.val();
-  const daftar = document.getElementById("daftarAdmin");
-  const total = document.getElementById("total");
+    if (!data) {
+      totalSpan.textContent = 0;
+      return;
+    }
 
-  daftar.innerHTML = "";
+    const sortedData = Object.entries(data).sort((a,b) => new Date(b[1].waktu) - new Date(a[1].waktu));
 
-  if (!data) {
-    total.textContent = 0;
-    return;
-  }
+    totalSpan.textContent = sortedData.length;
 
-  const keys = Object.keys(data);
-  total.textContent = keys.length;
+    sortedData.forEach(([id, peserta]) => {
+      const tr = document.createElement("tr");
 
-  keys.forEach((id) => {
+      // warna baris berdasarkan status
+      let bgColor = "";
+      switch(peserta.kegiatan){
+        case "Hadir": bgColor = "#d4edda"; break;
+        case "Izin": bgColor = "#fff3cd"; break;
+        case "Sakit":
+        case "Alfa": bgColor = "#f8d7da"; break;
+      }
+      tr.style.backgroundColor = bgColor;
 
-    const li = document.createElement("li");
+      tr.innerHTML = `
+        <td>${peserta.nama}</td>
+        <td>${peserta.kegiatan}</td>
+        <td>${peserta.waktu}</td>
+        <td><button class="delete-btn">Hapus</button></td>
+      `;
 
-    li.textContent =
-      data[id].nama +
-      " | " +
-      data[id].kegiatan +
-      " | " +
-      data[id].waktu;
+      // tombol hapus
+      tr.querySelector(".delete-btn").onclick = () => {
+        remove(ref(db, "absensi/" + id));
+      };
 
-    const btn = document.createElement("button");
-    btn.textContent = "Hapus";
-    btn.style.marginLeft = "10px";
-
-    btn.onclick = function() {
-      remove(ref(db, "absensi/" + id));
-    };
-
-    li.appendChild(btn);
-    daftar.appendChild(li);
-
+      daftarBody.appendChild(tr);
+    });
   });
-
 });
