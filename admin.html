@@ -13,14 +13,19 @@
   </div>
 
   <div class="container">
-
     <h1>Rekap Absensi DKR</h1>
-    <h3>Total Respons: <span id="total">0</span></h3>
 
-    <div class="filter-container">
+    <!-- Tambah nama user -->
+    <div class="add-user-form">
+      <input type="text" id="newUser" placeholder="Nama baru">
+      <button id="addUserBtn">Tambah User</button>
+    </div>
+
+    <!-- Filter bulan -->
+    <div class="filter-form">
       <label for="bulan">Filter Bulan:</label>
       <select id="bulan">
-        <option value="all">Semua Bulan</option>
+        <option value="all">Semua</option>
         <option value="0">Januari</option>
         <option value="1">Februari</option>
         <option value="2">Maret</option>
@@ -36,17 +41,19 @@
       </select>
     </div>
 
+    <h2>Total Respons: <span id="total">0</span></h2>
+
     <div class="table-container">
-      <table id="daftarAdmin">
+      <table id="rekapTable">
         <thead>
           <tr>
             <th>Nama</th>
-            <th>Status</th>
+            <th>Kegiatan</th>
             <th>Waktu</th>
             <th>Aksi</th>
           </tr>
         </thead>
-        <tbody></tbody>
+        <tbody id="daftarAdmin"></tbody>
       </table>
     </div>
 
