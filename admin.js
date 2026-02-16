@@ -1,5 +1,6 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
 import { getDatabase, ref, onValue, push, remove } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
+import * as XLSX from "https://cdn.sheetjs.com/xlsx-latest/package/dist/xlsx.full.min.js";
 
 // 🔹 Firebase Config
 const firebaseConfig = {
@@ -22,19 +23,20 @@ const bulanSelect = document.getElementById("bulan");
 const addUserBtn = document.getElementById("addUserBtn");
 const newUserInput = document.getElementById("newUser");
 const userListUl = document.getElementById("userList");
+const exportBtn = document.getElementById("exportExcel");
 
 // 🔹 References
 const absensiRef = ref(db,"absensi/");
 const userRef = ref(db,"userList/");
 
-// Tambah user
+// 🔹 Tambah user
 addUserBtn.addEventListener("click", ()=>{
   const nama = newUserInput.value.trim();
   if(!nama){ alert("Nama kosong"); return; }
   push(userRef, nama).then(()=> newUserInput.value="");
 });
 
-// Daftar user realtime, urut A-Z
+// 🔹 Daftar user realtime, urut A→Z
 onValue(userRef, snapshot=>{
   const data = snapshot.val() || {};
   userListUl.innerHTML = "";
@@ -56,17 +58,17 @@ onValue(userRef, snapshot=>{
   });
 });
 
-// Ambil data absensi realtime
+// 🔹 Ambil data absensi realtime
 let allData = {};
 onValue(absensiRef, snapshot=>{
   allData = snapshot.val() || {};
   tampilkanDaftar();
 });
 
-// Filter bulan
+// 🔹 Filter bulan
 bulanSelect.addEventListener("change", tampilkanDaftar);
 
-// Fungsi tampilkan daftar
+// 🔹 Fungsi tampilkan daftar
 function tampilkanDaftar(){
   daftarBody.innerHTML="";
   let dataArray = Object.entries(allData).map(([id,p])=>({
@@ -154,3 +156,18 @@ function showModal(msg, callback){
   modal.appendChild(box);
   document.body.appendChild(modal);
 }
+
+// 🔹 Ekspor ke Excel
+exportBtn.addEventListener("click", ()=>{
+  const rows = [["Nama","Kegiatan","Waktu"]];
+  const trList = daftarBody.querySelectorAll("tr");
+  trList.forEach(tr=>{
+    const tds = tr.querySelectorAll("td");
+    rows.push([tds[0].textContent, tds[1].textContent, tds[2].textContent]);
+  });
+
+  const ws = XLSX.utils.aoa_to_sheet(rows);
+  const wb = XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(wb, ws, "Absensi");
+  XLSX.writeFile(wb, "Rekap_Absensi_DKR.xlsx");
+});
