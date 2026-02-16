@@ -91,10 +91,13 @@ li {
     width:
     
   .logo {
-    width: 100%;
-    max-width: 120px;
+    display: block;
+    width: 90%;
+    max-width: 420px;
     height: auto;
+    margin: 0 auto 15px auto;
   }
+
     
   .logo:hover {
     transform: scale(1.05);
