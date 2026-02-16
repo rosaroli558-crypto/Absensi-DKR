@@ -1,4 +1,6 @@
 // Kirim data
+import { set } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
+
 window.absen = function() {
   const nama = document.getElementById("nama").value.trim();
 
@@ -7,7 +9,7 @@ window.absen = function() {
     return;
   }
 
-  push(ref(db, "absensi/"), {
+  set(ref(db, "absensi/" + nama), {
     nama: nama,
     waktu: new Date().toLocaleString()
   });
