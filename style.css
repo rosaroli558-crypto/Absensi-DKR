@@ -89,3 +89,14 @@ li {
 
   ul {
     width:
+    
+  .logo {
+    width: 120px;
+    margin-bottom: 25px;
+    filter: drop-shadow(0 6px 15px rgba(0, 0, 0, 0.25));
+    transition: transform 0.3s ease;
+  }
+
+  .logo:hover {
+    transform: scale(1.05);
+  }
