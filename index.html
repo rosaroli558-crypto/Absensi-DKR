@@ -15,32 +15,33 @@
 
     <h1>Absensi Kegiatan</h1>
     
-  <div class="absen-form">
-    <input type="text" id="nama" placeholder="Masukkan Nama">
-    <select id="kegiatan">
-      <option value="Hadir">Hadir</option>
-      <option value="Izin">Izin</option>
-      <option value="Sakit">Sakit</option>
-      <option value="Alfa">Alfa</option>
-    </select>
-    <button onclick="absen()">Absen</button>
+    <div class="absen-form">
+      <input type="text" id="nama" placeholder="Masukkan Nama">
+      <select id="kegiatan">
+        <option value="Hadir">Hadir</option>
+        <option value="Izin">Izin</option>
+        <option value="Sakit">Sakit</option>
+        <option value="Alfa">Alfa</option>
+      </select>
+      <button onclick="absen()">Absen</button>
+    </div>
+
+    <h2>Daftar Hadir</h2>
+    <div class="table-container">
+      <table id="daftar">
+        <thead>
+          <tr>
+            <th>Nama</th>
+            <th>Status</th>
+            <th>Waktu</th>
+          </tr>
+        </thead>
+        <tbody></tbody>
+      </table>
+    </div>
+
   </div>
 
-  <h2>Daftar Hadir</h2>
-  <div class="table-container">
-    <table id="daftar">
-      <thead>
-        <tr>
-          <th>Nama</th>
-          <th>Status</th>
-          <th>Waktu</th>
-        </tr>
-      </thead>
-      <tbody></tbody>
-    </table>
-  </div>
-
-  </div>
   <script type="module" src="script.js"></script>
 </body>
 </html>
