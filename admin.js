@@ -41,7 +41,6 @@ function tampilkanRekap(){
 
   totalSpan.textContent = dataArray.length;
 
-  // Sort terbaru di atas
   dataArray.sort((a,b)=>b.date - a.date);
 
   dataArray.forEach(p=>{
