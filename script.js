@@ -16,15 +16,19 @@ const app = initializeApp(firebaseConfig);
 const db = getDatabase(app);
 
 const daftarRef = ref(db, "absensi/");
+const daftar = document.getElementById("daftar");
 
 // Tampilkan data realtime
-const daftar = document.getElementById("daftar");
 onValue(daftarRef, snapshot => {
   const data = snapshot.val();
   daftar.innerHTML = "";
   if (!data) return;
 
-  const dataArray = Object.values(data).sort((a, b) => new Date(b.waktu) - new Date(a.waktu));
+  // Sort terbaru di atas
+  let dataArray = Object.values(data).sort((a, b) => new Date(b.waktu) - new Date(a.waktu));
+
+  // Ambil 5 data terakhir saja
+  dataArray = dataArray.slice(0, 5);
 
   dataArray.forEach(p => {
     const li = document.createElement("li");
@@ -35,7 +39,7 @@ onValue(daftarRef, snapshot => {
   });
 });
 
-// Fungsi absen
+// Fungsi absen tetap sama
 window.absen = function() {
   const namaInput = document.getElementById("nama");
   const kegiatanInput = document.getElementById("kegiatan");
@@ -44,8 +48,9 @@ window.absen = function() {
   const kegiatan = kegiatanInput.value;
   if(!nama){ alert("Nama wajib diisi"); return; }
 
-  // Hitung absensi user bulan ini
   const now = new Date();
+
+  // Hitung absensi user bulan ini
   let count = 0;
   onValue(daftarRef, snapshot => {
     const data = snapshot.val() || {};
@@ -72,5 +77,5 @@ window.absen = function() {
     });
 
     namaInput.value = "";
-  }, 100); // timeout untuk menunggu onValue selesai
+  }, 100);
 };
