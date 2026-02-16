@@ -1,8 +1,9 @@
 /* Reset dasar */
 html, body {
-  height: 100%;
   margin: 0;
   padding: 0;
+  width: 100%;
+  min-heigh: 100vh;
 }
 
 /* Body utama */
@@ -11,15 +12,12 @@ body {
   background: linear-gradient(135deg, #4e73df, #1cc88a);
   background-repeat: no-repeat;
   background-size: cover;
-  min-height: 100vh;
 
   display: flex;
   flex-direction: column;
   align-items: center;
   padding: 40px 20px;
   box-sizing: border-box;
-  text-align: center;
-
 }
 
 /* Judul */
