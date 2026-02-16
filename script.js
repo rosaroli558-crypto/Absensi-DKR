@@ -17,25 +17,22 @@ const app = initializeApp(firebaseConfig);
 const db = getDatabase(app);
 
 // =======================================
-// ✅ FUNGSI ABSEN (Tidak Bisa Dobel)
+// ✅ FUNGSI ABSEN
 // =======================================
 window.absen = function() {
-
   const namaInput = document.getElementById("nama");
   const kegiatanInput = document.getElementById("kegiatan");
 
   let nama = namaInput.value.trim();
   const kegiatan = kegiatanInput.value;
 
-  if (nama === "") {
+  if (!nama) {
     alert("Nama wajib diisi");
     return;
   }
 
-  // Supaya tidak case sensitive
   const idNama = nama.toLowerCase();
 
-  // Simpan / Update data (bukan push)
   set(ref(db, "absensi/" + idNama), {
     nama: nama,
     kegiatan: kegiatan,
@@ -48,28 +45,23 @@ window.absen = function() {
 // =======================================
 // ✅ TAMPILKAN DATA REALTIME
 // =======================================
-const daftarRef = ref(db, "absensi/");
-
-onValue(daftarRef, (snapshot) => {
-
-  const data = snapshot.val();
+document.addEventListener("DOMContentLoaded", () => {
+  const daftarRef = ref(db, "absensi/");
   const daftar = document.getElementById("daftar");
 
-  daftar.innerHTML = "";
+  onValue(daftarRef, (snapshot) => {
+    const data = snapshot.val();
+    daftar.innerHTML = ""; // reset daftar
 
-  if (!data) return;
+    if (!data) return;
 
-  for (let id in data) {
-    const li = document.createElement("li");
+    // Urutkan data berdasarkan waktu (terbaru di atas)
+    const sortedData = Object.values(data).sort((a, b) => new Date(b.waktu) - new Date(a.waktu));
 
-    li.textContent =
-      data[id].nama +
-      " | " +
-      data[id].kegiatan +
-      " | " +
-      data[id].waktu;
-
-    daftar.appendChild(li);
-  }
-
+    sortedData.forEach((peserta) => {
+      const li = document.createElement("li");
+      li.textContent = `${peserta.nama} | ${peserta.kegiatan} | ${peserta.waktu}`;
+      daftar.appendChild(li);
+    });
+  });
 });
