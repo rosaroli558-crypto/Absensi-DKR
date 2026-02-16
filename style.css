@@ -1,106 +1,109 @@
-/* Reset dasar */
-html, body {
-  height: 100%;
+/* RESET */
+* {
   margin: 0;
   padding: 0;
-}
-
-body {
-  font-family: Arial, sans-serif;
-  background: linear-gradient(135deg, #4e73df, #1cc88a);
-  background-repeat: no-repeat;
-  background-size: cover;
-
-  min-height: 100vh;
-
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-
-  padding: 40px 20px;
   box-sizing: border-box;
 }
 
+html, body {
+  height: 100%;
+  font-family: 'Segoe UI', sans-serif;
+  overflow-x: hidden;
+}
 
-/* Judul */
-h2 {
-  color: white;
-  margin-bottom: 20px;
+/* BACKGROUND UTAMA */
+body {
+  min-height: 100vh;
+  background: linear-gradient(135deg, #4e73df, #1cc88a);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
   text-align: center;
 }
 
-/* Form input & select */
-input, select {
-  padding: 12px;
-  margin: 8px 0;
-  border-radius: 10px;
-  border: none;
-  width: 250px;
-  max-width: 100%;
-  font-size: 14px;
-  box-sizing: border-box;
+/* CONTAINER UTAMA */
+.container {
+  width: 100%;
+  max-width: 500px;
+  padding: 20px;
 }
 
-/* Tombol */
-button {
-  padding: 12px 20px;
+/* LOGO */
+.logo-container {
+  margin-bottom: 20px;
+}
+
+.logo-container img {
+  width: 100%;
+  max-width: 500px; /* Laptop */
+  height: auto;
+  object-fit: contain;
+}
+
+/* JUDUL */
+h1 {
+  color: white;
+  margin-bottom: 20px;
+  font-size: 28px;
+}
+
+/* INPUT */
+input, select {
+  width: 100%;
+  padding: 12px;
+  margin-bottom: 15px;
   border-radius: 10px;
   border: none;
+  font-size: 14px;
+}
+
+/* BUTTON */
+button {
   background-color: #f6c23e;
+  color: black;
+  padding: 10px 25px;
+  border-radius: 10px;
+  border: none;
   cursor: pointer;
   font-weight: bold;
-  transition: 0.3s ease;
-  margin-top: 8px;
+  margin-bottom: 20px;
+  transition: 0.3s;
 }
 
 button:hover {
   background-color: #dda20a;
-  transform: scale(1.05);
 }
 
-/* Daftar hadir */
-ul {
-  list-style: none;
-  padding: 0;
-  margin-top: 20px;
-  width: 100%;
-  max-width: 320px;
-}
-
-/* Item list */
-li {
-  background: white;
+/* DAFTAR HADIR */
+h2 {
+  color: black;
   margin-top: 10px;
-  padding: 12px;
-  border-radius: 10px;
-  font-size: 14px;
-  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
-  word-wrap: break-word;
 }
 
-/* Responsif untuk HP */
-@media (max-width: 600px) {
+/* ========================= */
+/* RESPONSIVE HP */
+/* ========================= */
+
+@media (max-width: 768px) {
 
   body {
-    padding: 25px 15px;
+    padding: 20px;
+  }
+
+  .logo-container img {
+    max-width: 300px; /* Diperkecil di HP */
+  }
+
+  h1 {
+    font-size: 22px;
   }
 
   input, select {
-    width: 100%;
+    font-size: 13px;
   }
 
-  ul {
-    width:
-    
-  .logo {
-    display: block;
-    width: 90%;
-    max-width: 420px;
-    height: auto;
-    margin: 0 auto 15px auto;
+  button {
+    padding: 8px 20px;
   }
-
-    
-  .logo:hover {
-    transform: scale(1.05);
-  }
+}
