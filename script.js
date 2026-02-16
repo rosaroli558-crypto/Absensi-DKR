@@ -70,6 +70,8 @@ document.addEventListener("DOMContentLoaded", () => {
           bgColor = "#fff3cd"; // kuning
           break;
         case "Sakit":
+          bgColor = "#fff3cd"; // kuning
+          break;
         case "Alfa":
           bgColor = "#f8d7da"; // merah
           break;
