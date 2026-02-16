@@ -9,19 +9,28 @@ html, body {
   height: 100%;
   font-family: 'Segoe UI', sans-serif;
   overflow-x: hidden;
-}
-
-/* ===== BACKGROUND ===== */
-body {
-  min-height: 100vh;
   background: linear-gradient(135deg, #4e73df, #1cc88a);
   display: flex;
   justify-content: center;
-  align-items: flex-start;
+  flex-direction: column;
+  align-items: center;
   padding-top: 20px;
 }
 
-/* ===== CONTAINER ===== */
+/* ===== LOGO DI LUAR CONTAINER PUTIH ===== */
+.logo-container {
+  margin-bottom: 20px;
+}
+
+.logo-container img {
+  width: 180px;
+  max-width: 220px;
+  height: auto;
+  display: block;
+  margin: 0 auto;
+}
+
+/* ===== CONTAINER PUTIH ===== */
 .container {
   width: 100%;
   max-width: 800px;
@@ -30,20 +39,6 @@ body {
   border-radius: 12px;
   box-shadow: 0 6px 15px rgba(0,0,0,0.1);
   text-align: center;
-}
-
-/* ===== LOGO ===== */
-.logo-container {
-  margin-bottom: 20px;
-}
-
-.logo-container img {
-  width: 150px; /* versi sebelumnya kecil, sekarang lebih besar */
-  max-width: 200px;
-  height: auto;
-  object-fit: contain;
-  display: block;
-  margin: 0 auto 10px auto; /* center */
 }
 
 /* ===== JUDUL ===== */
@@ -67,7 +62,7 @@ h3 {
 #daftarAdmin {
   width: 100%;
   border-collapse: collapse;
-  min-width: 500px; /* tetap scrollable di layar kecil */
+  min-width: 500px;
 }
 
 #daftarAdmin thead th {
@@ -106,7 +101,7 @@ h3 {
 @media (max-width: 768px) {
 
   .logo-container img {
-    width: 180px; /* lebih besar di HP juga */
+    width: 200px;
     max-width: 220px;
   }
 
@@ -114,9 +109,8 @@ h3 {
     min-width: 100%;
   }
 
-  /* Buat tetap terlihat seperti tabel di HP */
   #daftarAdmin, #daftarAdmin thead, #daftarAdmin tbody, #daftarAdmin th, #daftarAdmin td, #daftarAdmin tr {
-    display: table; /* jangan block, agar tetap tabel */
+    display: table; /* tetap tabel di HP */
   }
 
   #daftarAdmin thead th, #daftarAdmin tbody td {
