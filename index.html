@@ -4,33 +4,37 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Absensi DKR</title>
-  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="user.css">
 </head>
 <body>
 
-  <!-- Logo besar -->
   <div class="logo-container">
     <img src="logo.png" alt="Logo">
   </div>
 
   <div class="container">
-    <h1>Absensi Kegiatan</h1>
+    <h1>Absensi Kegiatan DKR</h1>
 
     <div class="absen-form">
-      <input type="text" id="nama" placeholder="Masukkan Nama">
+      <select id="nama">
+        <option value="">Pilih Nama</option>
+      </select>
+
       <select id="kegiatan">
         <option value="Hadir">Hadir</option>
         <option value="Izin">Izin</option>
         <option value="Sakit">Sakit</option>
         <option value="Alfa">Alfa</option>
       </select>
+
       <button onclick="absen()">Absen</button>
     </div>
 
-    <h2>Daftar Hadir</h2>
+    <h2>Daftar Hadir (5 terakhir)</h2>
     <ul id="daftar"></ul>
+
   </div>
 
-  <script type="module" src="script.js"></script>
+  <script type="module" src="user.js"></script>
 </body>
 </html>
