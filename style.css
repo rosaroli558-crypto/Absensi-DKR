@@ -51,3 +51,18 @@ li {
   box-shadow: 0 4px 8px rgba(0,0,0,0.1);
 }
 
+@media (max-width: 600px) {
+  body {
+    padding: 20px;
+  }
+
+  input, select {
+    width: 100%;
+    max-width: 300px;
+  }
+
+  ul {
+    width: 100%;
+    max-width: 300px;
+  }
+}
