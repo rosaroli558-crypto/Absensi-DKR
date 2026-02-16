@@ -18,6 +18,8 @@ body {
   align-items: center;
   padding: 40px 20px;
   box-sizing: border-box;
+  text-align: center;
+
 }
 
 /* Judul */
@@ -91,11 +93,14 @@ li {
     width:
     
   .logo {
-    width: 120px;
-    margin-bottom: 25px;
+    width: 25vw;          /* 25% dari lebar layar */
+    max-width: 120px;     /* maksimal 120px di laptop */
+    min-width: 70px;      /* biar nggak kekecilan */
+    margin-bottom: 20px;
     filter: drop-shadow(0 6px 15px rgba(0, 0, 0, 0.25));
     transition: transform 0.3s ease;
   }
+
 
   .logo:hover {
     transform: scale(1.05);
