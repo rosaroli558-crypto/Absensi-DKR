@@ -1,20 +1,21 @@
 <!DOCTYPE html>
 <html lang="id">
 <head>
+  <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Absensi Dewan Kerja Ranting Batulicin 2025-2028</title>
+  <title>Absensi DKR</title>
   <link rel="stylesheet" href="style.css">
 </head>
-
 <body>
+
+  <!-- Logo besar -->
+  <div class="logo-container">
+    <img src="logo.png" alt="Logo">
+  </div>
+
   <div class="container">
-
-    <div class="logo-container">
-      <img src="logo.png" alt="Logo">
-    </div>
-
     <h1>Absensi Kegiatan</h1>
-    
+
     <div class="absen-form">
       <input type="text" id="nama" placeholder="Masukkan Nama">
       <select id="kegiatan">
@@ -27,19 +28,7 @@
     </div>
 
     <h2>Daftar Hadir</h2>
-    <div class="table-container">
-      <table id="daftar">
-        <thead>
-          <tr>
-            <th>Nama</th>
-            <th>Status</th>
-            <th>Waktu</th>
-          </tr>
-        </thead>
-        <tbody></tbody>
-      </table>
-    </div>
-
+    <ul id="daftar"></ul>
   </div>
 
   <script type="module" src="script.js"></script>
