@@ -1,15 +1,36 @@
 <!DOCTYPE html>
-<html>
+<html lang="id">
 <head>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Admin Absensi</title>
+  <link rel="stylesheet" href="admin.css">
 </head>
 <body>
 
-  <h2>Halaman Admin</h2>
+  <div class="container">
 
-  <h3>Total Hadir: <span id="total">0</span></h3>
+    <div class="logo-container">
+      <img src="logo.png" alt="Logo">
+    </div>
 
-  <ul id="daftarAdmin"></ul>
+    <h1>Halaman Admin Absensi</h1>
+    <h3>Total Hadir: <span id="total">0</span></h3>
+
+    <div class="table-container">
+      <table id="daftarAdmin">
+        <thead>
+          <tr>
+            <th>Nama</th>
+            <th>Status</th>
+            <th>Waktu</th>
+            <th>Aksi</th>
+          </tr>
+        </thead>
+        <tbody></tbody>
+      </table>
+    </div>
+
+  </div>
 
   <script type="module" src="admin.js"></script>
 </body>
