@@ -1,7 +1,8 @@
+// Import Firebase modular SDK
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
 import { getDatabase, ref, onValue } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
 
-// Firebase config
+// 🔹 Konfigurasi Firebase
 const firebaseConfig = {
   apiKey: "AIzaSyC88eNtWMuOQ4eezVriirq_sjjVOkfl8K8",
   authDomain: "absensi-dkr.firebaseapp.com",
@@ -9,44 +10,48 @@ const firebaseConfig = {
   projectId: "absensi-dkr",
   storageBucket: "absensi-dkr.firebasestorage.app",
   messagingSenderId: "824325578551",
-  appId: "1:824325578551:web:3fa855eab199686e5d84b2"
+  appId: "1:824325578551:web:3fa855eab199686e5d84b2",
+  measurementId: "G-MYTKHS8FHM"
 };
 
+// 🔹 Initialize Firebase
 const app = initializeApp(firebaseConfig);
 const db = getDatabase(app);
 
+// Ambil elemen tabel & filter
 const daftarBody = document.querySelector("#daftarAdmin tbody");
 const totalSpan = document.getElementById("total");
 const bulanSelect = document.getElementById("bulan");
 
 let dataGlobal = {};
 
-// Ambil data real-time
+// 🔹 Ambil data realtime dari Firebase
 onValue(ref(db, "absensi/"), (snapshot) => {
   dataGlobal = snapshot.val() || {};
   tampilkanRekap();
 });
 
-// Event filter bulan
+// 🔹 Event filter bulan
 bulanSelect.addEventListener("change", tampilkanRekap);
 
+// 🔹 Fungsi tampilkan rekap per user per bulan
 function tampilkanRekap() {
   daftarBody.innerHTML = "";
 
   const selectedBulan = bulanSelect.value;
 
-  // Konversi ke array & parsing tanggal
+  // 1️⃣ Konversi ke array & parsing tanggal
   let dataArray = Object.values(dataGlobal).map(p => ({
     ...p,
     date: new Date(p.waktu)
   }));
 
-  // Filter bulan
+  // 2️⃣ Filter bulan
   if(selectedBulan !== "all") {
     dataArray = dataArray.filter(p => p.date.getMonth() === parseInt(selectedBulan));
   }
 
-  // Rekap per user
+  // 3️⃣ Rekap per user
   const rekapPerUser = {};
   dataArray.forEach(p => {
     if(!rekapPerUser[p.nama]){
@@ -66,9 +71,10 @@ function tampilkanRekap() {
 
   const rekapArray = Object.values(rekapPerUser);
 
+  // 4️⃣ Update total respons
   totalSpan.textContent = rekapArray.length;
 
-  // Tampilkan tabel
+  // 5️⃣ Tampilkan tabel
   rekapArray.forEach(user => {
     const tr = document.createElement("tr");
 
