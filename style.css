@@ -9,7 +9,8 @@ html, body {
 body {
   font-family: Arial, sans-serif;
   background: linear-gradient(135deg, #4e73df, #1cc88a);
-  background-attachment: fixed;
+  background-repeat: no-repeat;
+  background-size: cover;
   min-height: 100vh;
 
   display: flex;
