@@ -1,26 +1,34 @@
-// ==========================
-// FIREBASE CONFIG
-// ==========================
+// ===============================
+// IMPORT FIREBASE (CDN VERSION)
+// ===============================
 
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
 import { getDatabase, ref, push, onValue, remove } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
 
+// ===============================
+// FIREBASE CONFIG
+// ===============================
+
 const firebaseConfig = {
-  apiKey: "API_KEY_KAMU",
-  authDomain: "absensi-dkr-default.firebaseapp.com",
-  databaseURL: "https://absensi-dkr-default-default-rtdb.asia-southeast1.firebasedatabase.app",
-  projectId: "absensi-dkr-default",
-  storageBucket: "absensi-dkr-default.appspot.com",
-  messagingSenderId: "MESSAGING_ID_KAMU",
-  appId: "APP_ID_KAMU"
+  apiKey: "AIzaSyC88eNtWMuOQ4eezVriirq_sjjVOkfl8K8",
+  authDomain: "absensi-dkr.firebaseapp.com",
+  databaseURL: "https://absensi-dkr-default-rtdb.asia-southeast1.firebasedatabase.app",
+  projectId: "absensi-dkr",
+  storageBucket: "absensi-dkr.firebasestorage.app",
+  messagingSenderId: "824325578551",
+  appId: "1:824325578551:web:3fa855eab199686e5d84b2"
 };
+
+// ===============================
+// INIT FIREBASE
+// ===============================
 
 const app = initializeApp(firebaseConfig);
 const db = getDatabase(app);
 
-// ==========================
-// USER MANAGEMENT
-// ==========================
+// ===============================
+// USER SECTION
+// ===============================
 
 const userRef = ref(db, "users");
 
@@ -53,15 +61,15 @@ window.addUser = function() {
 
   push(userRef, { name });
   input.value = "";
-}
+};
 
 window.deleteUser = function(id) {
   remove(ref(db, "users/" + id));
-}
+};
 
-// ==========================
-// ABSENSI TABLE
-// ==========================
+// ===============================
+// ABSENSI SECTION
+// ===============================
 
 const absenRef = ref(db, "absensi");
 
@@ -98,4 +106,4 @@ onValue(absenRef, snapshot => {
 
 window.deleteAbsensi = function(id) {
   remove(ref(db, "absensi/" + id));
-}
+};
