@@ -1,7 +1,7 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-import { getDatabase, ref, set, onValue, push, remove } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
+import { getDatabase, ref, onValue, push, remove } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
 
-// Firebase config
+// 🔹 Firebase config
 const firebaseConfig = {
   apiKey: "AIzaSyC88eNtWMuOQ4eezVriirq_sjjVOkfl8K8",
   authDomain: "absensi-dkr.firebaseapp.com",
@@ -15,7 +15,7 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 const db = getDatabase(app);
 
-// Elements
+// 🔹 Elements
 const daftarBody = document.querySelector("#daftarAdmin tbody");
 const totalSpan = document.getElementById("total");
 const bulanSelect = document.getElementById("bulan");
@@ -24,7 +24,7 @@ const newUserInput = document.getElementById("newUser");
 const userListUl = document.getElementById("userList");
 const exportBtn = document.getElementById("exportExcel");
 
-// References
+// 🔹 References
 const absensiRef = ref(db,"absensi/");
 const userRef = ref(db,"userList/");
 
@@ -39,19 +39,21 @@ addUserBtn.addEventListener("click", ()=>{
 onValue(userRef, snapshot=>{
   const data = snapshot.val() || {};
   userListUl.innerHTML = "";
-  Object.entries(data).sort((a,b)=> a[1].localeCompare(b[1])).forEach(([key,nama])=>{
-    const li = document.createElement("li");
-    li.textContent = nama;
 
-    // 🔹 Hapus user langsung di element
-    const btn = document.createElement("button");
-    btn.textContent = "Hapus";
-    btn.addEventListener("click", ()=>{
-      if(confirm(`Hapus user "${nama}"?`)) remove(ref(db,"userList/"+key));
-    });
+  Object.entries(data)
+    .sort((a,b)=> a[1].localeCompare(b[1]))
+    .forEach(([key,nama])=>{
+      const li = document.createElement("li");
+      li.textContent = nama + " ";
 
-    li.appendChild(btn);
-    userListUl.appendChild(li);
+      const btn = document.createElement("button");
+      btn.textContent = "Hapus";
+      btn.addEventListener("click", ()=>{
+        if(confirm(`Hapus user "${nama}"?`)) remove(ref(db,"userList/"+key));
+      });
+
+      li.appendChild(btn);
+      userListUl.appendChild(li);
   });
 });
 
@@ -95,21 +97,29 @@ function tampilkanDaftar(){
 
     const tr = document.createElement("tr");
 
+    // Warna baris sesuai status
     let bgColor="";
     switch(p.kegiatan){
       case "Hadir": bgColor="#d4edda"; break;
-      case "Izin": bgColor="#fff3cd"; break;
+      case "Izin":
       case "Sakit": bgColor="#fff3cd"; break;
       case "Alfa": bgColor="#f8d7da"; break;
     }
     tr.style.backgroundColor = bgColor;
 
+    // Nama
     const tdNama = document.createElement("td");
     tdNama.textContent = p.nama;
+
+    // Kegiatan
     const tdKegiatan = document.createElement("td");
     tdKegiatan.textContent = p.kegiatan;
+
+    // Waktu
     const tdWaktu = document.createElement("td");
     tdWaktu.textContent = `${p.date.toLocaleDateString('id-ID')} ${p.date.toLocaleTimeString('id-ID',{hour:'2-digit',minute:'2-digit'})}`;
+
+    // Aksi Hapus per entry
     const tdAksi = document.createElement("td");
     const delBtn = document.createElement("button");
     delBtn.textContent = "Hapus";
@@ -118,6 +128,7 @@ function tampilkanDaftar(){
     });
     tdAksi.appendChild(delBtn);
 
+    // Append td ke tr
     tr.appendChild(tdNama);
     tr.appendChild(tdKegiatan);
     tr.appendChild(tdWaktu);
