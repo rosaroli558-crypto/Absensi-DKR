@@ -2,25 +2,25 @@
   margin:0;
   padding:0;
   box-sizing:border-box;
-  font-family:'Segoe UI',sans-serif;
+  font-family:Segoe UI, sans-serif;
 }
 
 body{
   min-height:100vh;
-  background: linear-gradient(135deg,#4e73df,#1cc88a);
-  padding:30px;
+  background:linear-gradient(135deg,#4e73df,#1cc88a);
+  padding:40px;
 }
 
+/* TITLE */
 h2{
   text-align:center;
   color:white;
   margin-bottom:30px;
 }
 
-/* LAYOUT 2 KOLOM */
+/* LAYOUT */
 .layout{
-  display:grid;
-  grid-template-columns: 300px 1fr;
+  display:flex;
   gap:30px;
   max-width:1300px;
   margin:auto;
@@ -28,17 +28,24 @@ h2{
 
 /* SIDEBAR */
 .sidebar{
-  height:fit-content;
+  width:300px;
+}
+
+/* MAIN AREA */
+.main-area{
+  flex:1;
 }
 
 /* CARD */
 .card{
   background:white;
-  border-radius:15px;
-  box-shadow:0 10px 25px rgba(0,0,0,0.15);
   padding:20px;
+  border-radius:15px;
+  box-shadow:0 8px 20px rgba(0,0,0,0.15);
+  margin-bottom:20px;
 }
 
+/* HEADINGS */
 .card h3{
   margin-bottom:15px;
   color:#4e73df;
@@ -48,9 +55,9 @@ h2{
 input, select{
   width:100%;
   padding:10px;
+  margin-bottom:10px;
   border-radius:8px;
   border:1px solid #ddd;
-  margin-bottom:10px;
 }
 
 /* BUTTON */
@@ -102,10 +109,6 @@ button:hover{
 }
 
 /* TABLE */
-.table-card{
-  margin-top:20px;
-}
-
 table{
   width:100%;
   border-collapse:collapse;
@@ -127,12 +130,16 @@ tbody tr:nth-child(even){
 }
 
 tbody tr:hover{
-  background:#f1f4ff;
+  background:#eef3ff;
 }
 
 /* RESPONSIVE */
 @media(max-width:900px){
   .layout{
-    grid-template-columns:1fr;
+    flex-direction:column;
+  }
+
+  .sidebar{
+    width:100%;
   }
 }
