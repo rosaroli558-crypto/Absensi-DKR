@@ -1,124 +1,58 @@
-* {margin:0;padding:0;box-sizing:border-box;}
-
-html,body{
-  height:100%;
-  font-family:'Segoe UI',sans-serif;
-  background: linear-gradient(135deg,#4e73df,#1cc88a);
-  display:flex;
-  justify-content:center;
-  padding-top:20px;
+body{
+  font-family: Arial, sans-serif;
+  background:#f4f6f9;
+  padding:30px;
 }
 
-.container{
-  width:100%;
-  max-width:1000px;
-  padding:20px;
+h2{
   text-align:center;
+  margin-bottom:20px;
 }
 
-.logo-container img{
-  width:160px;
-  margin-bottom:15px;
-}
-
-h1{
-  color:white;
-  margin-bottom:15px;
-}
-
-.controls{
+.filter-box{
   display:flex;
-  flex-wrap:wrap;
   gap:10px;
-  justify-content:center;
-  margin-bottom:15px;
+  margin-bottom:20px;
+  flex-wrap:wrap;
 }
 
-.controls select,
-.controls input{
+.filter-box input,
+.filter-box select{
   padding:8px;
-  border-radius:8px;
+  border:1px solid #ccc;
+  border-radius:6px;
+}
+
+button{
+  padding:8px 14px;
   border:none;
-}
-
-.controls button{
-  padding:8px 15px;
-  border-radius:8px;
-  border:none;
-  background:#f6c23e;
-  font-weight:bold;
-  cursor:pointer;
-}
-
-.add-user{
-  margin-bottom:15px;
-}
-
-.add-user input{
-  padding:8px;
-  border-radius:8px;
-  border:none;
-}
-
-.add-user button{
-  padding:8px 15px;
-  border-radius:8px;
-  border:none;
-  background:#f6c23e;
-  font-weight:bold;
-  cursor:pointer;
-}
-
-#userList{
-  list-style:none;
-  margin-bottom:15px;
-  max-height:150px;
-  overflow:auto;
-}
-
-#userList li{
-  display:flex;
-  justify-content:space-between;
-  padding:5px 0;
-}
-
-#userList button{
-  background:#e74a3b;
-  border:none;
+  background:#1e88e5;
   color:white;
-  padding:3px 6px;
-  border-radius:5px;
+  border-radius:6px;
   cursor:pointer;
 }
 
-.table-container{
-  max-height:400px;
-  overflow:auto;
+button:hover{
+  background:#1565c0;
 }
 
 table{
   width:100%;
   border-collapse:collapse;
   background:white;
-  border-radius:10px;
-  overflow:hidden;
 }
 
-th,td{
+th, td{
+  border:1px solid #ddd;
   padding:8px;
-  border-bottom:1px solid #ddd;
   text-align:center;
 }
 
 th{
-  background:#f6c23e;
+  background:#1976d2;
+  color:white;
 }
 
-td button{
-  background:#e74a3b;
-  border:none;
-  color:white;
-  padding:5px 10px;
-  border-radius:5px;
-  cursor:pointer;
+tr:nth-child(even){
+  background:#f2f2f2;
 }
