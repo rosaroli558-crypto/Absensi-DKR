@@ -1,5 +1,5 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-import { getDatabase, ref, onValue, push, remove } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
+import { getDatabase, ref, onValue } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
 
 const firebaseConfig = {
   apiKey: "YOUR_API_KEY",
@@ -14,128 +14,95 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 const db = getDatabase(app);
 
-const daftarBody = document.querySelector("#daftarAdmin tbody");
-const totalSpan = document.getElementById("total");
-const bulanSelect = document.getElementById("bulan");
-const searchInput = document.getElementById("searchInput");
-const addUserBtn = document.getElementById("addUserBtn");
-const newUserInput = document.getElementById("newUser");
-const userListUl = document.getElementById("userList");
-const exportBtn = document.getElementById("exportExcel");
+const tabel = document.getElementById("tabelData");
 
-let allData = {};
+let semuaData = [];
 
-// ================= DATA ABSENSI =================
+/* ==============================
+   LOAD DATA
+================================ */
 onValue(ref(db,"absensi/"), snapshot=>{
-  allData = snapshot.val() || {};
-  renderTable();
+  const data = snapshot.val() || {};
+
+  semuaData = Object.values(data)
+    .map(item=>{
+      const tgl = new Date(item.waktu);
+      return {
+        nama: item.nama,
+        tanggal: tgl,
+        tanggalString: tgl.toISOString().split("T")[0],
+        keterangan: item.keterangan || item.kegiatan || "Hadir"
+      }
+    })
+    // Urutkan berdasarkan tanggal sama lalu nama A-Z
+    .sort((a,b)=>{
+      if(a.tanggalString === b.tanggalString){
+        return a.nama.localeCompare(b.nama);
+      }
+      return new Date(a.tanggal) - new Date(b.tanggal);
+    });
+
+  tampilkanData(semuaData);
 });
 
-bulanSelect.addEventListener("change", renderTable);
-searchInput.addEventListener("input", renderTable);
-
-function renderTable(){
-  daftarBody.innerHTML = "";
-
-  let dataArray = Object.entries(allData).map(([id,p])=>({
-    id,
-    ...p,
-    date:new Date(p.waktu)
-  }));
-
-  // FILTER BULAN
-  if(bulanSelect.value !== "all"){
-    dataArray = dataArray.filter(p =>
-      p.date.getMonth() === parseInt(bulanSelect.value)
-    );
-  }
-
-  // FILTER SEARCH
-  const keyword = searchInput.value.toLowerCase().trim();
-
-  if(keyword){
-    dataArray = dataArray.filter(p=>{
-      const tanggal = p.date.toLocaleDateString('id-ID');
-      return (
-        p.nama.toLowerCase().includes(keyword) ||
-        p.kegiatan.toLowerCase().includes(keyword) ||
-        tanggal.includes(keyword)
-      );
-    });
-  }
-
-  totalSpan.textContent = dataArray.length;
-
-  dataArray.sort((a,b)=>b.date-a.date);
-
-  dataArray.forEach(p=>{
-    const tr = document.createElement("tr");
-
-    switch(p.kegiatan){
-      case "Hadir": tr.style.background="#d4edda"; break;
-      case "Izin": tr.style.background="#fff3cd"; break;
-      case "Sakit": tr.style.background="#fff3cd"; break;
-      case "Alfa": tr.style.background="#f8d7da"; break;
-    }
-
-    tr.innerHTML = `
-      <td>${p.nama}</td>
-      <td>${p.kegiatan}</td>
-      <td>${p.date.toLocaleDateString('id-ID')} ${p.date.toLocaleTimeString('id-ID',{hour:'2-digit',minute:'2-digit'})}</td>
-      <td><button data-id="${p.id}">Hapus</button></td>
+/* ==============================
+   TAMPILKAN DATA
+================================ */
+function tampilkanData(data){
+  tabel.innerHTML="";
+  data.forEach((d,i)=>{
+    const row = `
+      <tr>
+        <td>${i+1}</td>
+        <td>${d.nama}</td>
+        <td>${formatTanggal(d.tanggal)}</td>
+        <td>${d.keterangan}</td>
+      </tr>
     `;
-
-    tr.querySelector("button").onclick = ()=>{
-      if(confirm("Hapus data ini?")){
-        remove(ref(db,"absensi/"+p.id));
-      }
-    };
-
-    daftarBody.appendChild(tr);
+    tabel.innerHTML += row;
   });
 }
 
-// ================= USER =================
-addUserBtn.onclick = ()=>{
-  const nama = newUserInput.value.trim();
-  if(!nama) return alert("Nama kosong!");
-  push(ref(db,"userList/"), nama);
-  newUserInput.value="";
-};
+/* ==============================
+   FILTER
+================================ */
+window.filterData = function(){
+  const nama = document.getElementById("searchNama").value.toLowerCase();
+  const tanggal = document.getElementById("searchTanggal").value;
+  const ket = document.getElementById("searchKeterangan").value;
 
-onValue(ref(db,"userList/"), snapshot=>{
-  const data = snapshot.val() || {};
-  userListUl.innerHTML="";
-
-  Object.entries(data)
-    .sort((a,b)=>a[1].localeCompare(b[1]))
-    .forEach(([key,nama])=>{
-      const li = document.createElement("li");
-      li.innerHTML = `${nama} <button data-key="${key}">Hapus</button>`;
-      li.querySelector("button").onclick = ()=>{
-        if(confirm("Hapus user?")){
-          remove(ref(db,"userList/"+key));
-        }
-      };
-      userListUl.appendChild(li);
-    });
-});
-
-// ================= EXPORT =================
-exportBtn.onclick = ()=>{
-  const rows = [["Nama","Status","Waktu"]];
-
-  daftarBody.querySelectorAll("tr").forEach(tr=>{
-    const tds = tr.querySelectorAll("td");
-    rows.push([
-      tds[0].textContent,
-      tds[1].textContent,
-      tds[2].textContent
-    ]);
+  let filtered = semuaData.filter(d=>{
+    return (
+      (nama === "" || d.nama.toLowerCase().includes(nama)) &&
+      (tanggal === "" || d.tanggalString === tanggal) &&
+      (ket === "" || d.keterangan === ket)
+    );
   });
 
-  const ws = XLSX.utils.aoa_to_sheet(rows);
-  const wb = XLSX.utils.book_new();
-  XLSX.utils.book_append_sheet(wb, ws, "Absensi");
-  XLSX.writeFile(wb, "Rekap_Absensi_DKR.xlsx");
-};
+  tampilkanData(filtered);
+}
+
+window.resetFilter = function(){
+  document.getElementById("searchNama").value="";
+  document.getElementById("searchTanggal").value="";
+  document.getElementById("searchKeterangan").value="";
+  tampilkanData(semuaData);
+}
+
+/* ==============================
+   FORMAT TANGGAL
+================================ */
+function formatTanggal(date){
+  return date.toLocaleDateString("id-ID",{
+    day:"2-digit",
+    month:"long",
+    year:"numeric"
+  });
+}
+
+/* ==============================
+   EXPORT (Placeholder)
+================================ */
+window.exportExcel = function(){
+  alert("Fitur export Excel bisa kita sambungkan ke backend Python.");
+}
