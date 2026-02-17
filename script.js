@@ -16,21 +16,17 @@ const app = initializeApp(firebaseConfig);
 const db = getDatabase(app);
 
 const daftar = document.getElementById("daftar");
-const namaSelect = document.getElementById("nama"); // dropdown nama user
+const namaSelect = document.getElementById("nama");
 const kegiatanSelect = document.getElementById("kegiatan");
 
-// Ambil daftar user realtime & urut A-Z
+// Ambil user list realtime
 const userRef = ref(db,"userList/");
 onValue(userRef, snapshot=>{
   const data = snapshot.val() || {};
-  namaSelect.innerHTML = "";
-
-  const sortedNames = Object.values(data).sort((a,b)=> a.localeCompare(b));
-
-  sortedNames.forEach(nama=>{
+  namaSelect.innerHTML="";
+  Object.values(data).sort((a,b)=> a.localeCompare(b)).forEach(nama=>{
     const option = document.createElement("option");
-    option.value = nama;
-    option.textContent = nama;
+    option.value = nama; option.textContent = nama;
     namaSelect.appendChild(option);
   });
 });
