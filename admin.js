@@ -1,12 +1,13 @@
-// =============================
-// FIREBASE IMPORT
-// =============================
-import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-import { getDatabase, ref, onValue, remove } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+import {
+  getDatabase,
+  ref,
+  onValue,
+  remove
+} from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
 
-// =============================
-// FIREBASE CONFIG (DATA KAMU)
-// =============================
+/* ================= FIREBASE CONFIG ================= */
+
 const firebaseConfig = {
   apiKey: "AIzaSyC88eNtWMuOQ4eezVriirq_sjjVOkfl8K8",
   authDomain: "absensi-dkr.firebaseapp.com",
@@ -18,91 +19,184 @@ const firebaseConfig = {
   measurementId: "G-MYTKHS8FHM"
 };
 
-// =============================
-// INIT FIREBASE
-// =============================
 const app = initializeApp(firebaseConfig);
 const db = getDatabase(app);
+const absensiRef = ref(db, "absensi");
 
-// =============================
-// RENDER TABLE
-// =============================
-function renderTable(snapshot) {
-  const tbody = document.getElementById("absenBody");
-  if (!tbody) return;
+/* ================= ELEMENT ================= */
 
-  tbody.innerHTML = "";
+const tableBody = document.getElementById("adminTable");
+const filterBulan = document.getElementById("filterBulan");
+const rekapBox = document.getElementById("rekapData");
+const exportBtn = document.getElementById("exportExcel");
 
-  if (!snapshot.exists()) {
-    tbody.innerHTML = `
-      <tr>
-        <td colspan="5" style="text-align:center;">
-          Belum ada data absensi
-        </td>
-      </tr>
-    `;
+/* ================= STATE ================= */
+
+let globalData = [];
+
+/* ================= SORT ================= */
+
+function sortData(data) {
+  return data.sort((a, b) => {
+
+    const timeA = new Date(a.timestamp).getTime();
+    const timeB = new Date(b.timestamp).getTime();
+
+    if (timeA !== timeB) {
+      return timeB - timeA; // terbaru dulu
+    }
+
+    return a.nama.localeCompare(b.nama, "id", { sensitivity: "base" });
+  });
+}
+
+/* ================= RENDER TABLE ================= */
+
+function renderTable(data) {
+
+  tableBody.innerHTML = "";
+
+  if (!data.length) {
+    tableBody.innerHTML =
+      "<tr><td colspan='5'>Tidak ada data</td></tr>";
     return;
   }
 
-  let no = 1;
-
-  snapshot.forEach((child) => {
-    const data = child.val() || {};
+  data.forEach(item => {
 
     const tr = document.createElement("tr");
 
     tr.innerHTML = `
-      <td>${no++}</td>
-      <td>${data.nama ?? "-"}</td>
-      <td>${data.tanggal ?? "-"}</td>
-      <td>${data.keterangan ?? "-"}</td>
-      <td>
-        <button class="btn-delete" data-id="${child.key}">
-          Hapus
-        </button>
-      </td>
+      <td>${item.nama}</td>
+      <td>${item.kegiatan}</td>
+      <td>${item.tanggal}</td>
+      <td>${item.jam}</td>
+      <td><button data-id="${item.id}">Hapus</button></td>
     `;
 
-    tbody.appendChild(tr);
-  });
-}
-
-// =============================
-// DELETE FUNCTION
-// =============================
-function deleteAbsensi(id) {
-  if (!id) return;
-
-  const confirmDelete = confirm("Yakin ingin menghapus data ini?");
-  if (!confirmDelete) return;
-
-  remove(ref(db, "absensi/" + id))
-    .catch(error => {
-      console.error("Gagal hapus:", error);
-      alert("Gagal menghapus data.");
-    });
-}
-
-// =============================
-// INIT ADMIN
-// =============================
-document.addEventListener("DOMContentLoaded", () => {
-
-  const dataRef = ref(db, "absensi");
-
-  onValue(dataRef, (snapshot) => {
-    renderTable(snapshot);
-  });
-
-  const tbody = document.getElementById("absenBody");
-
-  if (tbody) {
-    tbody.addEventListener("click", (e) => {
-      if (e.target.classList.contains("btn-delete")) {
-        const id = e.target.getAttribute("data-id");
-        deleteAbsensi(id);
+    tr.querySelector("button").addEventListener("click", () => {
+      if (confirm("Yakin hapus data ini?")) {
+        remove(ref(db, "absensi/" + item.id));
       }
     });
+
+    tableBody.appendChild(tr);
+  });
+}
+
+/* ================= REKAP ================= */
+
+function renderRekap(data) {
+
+  const rekap = {};
+
+  data.forEach(item => {
+    if (!rekap[item.nama]) {
+      rekap[item.nama] = 0;
+    }
+    rekap[item.nama]++;
+  });
+
+  const sortedNama = Object.keys(rekap)
+    .sort((a, b) => a.localeCompare(b, "id", { sensitivity: "base" }));
+
+  let html = "";
+
+  sortedNama.forEach(nama => {
+    html += `<p>${nama} : ${rekap[nama]} kali</p>`;
+  });
+
+  rekapBox.innerHTML = html || "Belum ada data";
+}
+
+/* ================= UPDATE UI ================= */
+
+function updateUI(data) {
+  const sorted = sortData([...data]);
+  renderTable(sorted);
+  renderRekap(sorted);
+}
+
+/* ================= FILTER ================= */
+
+function applyFilter() {
+
+  const bulan = filterBulan.value;
+
+  if (!bulan) {
+    updateUI(globalData);
+    return;
   }
 
+  const filtered = globalData.filter(item =>
+    item.timestamp.startsWith(bulan)
+  );
+
+  updateUI(filtered);
+}
+
+/* ================= EXPORT CSV ================= */
+
+function exportCSV(data) {
+
+  if (!data.length) {
+    alert("Tidak ada data untuk export.");
+    return;
+  }
+
+  const sorted = sortData([...data]);
+
+  let csv = "Nama,Kegiatan,Tanggal,Jam\n";
+
+  sorted.forEach(item => {
+    csv += `${item.nama},${item.kegiatan},${item.tanggal},${item.jam}\n`;
+  });
+
+  const blob = new Blob([csv], { type: "text/csv" });
+  const url = URL.createObjectURL(blob);
+
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = "rekap_absensi.csv";
+  a.click();
+
+  URL.revokeObjectURL(url);
+}
+
+/* ================= FIREBASE LISTENER ================= */
+
+onValue(absensiRef, snapshot => {
+
+  const data = snapshot.val();
+
+  if (!data) {
+    globalData = [];
+    updateUI([]);
+    return;
+  }
+
+  globalData = Object.keys(data).map(key => ({
+    id: key,
+    ...data[key]
+  }));
+
+  applyFilter();
+});
+
+/* ================= EVENT ================= */
+
+filterBulan.addEventListener("change", applyFilter);
+
+exportBtn.addEventListener("click", () => {
+
+  const bulan = filterBulan.value;
+
+  if (!bulan) {
+    exportCSV(globalData);
+  } else {
+    const filtered = globalData.filter(item =>
+      item.timestamp.startsWith(bulan)
+    );
+    exportCSV(filtered);
+  }
 });
