@@ -18,6 +18,7 @@
 
   <div class="controls">
     <label>Total Respons: <span id="total">0</span></label>
+
     <select id="bulan">
       <option value="all">Semua Bulan</option>
       <option value="0">Januari</option>
@@ -33,6 +34,9 @@
       <option value="10">November</option>
       <option value="11">Desember</option>
     </select>
+
+    <input type="text" id="searchInput" placeholder="Cari nama / tanggal / status...">
+
     <button id="exportExcel">Simpan ke Excel</button>
   </div>
 
@@ -43,24 +47,24 @@
 
   <ul id="userList"></ul>
 
-  <table id="daftarAdmin">
-    <thead>
-      <tr>
-        <th>Nama</th>
-        <th>Absensi</th>
-        <th>Waktu</th>
-        <th>Aksi</th>
-      </tr>
-    </thead>
-    <tbody>
-      <!-- Data absensi akan dirender JS -->
-    </tbody>
-  </table>
+  <div class="table-container">
+    <table id="daftarAdmin">
+      <thead>
+        <tr>
+          <th>Nama</th>
+          <th>Status</th>
+          <th>Waktu</th>
+          <th>Aksi</th>
+        </tr>
+      </thead>
+      <tbody></tbody>
+    </table>
+  </div>
 
 </div>
 
-<!-- SheetJS untuk export Excel -->
 <script src="https://cdn.sheetjs.com/xlsx-latest/package/dist/xlsx.full.min.js"></script>
 <script type="module" src="admin.js"></script>
+
 </body>
 </html>
