@@ -2,10 +2,10 @@
 // FIREBASE IMPORT
 // =============================
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-import { getDatabase, ref, push } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
+import { getDatabase, ref, push, onValue, query, limitToLast } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
 
 // =============================
-// FIREBASE CONFIG (DATA KAMU)
+// FIREBASE CONFIG
 // =============================
 const firebaseConfig = {
   apiKey: "AIzaSyC88eNtWMuOQ4eezVriirq_sjjVOkfl8K8",
@@ -25,40 +25,98 @@ const app = initializeApp(firebaseConfig);
 const db = getDatabase(app);
 
 // =============================
-// FORM HANDLER
+// DAFTAR NAMA (ISI SESUAI ANGGOTA)
+// =============================
+const daftarNama = [
+  "Ahmad",
+  "Budi",
+  "Citra",
+  "Dina",
+  "Eko"
+];
+
+// =============================
+// LOAD NAMA KE SELECT
 // =============================
 document.addEventListener("DOMContentLoaded", () => {
 
-  const form = document.getElementById("formAbsensi");
-  if (!form) return;
+  const selectNama = document.getElementById("nama");
+  if (!selectNama) return;
 
-  form.addEventListener("submit", async (e) => {
-    e.preventDefault();
+  selectNama.innerHTML = `<option value="">-- Pilih Nama --</option>`;
 
-    const nama = document.getElementById("nama")?.value.trim();
-    const tanggal = document.getElementById("tanggal")?.value;
-    const keterangan = document.getElementById("keterangan")?.value.trim();
+  daftarNama.forEach(nama => {
+    const option = document.createElement("option");
+    option.value = nama;
+    option.textContent = nama;
+    selectNama.appendChild(option);
+  });
 
-    if (!nama || !tanggal || !keterangan) {
-      alert("Semua field wajib diisi!");
+  loadDaftarTerakhir();
+});
+
+// =============================
+// FUNGSI ABSEN (GLOBAL)
+// =============================
+window.absen = async function () {
+
+  const nama = document.getElementById("nama")?.value;
+  const kegiatan = document.getElementById("kegiatan")?.value;
+
+  if (!nama) {
+    alert("Pilih nama dulu!");
+    return;
+  }
+
+  try {
+    await push(ref(db, "absensi"), {
+      nama: nama,
+      status: kegiatan,
+      waktu: new Date().toLocaleString(),
+      createdAt: Date.now()
+    });
+
+    alert("Absensi berhasil!");
+
+  } catch (error) {
+    console.error(error);
+    alert("Gagal menyimpan data.");
+  }
+};
+
+// =============================
+// LOAD 5 DATA TERAKHIR
+// =============================
+function loadDaftarTerakhir() {
+
+  const list = document.getElementById("daftar");
+  if (!list) return;
+
+  const q = query(ref(db, "absensi"), limitToLast(5));
+
+  onValue(q, (snapshot) => {
+
+    list.innerHTML = "";
+
+    if (!snapshot.exists()) {
+      list.innerHTML = "<li>Belum ada data</li>";
       return;
     }
 
-    try {
-      await push(ref(db, "absensi"), {
-        nama,
-        tanggal,
-        keterangan,
-        createdAt: Date.now()
-      });
+    const dataArray = [];
 
-      alert("Absensi berhasil dikirim!");
-      form.reset();
+    snapshot.forEach(child => {
+      dataArray.push(child.val());
+    });
 
-    } catch (error) {
-      console.error("Gagal kirim data:", error);
-      alert("Terjadi kesalahan. Coba lagi.");
-    }
+    // Urutkan terbaru di atas
+    dataArray.reverse();
+
+    dataArray.forEach(data => {
+      const li = document.createElement("li");
+      li.textContent = `${data.nama} - ${data.status} (${data.waktu})`;
+      list.appendChild(li);
+    });
+
   });
-
-});
+}
