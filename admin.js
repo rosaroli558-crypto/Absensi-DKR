@@ -1,5 +1,5 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-import { getDatabase, ref, onValue, push, remove } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
+import { getDatabase, ref, onValue, push, remove, set } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
 import * as XLSX from "https://cdn.sheetjs.com/xlsx-latest/package/dist/xlsx.full.min.js";
 
 // 🔹 Firebase Config
@@ -13,11 +13,10 @@ const firebaseConfig = {
   appId: "1:824325578551:web:3fa855eab199686e5d84b2"
 };
 
-// 🔹 Init Firebase
 const app = initializeApp(firebaseConfig);
 const db = getDatabase(app);
 
-// 🔹 Elements
+// Elements
 const daftarBody = document.querySelector("#daftarAdmin tbody");
 const totalSpan = document.getElementById("total");
 const bulanSelect = document.getElementById("bulan");
@@ -26,7 +25,7 @@ const newUserInput = document.getElementById("newUser");
 const userListUl = document.getElementById("userList");
 const exportBtn = document.getElementById("exportExcel");
 
-// 🔹 References
+// References
 const absensiRef = ref(db,"absensi/");
 const userRef = ref(db,"userList/");
 
@@ -37,23 +36,17 @@ addUserBtn.addEventListener("click", ()=>{
   push(userRef, nama).then(()=> newUserInput.value="");
 });
 
-// 🔹 Daftar user realtime, urut A→Z
+// 🔹 Daftar user realtime A→Z
 onValue(userRef, snapshot=>{
   const data = snapshot.val() || {};
   userListUl.innerHTML = "";
-
   const sortedUsers = Object.entries(data).sort((a,b)=> a[1].localeCompare(b[1]));
-
   sortedUsers.forEach(([key,nama])=>{
     const li = document.createElement("li");
     li.textContent = nama;
-
     const btn = document.createElement("button");
     btn.textContent = "Hapus";
-    btn.addEventListener("click", ()=>{
-      if(confirm(`Hapus user "${nama}"?`)) remove(ref(db,"userList/"+key));
-    });
-
+    btn.addEventListener("click", ()=> {if(confirm(`Hapus user "${nama}"?`)) remove(ref(db,"userList/"+key));});
     li.appendChild(btn);
     userListUl.appendChild(li);
   });
@@ -69,34 +62,40 @@ onValue(absensiRef, snapshot=>{
 // 🔹 Filter bulan
 bulanSelect.addEventListener("change", tampilkanDaftar);
 
-// 🔹 Fungsi tampilkan daftar
+// 🔹 Fungsi tampilkan daftar & batas 4 absensi per user per bulan
 function tampilkanDaftar(){
   daftarBody.innerHTML="";
-  let dataArray = Object.entries(allData).map(([id,p])=>({
-    id, ...p, date:new Date(p.waktu)
-  }));
+  let dataArray = Object.entries(allData).map(([id,p])=>({id,...p,date:new Date(p.waktu)}));
 
-  // Filter bulan
   const selBulan = bulanSelect.value;
   if(selBulan!=="all"){
     dataArray = dataArray.filter(p=>p.date.getMonth()===parseInt(selBulan));
   }
 
-  // Urut terbaru
-  dataArray.sort((a,b)=>b.date-a.date);
+  // Hitung absensi per user per bulan
+  const countPerUser = {};
+  dataArray.forEach(p=>{
+    const key = `${p.nama}-${p.date.getMonth()}`;
+    countPerUser[key] = (countPerUser[key]||0)+1;
+  });
 
   // Total respons
   totalSpan.textContent = dataArray.length;
 
+  // Urut terbaru
+  dataArray.sort((a,b)=>b.date-a.date);
+
   // Render tabel
   dataArray.forEach(p=>{
+    const key = `${p.nama}-${p.date.getMonth()}`;
+    if(countPerUser[key]>4) return; // batasi 4 absensi per user per bulan
+
     const tr = document.createElement("tr");
 
-    // Warna baris sesuai status
     let bgColor="";
     switch(p.kegiatan){
       case "Hadir": bgColor="#d4edda"; break;
-      case "Izin": bgColor="#fff3cd"; break;
+      case "Izin":
       case "Sakit": bgColor="#fff3cd"; break;
       case "Alfa": bgColor="#f8d7da"; break;
     }
@@ -109,11 +108,8 @@ function tampilkanDaftar(){
       <td><button class="delete-btn">Hapus</button></td>
     `;
 
-    // Hapus per absensi
     tr.querySelector(".delete-btn").addEventListener("click", ()=>{
-      if(confirm(`Hapus absensi ${p.nama} | ${p.kegiatan}?`)){
-        remove(ref(db,"absensi/"+p.id));
-      }
+      if(confirm(`Hapus absensi ${p.nama} | ${p.kegiatan}?`)) remove(ref(db,"absensi/"+p.id));
     });
 
     daftarBody.appendChild(tr);
@@ -122,7 +118,6 @@ function tampilkanDaftar(){
 
 // 🔹 Ekspor ke Excel
 exportBtn.addEventListener("click", ()=>{
-  if(!daftarBody) return;
   const rows = [["Nama","Kegiatan","Waktu"]];
   const trList = daftarBody.querySelectorAll("tr");
   trList.forEach(tr=>{
