@@ -69,11 +69,10 @@ window.absen = async ()=>{
     }
   });
 
-  if(countThisMonth>=4){
-    alert(`User "${nama}" sudah melakukan 4 absensi bulan ini!`);
-    return;
-  }
-
+  if(countThisMonth >= 4){
+  showModal(`User "${nama}" Ciee Rajin Absen! Semoga Bulan Depan Rajin Lagi Yaa!!!`);
+  return;
+}
   // Simpan absensi baru
   const id = `${nama}_${now.getTime()}`;
   set(ref(db,"absensi/"+id),{
