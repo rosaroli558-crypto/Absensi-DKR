@@ -2,39 +2,48 @@
 <html lang="id">
 <head>
   <meta charset="UTF-8">
-  <title>Admin Absensi</title>
+  <title>Admin Absensi DKR</title>
   <link rel="stylesheet" href="admin.css">
 </head>
 <body>
 
-  <h2>ADMIN ABSENSI DKR</h2>
+<h2>ADMIN ABSENSI DKR</h2>
 
-  <div class="filter-box">
-    <input type="text" id="searchNama" placeholder="Cari Nama...">
-    <input type="date" id="searchTanggal">
-    <select id="searchKeterangan">
-      <option value="">Semua Keterangan</option>
-      <option value="Hadir">Hadir</option>
-      <option value="Izin">Izin</option>
-      <option value="Sakit">Sakit</option>
-      <option value="Alfa">Alfa</option>
-    </select>
-    <button onclick="filterData()">Filter</button>
-    <button onclick="resetFilter()">Reset</button>
-    <button onclick="exportExcel()">Export Excel</button>
-  </div>
+<!-- TAMBAH USER -->
+<div class="user-box">
+  <input type="text" id="namaBaru" placeholder="Nama user baru">
+  <button onclick="tambahUser()">Tambah User</button>
+</div>
 
-  <table>
-    <thead>
-      <tr>
-        <th>No</th>
-        <th>Nama</th>
-        <th>Tanggal</th>
-        <th>Keterangan</th>
-      </tr>
-    </thead>
-    <tbody id="tabelData"></tbody>
-  </table>
+<ul id="listUser"></ul>
+
+<!-- FILTER -->
+<div class="filter-box">
+  <input type="text" id="searchNama" placeholder="Cari Nama">
+  <input type="date" id="searchTanggal">
+  <select id="searchKeterangan">
+    <option value="">Semua</option>
+    <option value="Hadir">Hadir</option>
+    <option value="Izin">Izin</option>
+    <option value="Sakit">Sakit</option>
+    <option value="Alfa">Alfa</option>
+  </select>
+  <button onclick="filterData()">Filter</button>
+  <button onclick="resetFilter()">Reset</button>
+</div>
+
+<table>
+  <thead>
+    <tr>
+      <th>No</th>
+      <th>Nama</th>
+      <th>Tanggal</th>
+      <th>Keterangan</th>
+      <th>Aksi</th>
+    </tr>
+  </thead>
+  <tbody id="tabelData"></tbody>
+</table>
 
 <script type="module" src="admin.js"></script>
 </body>
