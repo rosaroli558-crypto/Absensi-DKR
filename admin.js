@@ -1,5 +1,5 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-import { getDatabase, ref, onValue } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
+import { getDatabase, ref, push, remove, onValue } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
 
 const firebaseConfig = {
   apiKey: "YOUR_API_KEY",
@@ -15,57 +15,106 @@ const app = initializeApp(firebaseConfig);
 const db = getDatabase(app);
 
 const tabel = document.getElementById("tabelData");
+const listUser = document.getElementById("listUser");
 
 let semuaData = [];
 
-/* ==============================
-   LOAD DATA
-================================ */
+/* ======================
+   LOAD USER
+====================== */
+onValue(ref(db,"userList/"), snapshot=>{
+  const data = snapshot.val() || {};
+  listUser.innerHTML="";
+  Object.entries(data)
+    .sort((a,b)=>a[1].localeCompare(b[1]))
+    .forEach(([key,nama])=>{
+      listUser.innerHTML += `
+        <li>
+          ${nama}
+          <button onclick="hapusUser('${key}')">Hapus</button>
+        </li>
+      `;
+    });
+});
+
+/* ======================
+   TAMBAH USER
+====================== */
+window.tambahUser = function(){
+  const nama = document.getElementById("namaBaru").value.trim();
+  if(!nama) return alert("Nama kosong");
+
+  push(ref(db,"userList/"), nama);
+  document.getElementById("namaBaru").value="";
+}
+
+/* ======================
+   HAPUS USER
+====================== */
+window.hapusUser = function(key){
+  if(confirm("Yakin hapus user?")){
+    remove(ref(db,"userList/"+key));
+  }
+}
+
+/* ======================
+   LOAD ABSENSI
+====================== */
 onValue(ref(db,"absensi/"), snapshot=>{
   const data = snapshot.val() || {};
 
-  semuaData = Object.values(data)
-    .map(item=>{
-      const tgl = new Date(item.waktu);
-      return {
-        nama: item.nama,
-        tanggal: tgl,
-        tanggalString: tgl.toISOString().split("T")[0],
-        keterangan: item.keterangan || item.kegiatan || "Hadir"
-      }
-    })
-    // Urutkan berdasarkan tanggal sama lalu nama A-Z
-    .sort((a,b)=>{
-      if(a.tanggalString === b.tanggalString){
-        return a.nama.localeCompare(b.nama);
-      }
-      return new Date(a.tanggal) - new Date(b.tanggal);
-    });
+  semuaData = Object.entries(data).map(([key,val])=>{
+    const tgl = new Date(val.waktu);
+    return {
+      id:key,
+      nama:val.nama,
+      tanggal:tgl,
+      tanggalString:tgl.toISOString().split("T")[0],
+      keterangan:val.keterangan || "Hadir"
+    }
+  })
+  .sort((a,b)=>{
+    if(a.tanggalString === b.tanggalString){
+      return a.nama.localeCompare(b.nama);
+    }
+    return new Date(a.tanggal) - new Date(b.tanggal);
+  });
 
   tampilkanData(semuaData);
 });
 
-/* ==============================
-   TAMPILKAN DATA
-================================ */
+/* ======================
+   TAMPILKAN
+====================== */
 function tampilkanData(data){
   tabel.innerHTML="";
   data.forEach((d,i)=>{
-    const row = `
+    tabel.innerHTML += `
       <tr>
         <td>${i+1}</td>
         <td>${d.nama}</td>
         <td>${formatTanggal(d.tanggal)}</td>
         <td>${d.keterangan}</td>
+        <td>
+          <button onclick="hapusAbsensi('${d.id}')">Hapus</button>
+        </td>
       </tr>
     `;
-    tabel.innerHTML += row;
   });
 }
 
-/* ==============================
+/* ======================
+   HAPUS ABSENSI
+====================== */
+window.hapusAbsensi = function(id){
+  if(confirm("Yakin hapus absensi ini?")){
+    remove(ref(db,"absensi/"+id));
+  }
+}
+
+/* ======================
    FILTER
-================================ */
+====================== */
 window.filterData = function(){
   const nama = document.getElementById("searchNama").value.toLowerCase();
   const tanggal = document.getElementById("searchTanggal").value;
@@ -73,9 +122,9 @@ window.filterData = function(){
 
   let filtered = semuaData.filter(d=>{
     return (
-      (nama === "" || d.nama.toLowerCase().includes(nama)) &&
-      (tanggal === "" || d.tanggalString === tanggal) &&
-      (ket === "" || d.keterangan === ket)
+      (nama==="" || d.nama.toLowerCase().includes(nama)) &&
+      (tanggal==="" || d.tanggalString===tanggal) &&
+      (ket==="" || d.keterangan===ket)
     );
   });
 
@@ -89,20 +138,13 @@ window.resetFilter = function(){
   tampilkanData(semuaData);
 }
 
-/* ==============================
+/* ======================
    FORMAT TANGGAL
-================================ */
+====================== */
 function formatTanggal(date){
   return date.toLocaleDateString("id-ID",{
     day:"2-digit",
     month:"long",
     year:"numeric"
   });
-}
-
-/* ==============================
-   EXPORT (Placeholder)
-================================ */
-window.exportExcel = function(){
-  alert("Fitur export Excel bisa kita sambungkan ke backend Python.");
 }
