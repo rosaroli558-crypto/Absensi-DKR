@@ -1,139 +1,124 @@
-/* RESET */
 * {margin:0;padding:0;box-sizing:border-box;}
+
 html,body{
   height:100%;
   font-family:'Segoe UI',sans-serif;
   background: linear-gradient(135deg,#4e73df,#1cc88a);
   display:flex;
-  flex-direction:column;
-  align-items:center;
+  justify-content:center;
   padding-top:20px;
 }
 
-/* LOGO */
-.logo-container{
-  margin-bottom:20px;
-}
-.logo-container img{
-  width:180px;
-  max-width:220px;
-  height:auto;
-  display:block;
-  margin:0 auto;
-}
-
-/* CONTAINER */
 .container{
   width:100%;
-  max-width:800px;
+  max-width:1000px;
   padding:20px;
   text-align:center;
 }
 
-/* JUDUL */
-h1,h2{
+.logo-container img{
+  width:160px;
+  margin-bottom:15px;
+}
+
+h1{
   color:white;
   margin-bottom:15px;
+}
+
+.controls{
+  display:flex;
+  flex-wrap:wrap;
+  gap:10px;
+  justify-content:center;
+  margin-bottom:15px;
+}
+
+.controls select,
+.controls input{
+  padding:8px;
+  border-radius:8px;
+  border:none;
+}
+
+.controls button{
+  padding:8px 15px;
+  border-radius:8px;
+  border:none;
+  background:#f6c23e;
+  font-weight:bold;
+  cursor:pointer;
+}
+
+.add-user{
+  margin-bottom:15px;
+}
+
+.add-user input{
+  padding:8px;
+  border-radius:8px;
+  border:none;
+}
+
+.add-user button{
+  padding:8px 15px;
+  border-radius:8px;
+  border:none;
+  background:#f6c23e;
+  font-weight:bold;
+  cursor:pointer;
 }
 
 #userList{
   list-style:none;
-  margin-top:10px;
-  padding:0 10px;
+  margin-bottom:15px;
   max-height:150px;
-  overflow-y:auto;
-  text-align:left;
+  overflow:auto;
 }
+
 #userList li{
-  padding:5px 0;
   display:flex;
   justify-content:space-between;
-  align-items:center;
-  border-bottom:1px solid rgba(0,0,0,0.2);
+  padding:5px 0;
 }
-#userList li button{
-  padding:3px 6px;
+
+#userList button{
+  background:#e74a3b;
   border:none;
-  border-radius:5px;
-  background-color:#e74a3b;
   color:white;
+  padding:3px 6px;
+  border-radius:5px;
   cursor:pointer;
-  font-size:12px;
-}
-#userList li button:hover{
-  background-color:#c0392b;
 }
 
-/* FORM TAMBAH USER & FILTER */
-.add-user-form, .filter-form{
-  margin-bottom:15px;
-}
-.add-user-form input{
-  padding:10px;
-  border-radius:10px;
-  border:none;
-  font-size:14px;
-}
-.add-user-form button{
-  padding:10px 20px;
-  border-radius:10px;
-  border:none;
-  cursor:pointer;
-  font-weight:bold;
-  background-color:#f6c23e;
-  color:black;
-  transition:0.3s;
-}
-.add-user-form button:hover{
-  background-color:#dda20a;
-}
-.filter-form select{
-  padding:10px;
-  border-radius:10px;
-  border:none;
-}
-
-/* TABLE */
 .table-container{
   max-height:400px;
-  overflow-y:auto;
-  margin-top:10px;
+  overflow:auto;
 }
+
 table{
   width:100%;
   border-collapse:collapse;
-  background-color: rgba(255,255,255,0.95);
+  background:white;
   border-radius:10px;
   overflow:hidden;
 }
+
 th,td{
-  padding:10px;
+  padding:8px;
   border-bottom:1px solid #ddd;
   text-align:center;
 }
+
 th{
-  background-color:#f6c23e;
-  font-weight:bold;
-  color:black;
-}
-td button{
-  padding:5px 10px;
-  border:none;
-  border-radius:5px;
-  cursor:pointer;
-  font-weight:bold;
-  background-color:#e74a3b;
-  color:white;
-  transition:0.3s;
-}
-td button:hover{
-  background-color:#c0392b;
+  background:#f6c23e;
 }
 
-/* RESPONSIVE HP */
-@media(max-width:768px){
-  .logo-container img{width:150px;}
-  h1,h2{font-size:20px;}
-  .add-user-form input,.add-user-form button,.filter-form select{font-size:13px;}
-  th,td{padding:6px;}
+td button{
+  background:#e74a3b;
+  border:none;
+  color:white;
+  padding:5px 10px;
+  border-radius:5px;
+  cursor:pointer;
 }
