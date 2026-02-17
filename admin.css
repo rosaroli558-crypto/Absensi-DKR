@@ -1,16 +1,139 @@
+/* RESET */
 * {margin:0;padding:0;box-sizing:border-box;}
-body {font-family:'Segoe UI',sans-serif;background:#f4f4f4; padding:20px;}
-.container {max-width:900px; margin:auto; text-align:center;}
-.logo-container img {width:200px; margin-bottom:20px;}
-h1 {margin-bottom:20px; color:#333;}
-.controls, .add-user {margin-bottom:15px;}
-input, select, button {padding:8px 12px; margin:5px; border-radius:6px; border:1px solid #ccc;}
-button {cursor:pointer; background:#4e73df; color:white; border:none;}
-button:hover {background:#2e59d9;}
-#userList {list-style:none; margin-bottom:20px; text-align:left;}
-#userList li {padding:5px 0;}
-#userList button {margin-left:10px; background:#e74a3b;}
-#userList button:hover {background:#c12f2f;}
-table {width:100%; border-collapse:collapse; margin-bottom:30px;}
-th, td {padding:10px; border:1px solid #ccc;}
-th {background:#4e73df; color:white;}
+html,body{
+  height:100%;
+  font-family:'Segoe UI',sans-serif;
+  background: linear-gradient(135deg,#4e73df,#1cc88a);
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  padding-top:20px;
+}
+
+/* LOGO */
+.logo-container{
+  margin-bottom:20px;
+}
+.logo-container img{
+  width:180px;
+  max-width:220px;
+  height:auto;
+  display:block;
+  margin:0 auto;
+}
+
+/* CONTAINER */
+.container{
+  width:100%;
+  max-width:800px;
+  padding:20px;
+  text-align:center;
+}
+
+/* JUDUL */
+h1,h2{
+  color:white;
+  margin-bottom:15px;
+}
+
+#userList{
+  list-style:none;
+  margin-top:10px;
+  padding:0 10px;
+  max-height:150px;
+  overflow-y:auto;
+  text-align:left;
+}
+#userList li{
+  padding:5px 0;
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  border-bottom:1px solid rgba(0,0,0,0.2);
+}
+#userList li button{
+  padding:3px 6px;
+  border:none;
+  border-radius:5px;
+  background-color:#e74a3b;
+  color:white;
+  cursor:pointer;
+  font-size:12px;
+}
+#userList li button:hover{
+  background-color:#c0392b;
+}
+
+/* FORM TAMBAH USER & FILTER */
+.add-user-form, .filter-form{
+  margin-bottom:15px;
+}
+.add-user-form input{
+  padding:10px;
+  border-radius:10px;
+  border:none;
+  font-size:14px;
+}
+.add-user-form button{
+  padding:10px 20px;
+  border-radius:10px;
+  border:none;
+  cursor:pointer;
+  font-weight:bold;
+  background-color:#f6c23e;
+  color:black;
+  transition:0.3s;
+}
+.add-user-form button:hover{
+  background-color:#dda20a;
+}
+.filter-form select{
+  padding:10px;
+  border-radius:10px;
+  border:none;
+}
+
+/* TABLE */
+.table-container{
+  max-height:400px;
+  overflow-y:auto;
+  margin-top:10px;
+}
+table{
+  width:100%;
+  border-collapse:collapse;
+  background-color: rgba(255,255,255,0.95);
+  border-radius:10px;
+  overflow:hidden;
+}
+th,td{
+  padding:10px;
+  border-bottom:1px solid #ddd;
+  text-align:center;
+}
+th{
+  background-color:#f6c23e;
+  font-weight:bold;
+  color:black;
+}
+td button{
+  padding:5px 10px;
+  border:none;
+  border-radius:5px;
+  cursor:pointer;
+  font-weight:bold;
+  background-color:#e74a3b;
+  color:white;
+  transition:0.3s;
+}
+td button:hover{
+  background-color:#c0392b;
+}
+
+/* RESPONSIVE HP */
+@media(max-width:768px){
+  .logo-container img{width:150px;}
+  h1,h2{font-size:20px;}
+  .add-user-form input,.add-user-form button,.filter-form select{font-size:13px;}
+  th,td{padding:6px;}
+}
