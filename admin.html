@@ -3,39 +3,57 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Admin Absensi DKR</title>
+  <title>Admin - Absensi DKR Batulicin</title>
   <link rel="stylesheet" href="style.css">
 </head>
-  
 <body>
 
-  <h2>ADMIN PANEL - ABSENSI DKR</h2>
+  <div class="container admin-page">
 
-  <label>Filter Bulan: </label>
-  <input type="month" id="filterBulan">
+    <!-- LOGO -->
+    <div class="logo-box">
+      <img src="logo.png" alt="Logo DKR" class="logo">
+    </div>
 
-  <div id="rekapBox">
-    <h3>Rekap Kehadiran</h3>
-    <div id="rekapData">Memuat data...</div>
+    <h2>ADMIN PANEL - ABSENSI DKR BATULICIN 2025–2028</h2>
+
+    <!-- FILTER BULAN -->
+    <div class="filter-box">
+      <label for="filterBulan">Filter Bulan:</label>
+      <input type="month" id="filterBulan">
+    </div>
+
+    <!-- REKAP -->
+    <div class="info-box">
+      <h3>Rekap Kehadiran</h3>
+      <div id="rekapData">Memuat data...</div>
+    </div>
+
+    <!-- TABEL DATA -->
+    <div class="table-wrapper">
+      <table>
+        <thead>
+          <tr>
+            <th>Nama</th>
+            <th>Keterangan</th>
+            <th>Tanggal</th>
+            <th>Jam</th>
+            <th>Aksi</th>
+          </tr>
+        </thead>
+        <tbody id="adminTable"></tbody>
+      </table>
+    </div>
+
+    <br>
+
+    <!-- EXPORT -->
+    <div style="text-align:center;">
+      <button id="exportExcel">Export Excel</button>
+    </div>
+
   </div>
 
-  <table>
-    <thead>
-      <tr>
-        <th>Nama</th>
-        <th>Kegiatan</th>
-        <th>Tanggal</th>
-        <th>Jam</th>
-        <th>Aksi</th>
-      </tr>
-    </thead>
-    <tbody id="adminTable"></tbody>
-  </table>
-
-  <br>
-  <button id="exportExcel">Export Excel</button>
-
   <script type="module" src="admin.js"></script>
-
 </body>
 </html>
