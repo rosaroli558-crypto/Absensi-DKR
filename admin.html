@@ -1,29 +1,62 @@
 <!DOCTYPE html>
 <html lang="id">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Admin - Absensi DKR Batulicin</title>
-  <link rel="stylesheet" href="style.css" />
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin Absensi DKR</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      padding: 20px;
+    }
+
+    h2 {
+      margin-bottom: 10px;
+    }
+
+    table {
+      border-collapse: collapse;
+      width: 100%;
+      margin-top: 15px;
+    }
+
+    th, td {
+      border: 1px solid #ddd;
+      padding: 8px;
+      text-align: center;
+    }
+
+    th {
+      background-color: #f2f2f2;
+    }
+
+    button {
+      padding: 5px 10px;
+      cursor: pointer;
+    }
+
+    #rekapBox {
+      margin-top: 15px;
+      padding: 10px;
+      background: #f7f7f7;
+      border-radius: 5px;
+    }
+
+  </style>
 </head>
 <body>
 
-  <h2>ADMIN PANEL</h2>
+  <h2>ADMIN PANEL - ABSENSI DKR</h2>
 
-  <!-- FILTER -->
-  <div>
-    <label>Filter Bulan:</label>
-    <input type="month" id="filterBulan" />
-  </div>
+  <label>Filter Bulan: </label>
+  <input type="month" id="filterBulan">
 
-  <!-- REKAP -->
   <div id="rekapBox">
     <h3>Rekap Kehadiran</h3>
-    <div id="rekapData"></div>
+    <div id="rekapData">Memuat data...</div>
   </div>
 
-  <!-- TABLE -->
-  <table border="1" width="100%">
+  <table>
     <thead>
       <tr>
         <th>Nama</th>
@@ -37,9 +70,9 @@
   </table>
 
   <br>
-
   <button id="exportExcel">Export Excel</button>
 
   <script type="module" src="admin.js"></script>
+
 </body>
 </html>
