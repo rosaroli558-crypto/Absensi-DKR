@@ -1,7 +1,9 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
 import { getDatabase, ref, onValue, push, remove } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
 
-// 🔹 Firebase config
+/* ===============================
+   🔹 FIREBASE CONFIG
+================================= */
 const firebaseConfig = {
   apiKey: "YOUR_API_KEY",
   authDomain: "absensi-dkr.firebaseapp.com",
@@ -15,7 +17,9 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 const db = getDatabase(app);
 
-// 🔹 Elements
+/* ===============================
+   🔹 ELEMENTS
+================================= */
 const daftarBody = document.querySelector("#daftarAdmin tbody");
 const totalSpan = document.getElementById("total");
 const bulanSelect = document.getElementById("bulan");
@@ -24,18 +28,20 @@ const newUserInput = document.getElementById("newUser");
 const userListUl = document.getElementById("userList");
 const exportBtn = document.getElementById("exportExcel");
 
-// 🔹 Modal Confirm Custom
+/* ===============================
+   🔹 MODAL KONFIRMASI
+================================= */
 const modal = document.createElement("div");
 modal.style.cssText = `
-  position: fixed; top:0; left:0; width:100%; height:100%;
+  position:fixed; top:0; left:0; width:100%; height:100%;
   display:none; justify-content:center; align-items:center;
-  background: rgba(0,0,0,0.5); z-index:1000;
+  background:rgba(0,0,0,0.5); z-index:9999;
 `;
 
 const modalBox = document.createElement("div");
 modalBox.style.cssText = `
-  background:white; padding:20px; border-radius:8px; min-width:250px;
-  text-align:center;
+  background:white; padding:20px; border-radius:8px;
+  min-width:260px; text-align:center;
 `;
 
 const modalText = document.createElement("p");
@@ -58,24 +64,29 @@ function confirmModal(message){
   return new Promise(resolve=>{
     modalText.textContent = message;
     modal.style.display = "flex";
-    btnYes.onclick = ()=> { modal.style.display="none"; resolve(true); };
-    btnNo.onclick = ()=> { modal.style.display="none"; resolve(false); };
+    btnYes.onclick = ()=>{ modal.style.display="none"; resolve(true); };
+    btnNo.onclick = ()=>{ modal.style.display="none"; resolve(false); };
   });
 }
 
-// 🔹 Tambah User
+/* ===============================
+   🔹 TAMBAH USER
+================================= */
 addUserBtn.addEventListener("click", ()=>{
   const nama = newUserInput.value.trim();
   if(!nama){
-    alert("Nama kosong!");
+    alert("Nama tidak boleh kosong!");
     return;
   }
-  push(ref(db,"userList/"), nama).then(()=>{
-    newUserInput.value="";
-  });
+
+  push(ref(db,"userList/"), nama)
+    .then(()=> newUserInput.value="")
+    .catch(err=> alert("Gagal tambah user: "+err.message));
 });
 
-// 🔹 List User realtime A-Z
+/* ===============================
+   🔹 LIST USER REALTIME A-Z
+================================= */
 onValue(ref(db,"userList/"), snapshot=>{
   const data = snapshot.val() || {};
   userListUl.innerHTML = "";
@@ -90,30 +101,34 @@ onValue(ref(db,"userList/"), snapshot=>{
       const btn = document.createElement("button");
       btn.textContent = "Hapus";
 
-      btn.addEventListener("click", async ()=>{
+      btn.onclick = async ()=>{
         if(await confirmModal(`Hapus user "${nama}"?`)){
           remove(ref(db,"userList/"+key));
         }
-      });
+      };
 
       li.appendChild(btn);
       userListUl.appendChild(li);
-  });
+    });
 });
 
-// 🔹 Ambil data absensi realtime
+/* ===============================
+   🔹 DATA ABSENSI REALTIME
+================================= */
 let allData = {};
 
 onValue(ref(db,"absensi/"), snapshot=>{
   allData = snapshot.val() || {};
-  tampilkanDaftar();
+  renderTable();
 });
 
-// 🔹 Filter bulan
-bulanSelect.addEventListener("change", tampilkanDaftar);
+bulanSelect.addEventListener("change", renderTable);
 
-// 🔹 Render tabel admin (TANPA BATAS 4 DATA)
-function tampilkanDaftar(){
+/* ===============================
+   🔹 RENDER TABLE (TANPA LIMIT)
+================================= */
+function renderTable(){
+
   daftarBody.innerHTML = "";
 
   let dataArray = Object.entries(allData).map(([id,p])=>({
@@ -122,58 +137,52 @@ function tampilkanDaftar(){
     date: new Date(p.waktu)
   }));
 
-  const selBulan = bulanSelect.value;
+  const selectedMonth = bulanSelect.value;
 
-  if(selBulan !== "all"){
+  if(selectedMonth !== "all"){
     dataArray = dataArray.filter(p =>
-      p.date.getMonth() === parseInt(selBulan)
+      p.date.getMonth() === parseInt(selectedMonth)
     );
   }
 
-  // Total respons
+  // total respons
   totalSpan.textContent = dataArray.length;
 
-  // Urut terbaru
+  // urut terbaru
   dataArray.sort((a,b)=> b.date - a.date);
 
   dataArray.forEach(p=>{
 
     const tr = document.createElement("tr");
 
-    // Warna baris sesuai status
-    let bgColor="";
+    // warna status
     switch(p.kegiatan){
-      case "Hadir": bgColor="#d4edda"; break;
-      case "Izin": bgColor="#fff3cd"; break;
-      case "Sakit": bgColor="#fff3cd"; break;
-      case "Alfa": bgColor="#f8d7da"; break;
+      case "Hadir": tr.style.backgroundColor="#d4edda"; break;
+      case "Izin": tr.style.backgroundColor="#fff3cd"; break;
+      case "Sakit": tr.style.backgroundColor="#fff3cd"; break;
+      case "Alfa": tr.style.backgroundColor="#f8d7da"; break;
     }
-    tr.style.backgroundColor = bgColor;
 
-    // Nama
     const tdNama = document.createElement("td");
     tdNama.textContent = p.nama;
 
-    // Kegiatan
     const tdKegiatan = document.createElement("td");
     tdKegiatan.textContent = p.kegiatan;
 
-    // Waktu
     const tdWaktu = document.createElement("td");
     tdWaktu.textContent =
       `${p.date.toLocaleDateString('id-ID')} ` +
       `${p.date.toLocaleTimeString('id-ID',{hour:'2-digit',minute:'2-digit'})}`;
 
-    // Aksi
     const tdAksi = document.createElement("td");
     const delBtn = document.createElement("button");
     delBtn.textContent = "Hapus";
 
-    delBtn.addEventListener("click", async ()=>{
+    delBtn.onclick = async ()=>{
       if(await confirmModal(`Hapus absensi ${p.nama} | ${p.kegiatan}?`)){
         remove(ref(db,"absensi/"+p.id));
       }
-    });
+    };
 
     tdAksi.appendChild(delBtn);
 
@@ -186,7 +195,9 @@ function tampilkanDaftar(){
   });
 }
 
-// 🔹 Export ke Excel
+/* ===============================
+   🔹 EXPORT EXCEL
+================================= */
 exportBtn.addEventListener("click", ()=>{
   const rows = [["Nama","Kegiatan","Waktu"]];
 
