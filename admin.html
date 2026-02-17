@@ -1,50 +1,57 @@
-<!DOCTYPE html>
-<html lang="id">
-<head>
-  <meta charset="UTF-8">
-  <title>Admin Absensi DKR</title>
-  <link rel="stylesheet" href="admin.css">
-</head>
-<body>
-
 <h2>ADMIN ABSENSI DKR</h2>
 
-<!-- TAMBAH USER -->
-<div class="user-box">
-  <input type="text" id="namaBaru" placeholder="Nama user baru">
-  <button onclick="tambahUser()">Tambah User</button>
+<div class="layout">
+
+  <!-- KIRI -->
+  <div class="sidebar card">
+    <h3>Manajemen User</h3>
+
+    <input type="text" id="namaBaru" placeholder="Nama user baru">
+    <button onclick="tambahUser()">Tambah User</button>
+
+    <ul id="listUser"></ul>
+  </div>
+
+  <!-- KANAN -->
+  <div class="main">
+
+    <!-- FILTER -->
+    <div class="card filter-card">
+      <h3>Filter Data</h3>
+
+      <div class="filter-grid">
+        <input type="text" id="searchNama" placeholder="Cari Nama">
+        <input type="date" id="searchTanggal">
+
+        <select id="searchKeterangan">
+          <option value="">Semua</option>
+          <option value="Hadir">Hadir</option>
+          <option value="Izin">Izin</option>
+          <option value="Sakit">Sakit</option>
+          <option value="Alfa">Alfa</option>
+        </select>
+
+        <button onclick="filterData()">Filter</button>
+        <button onclick="resetFilter()">Reset</button>
+      </div>
+    </div>
+
+    <!-- TABEL -->
+    <div class="card table-card">
+      <table>
+        <thead>
+          <tr>
+            <th>No</th>
+            <th>Nama</th>
+            <th>Tanggal</th>
+            <th>Keterangan</th>
+            <th>Aksi</th>
+          </tr>
+        </thead>
+        <tbody id="tabelData"></tbody>
+      </table>
+    </div>
+
+  </div>
+
 </div>
-
-<ul id="listUser"></ul>
-
-<!-- FILTER -->
-<div class="filter-box">
-  <input type="text" id="searchNama" placeholder="Cari Nama">
-  <input type="date" id="searchTanggal">
-  <select id="searchKeterangan">
-    <option value="">Semua</option>
-    <option value="Hadir">Hadir</option>
-    <option value="Izin">Izin</option>
-    <option value="Sakit">Sakit</option>
-    <option value="Alfa">Alfa</option>
-  </select>
-  <button onclick="filterData()">Filter</button>
-  <button onclick="resetFilter()">Reset</button>
-</div>
-
-<table>
-  <thead>
-    <tr>
-      <th>No</th>
-      <th>Nama</th>
-      <th>Tanggal</th>
-      <th>Keterangan</th>
-      <th>Aksi</th>
-    </tr>
-  </thead>
-  <tbody id="tabelData"></tbody>
-</table>
-
-<script type="module" src="admin.js"></script>
-</body>
-</html>
