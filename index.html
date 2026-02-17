@@ -16,14 +16,18 @@
   <h1>Absensi Kegiatan</h1>
 
   <div class="absen-form">
-    <select id="nama"></select>
+    <select id="nama">
+      <option value="">Memuat nama...</option>
+    </select>
+
     <select id="kegiatan">
       <option value="Hadir">Hadir</option>
       <option value="Izin">Izin</option>
       <option value="Sakit">Sakit</option>
       <option value="Alfa">Alfa</option>
     </select>
-    <button onclick="absen()">Absen</button>
+
+    <button id="btnAbsen">Absen</button>
   </div>
 
   <h2>Daftar Hadir (5 Terakhir)</h2>
@@ -31,5 +35,6 @@
 </div>
 
 <script type="module" src="script.js"></script>
+
 </body>
 </html>
