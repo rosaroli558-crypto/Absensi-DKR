@@ -1,127 +1,150 @@
-import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-import { getDatabase, ref, onValue, get, push } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
+// ===============================
+// INIT DATA
+// ===============================
 
-/* ===============================
-   🔹 FIREBASE CONFIG
-================================= */
-const firebaseConfig = {
-  apiKey: "YOUR_API_KEY",
-  authDomain: "absensi-dkr.firebaseapp.com",
-  databaseURL: "https://absensi-dkr-default-rtdb.asia-southeast1.firebasedatabase.app",
-  projectId: "absensi-dkr",
-  storageBucket: "absensi-dkr.firebasestorage.app",
-  messagingSenderId: "824325578551",
-  appId: "1:824325578551:web:3fa855eab199686e5d84b2"
-};
+let users = JSON.parse(localStorage.getItem("users")) || [];
+let absensi = JSON.parse(localStorage.getItem("absensi")) || [];
 
-const app = initializeApp(firebaseConfig);
-const db = getDatabase(app);
+// ===============================
+// SAVE FUNCTION
+// ===============================
 
-/* ===============================
-   🔹 ELEMENTS
-================================= */
-const daftar = document.getElementById("daftar");
-const namaSelect = document.getElementById("nama");
-const kegiatanSelect = document.getElementById("kegiatan");
-
-/* ===============================
-   🔹 MODAL SEDERHANA
-================================= */
-function showAlert(message){
-  alert(message);
+function saveData() {
+  localStorage.setItem("users", JSON.stringify(users));
+  localStorage.setItem("absensi", JSON.stringify(absensi));
 }
 
-/* ===============================
-   🔹 LOAD USER LIST A-Z
-================================= */
-onValue(ref(db,"userList/"), snapshot=>{
-  const data = snapshot.val() || {};
-  namaSelect.innerHTML = "";
+// ===============================
+// RENDER USER LIST (KIRI)
+// ===============================
 
-  Object.values(data)
-    .sort((a,b)=>a.localeCompare(b))
-    .forEach(nama=>{
-      const option = document.createElement("option");
-      option.value = nama;
-      option.textContent = nama;
-      namaSelect.appendChild(option);
-    });
-});
+function renderUsers() {
+  const userList = document.getElementById("userList");
+  userList.innerHTML = "";
 
-/* ===============================
-   🔹 TAMPIL 5 ABSENSI TERAKHIR
-================================= */
-onValue(ref(db,"absensi/"), snapshot=>{
-  const data = snapshot.val() || {};
-
-  let arr = Object.values(data)
-    .map(p=>({...p, date:new Date(p.waktu)}))
-    .sort((a,b)=>b.date - a.date)
-    .slice(0,5);
-
-  daftar.innerHTML = "";
-
-  arr.forEach(p=>{
+  users.forEach((user, index) => {
     const li = document.createElement("li");
-    li.textContent =
-      `${p.nama} | ${p.kegiatan} | ` +
-      `${p.date.toLocaleDateString('id-ID')} ` +
-      `${p.date.toLocaleTimeString('id-ID',{hour:'2-digit',minute:'2-digit'})}`;
-    daftar.appendChild(li);
+    li.className = "user-item";
+
+    li.innerHTML = `
+      ${user}
+      <button onclick="deleteUser(${index})" class="btn-delete">X</button>
+    `;
+
+    userList.appendChild(li);
   });
-});
+}
 
-/* ===============================
-   🔹 FUNGSI ABSEN (LIMIT 4/BULAN)
-================================= */
-window.absen = async ()=>{
+// ===============================
+// TAMBAH USER
+// ===============================
 
-  const nama = namaSelect.value;
-  const kegiatan = kegiatanSelect.value;
+function addUser() {
+  const input = document.getElementById("newUser");
+  const name = input.value.trim();
 
-  if(!nama){
-    showAlert("Pilih nama terlebih dahulu!");
+  if (!name) return alert("Nama tidak boleh kosong");
+
+  if (users.includes(name)) {
+    alert("User sudah ada");
     return;
   }
 
-  const now = new Date();
-  const bulan = now.getMonth();
-  const tahun = now.getFullYear();
+  users.push(name);
+  saveData();
+  renderUsers();
+  input.value = "";
+}
 
-  try{
+// ===============================
+// HAPUS USER
+// ===============================
 
-    // Ambil semua data absensi
-    const snapshot = await get(ref(db,"absensi/"));
-    const data = snapshot.val() || {};
+function deleteUser(index) {
+  if (!confirm("Hapus user ini?")) return;
 
-    let countThisMonth = 0;
+  const deletedUser = users[index];
 
-    Object.values(data).forEach(p=>{
-      const d = new Date(p.waktu);
-      if(
-        p.nama === nama &&
-        d.getMonth() === bulan &&
-        d.getFullYear() === tahun
-      ){
-        countThisMonth++;
-      }
-    });
+  // hapus semua absensi user itu juga
+  absensi = absensi.filter(a => a.nama !== deletedUser);
 
-    if(countThisMonth >= 4){
-      showAlert(`User "${nama}" sudah 4x absen bulan ini!`);
-      return;
-    }
+  users.splice(index, 1);
+  saveData();
+  renderUsers();
+  renderTable();
+}
 
-    // ✅ SIMPAN DENGAN PUSH (AMAN)
-    await push(ref(db,"absensi/"),{
-      nama,
-      kegiatan,
-      waktu: now.toISOString()
-    });
+// ===============================
+// RENDER TABEL ABSENSI (KANAN)
+// ===============================
 
-    showAlert("Absensi berhasil!");
+function renderTable(data = absensi) {
+  const tbody = document.getElementById("absenBody");
+  tbody.innerHTML = "";
 
-  }catch(error){
-    showAlert("Gagal menyimpan data: " + error.message);
-  }
-};
+  data.forEach((item, index) => {
+    const tr = document.createElement("tr");
+
+    tr.innerHTML = `
+      <td>${index + 1}</td>
+      <td>${item.nama}</td>
+      <td>${item.tanggal}</td>
+      <td>${item.keterangan}</td>
+      <td>
+        <button onclick="deleteAbsensi(${index})" class="btn-delete">
+          Hapus
+        </button>
+      </td>
+    `;
+
+    tbody.appendChild(tr);
+  });
+}
+
+// ===============================
+// HAPUS PER ABSENSI
+// ===============================
+
+function deleteAbsensi(index) {
+  if (!confirm("Hapus data absensi ini?")) return;
+
+  absensi.splice(index, 1);
+  saveData();
+  renderTable();
+}
+
+// ===============================
+// FILTER DATA
+// ===============================
+
+function filterData() {
+  const cariNama = document.getElementById("searchNama").value.toLowerCase();
+  const tanggal = document.getElementById("searchTanggal").value;
+  const status = document.getElementById("searchStatus").value;
+
+  let filtered = absensi.filter(item => {
+    return (
+      item.nama.toLowerCase().includes(cariNama) &&
+      (tanggal === "" || item.tanggal === tanggal) &&
+      (status === "Semua" || item.keterangan === status)
+    );
+  });
+
+  renderTable(filtered);
+}
+
+function resetFilter() {
+  document.getElementById("searchNama").value = "";
+  document.getElementById("searchTanggal").value = "";
+  document.getElementById("searchStatus").value = "Semua";
+  renderTable();
+}
+
+// ===============================
+// AUTO LOAD SAAT HALAMAN DIBUKA
+// ===============================
+
+document.addEventListener("DOMContentLoaded", function () {
+  renderUsers();
+  renderTable();
+});
