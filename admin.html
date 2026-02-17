@@ -1,180 +1,44 @@
 <!DOCTYPE html>
 <html lang="id">
 <head>
-  <meta charset="UTF-8">
-  <title>Admin Absensi DKR</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-  <style>
-    body {
-      margin: 0;
-      font-family: Arial, sans-serif;
-      background: linear-gradient(135deg, #4e73df, #1cc88a);
-      min-height: 100vh;
-    }
-
-    h1 {
-      text-align: center;
-      color: white;
-      padding: 20px 0;
-      margin: 0;
-    }
-
-    .container {
-      display: flex;
-      gap: 30px;
-      padding: 30px;
-    }
-
-    .card {
-      background: #f8f9fc;
-      border-radius: 15px;
-      padding: 20px;
-      box-shadow: 0 10px 25px rgba(0,0,0,0.1);
-    }
-
-    .left {
-      width: 300px;
-    }
-
-    .right {
-      flex: 1;
-      display: flex;
-      flex-direction: column;
-      gap: 20px;
-    }
-
-    input, select {
-      padding: 8px;
-      border-radius: 8px;
-      border: 1px solid #ccc;
-      width: 100%;
-      box-sizing: border-box;
-    }
-
-    button {
-      padding: 8px 12px;
-      border: none;
-      border-radius: 8px;
-      cursor: pointer;
-      background: #4e73df;
-      color: white;
-    }
-
-    button:hover {
-      opacity: 0.9;
-    }
-
-    .btn-delete {
-      background: #e74a3b;
-      font-size: 12px;
-      padding: 4px 8px;
-      margin-left: 10px;
-    }
-
-    ul {
-      list-style: none;
-      padding: 0;
-      margin-top: 15px;
-    }
-
-    .user-item {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      padding: 8px;
-      background: white;
-      border-radius: 8px;
-      margin-bottom: 8px;
-    }
-
-    table {
-      width: 100%;
-      border-collapse: collapse;
-      background: white;
-      border-radius: 10px;
-      overflow: hidden;
-    }
-
-    th {
-      background: #4e73df;
-      color: white;
-      padding: 10px;
-    }
-
-    td {
-      padding: 10px;
-      text-align: center;
-      border-bottom: 1px solid #eee;
-    }
-
-    .filter-row {
-      display: grid;
-      grid-template-columns: 1fr 1fr 1fr auto auto;
-      gap: 10px;
-      align-items: center;
-    }
-  </style>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Admin - Absensi DKR Batulicin</title>
+  <link rel="stylesheet" href="style.css" />
 </head>
 <body>
 
-  <h1>ADMIN ABSENSI DKR</h1>
+  <h2>ADMIN PANEL</h2>
 
-  <div class="container">
-
-    <!-- KIRI - MANAJEMEN USER -->
-    <div class="card left">
-      <h3>Manajemen User</h3>
-
-      <input type="text" id="newUser" placeholder="Nama user baru">
-      <br><br>
-      <button onclick="addUser()">Tambah User</button>
-
-      <ul id="userList"></ul>
-    </div>
-
-    <!-- KANAN -->
-    <div class="right">
-
-      <!-- FILTER -->
-      <div class="card">
-        <h3>Filter Data</h3>
-
-        <div class="filter-row">
-          <input type="text" id="searchNama" placeholder="Cari Nama">
-          <input type="date" id="searchTanggal">
-          <select id="searchStatus">
-            <option>Semua</option>
-            <option>Hadir</option>
-            <option>Izin</option>
-            <option>Sakit</option>
-          </select>
-
-          <button onclick="filterData()">Filter</button>
-          <button onclick="resetFilter()">Reset</button>
-        </div>
-      </div>
-
-      <!-- TABEL -->
-      <div class="card">
-        <table>
-          <thead>
-            <tr>
-              <th>No</th>
-              <th>Nama</th>
-              <th>Tanggal</th>
-              <th>Keterangan</th>
-              <th>Aksi</th>
-            </tr>
-          </thead>
-          <tbody id="absenBody">
-          </tbody>
-        </table>
-      </div>
-
-    </div>
-
+  <!-- FILTER -->
+  <div>
+    <label>Filter Bulan:</label>
+    <input type="month" id="filterBulan" />
   </div>
+
+  <!-- REKAP -->
+  <div id="rekapBox">
+    <h3>Rekap Kehadiran</h3>
+    <div id="rekapData"></div>
+  </div>
+
+  <!-- TABLE -->
+  <table border="1" width="100%">
+    <thead>
+      <tr>
+        <th>Nama</th>
+        <th>Kegiatan</th>
+        <th>Tanggal</th>
+        <th>Jam</th>
+        <th>Aksi</th>
+      </tr>
+    </thead>
+    <tbody id="adminTable"></tbody>
+  </table>
+
+  <br>
+
+  <button id="exportExcel">Export Excel</button>
 
   <script type="module" src="admin.js"></script>
 </body>
