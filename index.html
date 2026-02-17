@@ -1,41 +1,35 @@
 <!DOCTYPE html>
 <html lang="id">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Absensi DKR</title>
-  <link rel="stylesheet" href="style.css">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Absensi DKR</title>
+<link rel="stylesheet" href="style.css">
 </head>
 <body>
 
+<div class="container">
   <div class="logo-container">
     <img src="logo.png" alt="Logo">
   </div>
 
-  <div class="container">
-    <h1>Absensi Kegiatan DKR</h1>
+  <h1>Absensi Kegiatan</h1>
 
-    <div class="absen-form">
-      <select id="nama">
-        <option value="">Pilih Nama</option>
-      </select>
-
-      <select id="kegiatan">
-        <option value="">Absensi</option>
-        <option value="Hadir">Hadir</option>
-        <option value="Izin">Izin</option>
-        <option value="Sakit">Sakit</option>
-        <option value="Alfa">Alfa</option>
-      </select>
-
-      <button onclick="absen()">Absen</button>
-    </div>
-
-    <h2>Daftar Hadir (5 terakhir)</h2>
-    <ul id="daftar"></ul>
-
+  <div class="absen-form">
+    <select id="nama"></select>
+    <select id="kegiatan">
+      <option value="Hadir">Hadir</option>
+      <option value="Izin">Izin</option>
+      <option value="Sakit">Sakit</option>
+      <option value="Alfa">Alfa</option>
+    </select>
+    <button onclick="absen()">Absen</button>
   </div>
 
-  <script type="module" src="script.js"></script>
+  <h2>Daftar Hadir (5 Terakhir)</h2>
+  <ul id="daftar"></ul>
+</div>
+
+<script type="module" src="script.js"></script>
 </body>
 </html>
