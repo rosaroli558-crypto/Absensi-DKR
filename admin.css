@@ -6,105 +6,89 @@
   font-family:'Segoe UI',sans-serif;
 }
 
-/* BACKGROUND GRADIENT */
+/* BACKGROUND */
 body{
   min-height:100vh;
   background: linear-gradient(135deg,#4e73df,#1cc88a);
-  display:flex;
-  justify-content:center;
-  padding:30px 15px;
+  padding:30px;
 }
 
-/* CONTAINER CARD */
-body > *{
-  width:100%;
-  max-width:1100px;
-}
-
+/* TITLE */
 h2{
   text-align:center;
   color:white;
-  margin-bottom:25px;
-  font-weight:600;
+  margin-bottom:30px;
   letter-spacing:1px;
 }
 
-/* MAIN CARD */
-table,
-.user-box,
-.filter-box,
-ul{
+/* LAYOUT GRID 3 KOLOM */
+.main-container{
+  display:grid;
+  grid-template-columns: 280px 280px 1fr;
+  gap:25px;
+  max-width:1300px;
+  margin:auto;
+}
+
+/* CARD STYLE */
+.card{
   background:white;
-  border-radius:12px;
-  box-shadow:0 8px 20px rgba(0,0,0,0.15);
-  padding:15px;
+  border-radius:15px;
+  box-shadow:0 10px 25px rgba(0,0,0,0.15);
+  padding:20px;
 }
 
 /* USER LIST */
-ul{
-  margin-bottom:20px;
-  max-height:200px;
+#listUser{
+  max-height:350px;
   overflow-y:auto;
+  margin-top:15px;
 }
 
-ul li{
+#listUser li{
   list-style:none;
   display:flex;
   justify-content:space-between;
-  align-items:center;
   padding:6px 0;
   border-bottom:1px solid #eee;
 }
 
-/* INPUT AREA */
-.user-box,
-.filter-box{
-  margin-bottom:20px;
-  display:flex;
-  flex-wrap:wrap;
-  gap:10px;
-}
-
+/* INPUT */
 input, select{
+  width:100%;
   padding:10px;
   border-radius:8px;
   border:1px solid #ddd;
+  margin-bottom:10px;
   font-size:14px;
-  outline:none;
-  transition:0.2s;
 }
 
-input:focus,
-select:focus{
-  border-color:#4e73df;
-  box-shadow:0 0 0 2px rgba(78,115,223,0.2);
-}
-
-/* BUTTON STYLE */
+/* BUTTON */
 button{
-  padding:9px 15px;
+  width:100%;
+  padding:10px;
   border:none;
   border-radius:8px;
+  background:#4e73df;
+  color:white;
   font-weight:500;
   cursor:pointer;
   transition:0.2s;
-  background:#4e73df;
-  color:white;
 }
 
 button:hover{
   background:#2e59d9;
-  transform:translateY(-1px);
 }
 
 /* DELETE BUTTON */
-td button,
-ul li button{
+.delete-btn{
   background:#e74a3b;
+  width:auto;
+  padding:5px 10px;
+  font-size:12px;
 }
 
-td button:hover,
-ul li button:hover{
+.delete-btn:hover{
   background:#c0392b;
 }
 
@@ -112,6 +96,7 @@ ul li button:hover{
 table{
   width:100%;
   border-collapse:collapse;
+  border-radius:15px;
   overflow:hidden;
 }
 
@@ -126,19 +111,17 @@ th, td{
   border-bottom:1px solid #eee;
 }
 
-tbody tr:hover{
-  background:#f8f9fc;
-  transition:0.2s;
+tbody tr:nth-child(even){
+  background:#f9f9f9;
 }
 
-tbody tr:nth-child(even){
-  background:#fafafa;
+tbody tr:hover{
+  background:#f1f4ff;
 }
 
 /* RESPONSIVE */
-@media(max-width:768px){
-  th, td{
-    font-size:12px;
-    padding:8px;
+@media(max-width:1000px){
+  .main-container{
+    grid-template-columns:1fr;
   }
 }
