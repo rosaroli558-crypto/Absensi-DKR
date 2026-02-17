@@ -1,8 +1,7 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-import { getDatabase, ref, onValue, push, remove, set } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
-import * as XLSX from "https://cdn.sheetjs.com/xlsx-latest/package/dist/xlsx.full.min.js";
+import { getDatabase, ref, set, onValue, push, remove } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
 
-// 🔹 Firebase Config
+// 🔹 Firebase config
 const firebaseConfig = {
   apiKey: "AIzaSyC88eNtWMuOQ4eezVriirq_sjjVOkfl8K8",
   authDomain: "absensi-dkr.firebaseapp.com",
@@ -40,8 +39,7 @@ addUserBtn.addEventListener("click", ()=>{
 onValue(userRef, snapshot=>{
   const data = snapshot.val() || {};
   userListUl.innerHTML = "";
-  const sortedUsers = Object.entries(data).sort((a,b)=> a[1].localeCompare(b[1]));
-  sortedUsers.forEach(([key,nama])=>{
+  Object.entries(data).sort((a,b)=> a[1].localeCompare(b[1])).forEach(([key,nama])=>{
     const li = document.createElement("li");
     li.textContent = nama;
     const btn = document.createElement("button");
@@ -95,7 +93,7 @@ function tampilkanDaftar(){
     let bgColor="";
     switch(p.kegiatan){
       case "Hadir": bgColor="#d4edda"; break;
-      case "Izin": bgColor="#fff3cd"; break;
+      case "Izin":
       case "Sakit": bgColor="#fff3cd"; break;
       case "Alfa": bgColor="#f8d7da"; break;
     }
@@ -119,8 +117,7 @@ function tampilkanDaftar(){
 // 🔹 Ekspor ke Excel
 exportBtn.addEventListener("click", ()=>{
   const rows = [["Nama","Kegiatan","Waktu"]];
-  const trList = daftarBody.querySelectorAll("tr");
-  trList.forEach(tr=>{
+  daftarBody.querySelectorAll("tr").forEach(tr=>{
     const tds = tr.querySelectorAll("td");
     rows.push([tds[0].textContent, tds[1].textContent, tds[2].textContent]);
   });
