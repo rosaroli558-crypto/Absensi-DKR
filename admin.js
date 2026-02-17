@@ -95,7 +95,7 @@ function tampilkanDaftar(){
     let bgColor="";
     switch(p.kegiatan){
       case "Hadir": bgColor="#d4edda"; break;
-      case "Izin":
+      case "Izin": bgColor="#fff3cd"; break;
       case "Sakit": bgColor="#fff3cd"; break;
       case "Alfa": bgColor="#f8d7da"; break;
     }
