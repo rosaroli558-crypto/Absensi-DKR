@@ -1,70 +1,141 @@
-<!DOCTYPE html>
-<html lang="id">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Rekap Absensi DKR</title>
-<link rel="stylesheet" href="admin.css">
-</head>
-<body>
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+import { getDatabase, ref, onValue, push, remove } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
 
-<div class="container">
+const firebaseConfig = {
+  apiKey: "YOUR_API_KEY",
+  authDomain: "absensi-dkr.firebaseapp.com",
+  databaseURL: "https://absensi-dkr-default-rtdb.asia-southeast1.firebasedatabase.app",
+  projectId: "absensi-dkr",
+  storageBucket: "absensi-dkr.firebasestorage.app",
+  messagingSenderId: "824325578551",
+  appId: "1:824325578551:web:3fa855eab199686e5d84b2"
+};
 
-  <div class="logo-container">
-    <img src="logo.png" alt="Logo">
-  </div>
+const app = initializeApp(firebaseConfig);
+const db = getDatabase(app);
 
-  <h1>Rekap Absensi DKR</h1>
+const daftarBody = document.querySelector("#daftarAdmin tbody");
+const totalSpan = document.getElementById("total");
+const bulanSelect = document.getElementById("bulan");
+const searchInput = document.getElementById("searchInput");
+const addUserBtn = document.getElementById("addUserBtn");
+const newUserInput = document.getElementById("newUser");
+const userListUl = document.getElementById("userList");
+const exportBtn = document.getElementById("exportExcel");
 
-  <div class="controls">
-    <label>Total Respons: <span id="total">0</span></label>
+let allData = {};
 
-    <select id="bulan">
-      <option value="all">Semua Bulan</option>
-      <option value="0">Januari</option>
-      <option value="1">Februari</option>
-      <option value="2">Maret</option>
-      <option value="3">April</option>
-      <option value="4">Mei</option>
-      <option value="5">Juni</option>
-      <option value="6">Juli</option>
-      <option value="7">Agustus</option>
-      <option value="8">September</option>
-      <option value="9">Oktober</option>
-      <option value="10">November</option>
-      <option value="11">Desember</option>
-    </select>
+// ================= DATA ABSENSI =================
+onValue(ref(db,"absensi/"), snapshot=>{
+  allData = snapshot.val() || {};
+  renderTable();
+});
 
-    <input type="text" id="searchInput" placeholder="Cari nama / tanggal / status...">
+bulanSelect.addEventListener("change", renderTable);
+searchInput.addEventListener("input", renderTable);
 
-    <button id="exportExcel">Simpan ke Excel</button>
-  </div>
+function renderTable(){
+  daftarBody.innerHTML = "";
 
-  <div class="add-user">
-    <input type="text" id="newUser" placeholder="Nama user baru">
-    <button id="addUserBtn">Tambah User</button>
-  </div>
+  let dataArray = Object.entries(allData).map(([id,p])=>({
+    id,
+    ...p,
+    date:new Date(p.waktu)
+  }));
 
-  <ul id="userList"></ul>
+  // FILTER BULAN
+  if(bulanSelect.value !== "all"){
+    dataArray = dataArray.filter(p =>
+      p.date.getMonth() === parseInt(bulanSelect.value)
+    );
+  }
 
-  <div class="table-container">
-    <table id="daftarAdmin">
-      <thead>
-        <tr>
-          <th>Nama</th>
-          <th>Status</th>
-          <th>Waktu</th>
-          <th>Aksi</th>
-        </tr>
-      </thead>
-      <tbody></tbody>
-    </table>
-  </div>
+  // FILTER SEARCH
+  const keyword = searchInput.value.toLowerCase().trim();
 
-</div>
+  if(keyword){
+    dataArray = dataArray.filter(p=>{
+      const tanggal = p.date.toLocaleDateString('id-ID');
+      return (
+        p.nama.toLowerCase().includes(keyword) ||
+        p.kegiatan.toLowerCase().includes(keyword) ||
+        tanggal.includes(keyword)
+      );
+    });
+  }
 
-<script src="https://cdn.sheetjs.com/xlsx-latest/package/dist/xlsx.full.min.js"></script>
-<script type="module" src="admin.js"></script>
+  totalSpan.textContent = dataArray.length;
 
-</body>
-</html>
+  dataArray.sort((a,b)=>b.date-a.date);
+
+  dataArray.forEach(p=>{
+    const tr = document.createElement("tr");
+
+    switch(p.kegiatan){
+      case "Hadir": tr.style.background="#d4edda"; break;
+      case "Izin": tr.style.background="#fff3cd"; break;
+      case "Sakit": tr.style.background="#fff3cd"; break;
+      case "Alfa": tr.style.background="#f8d7da"; break;
+    }
+
+    tr.innerHTML = `
+      <td>${p.nama}</td>
+      <td>${p.kegiatan}</td>
+      <td>${p.date.toLocaleDateString('id-ID')} ${p.date.toLocaleTimeString('id-ID',{hour:'2-digit',minute:'2-digit'})}</td>
+      <td><button data-id="${p.id}">Hapus</button></td>
+    `;
+
+    tr.querySelector("button").onclick = ()=>{
+      if(confirm("Hapus data ini?")){
+        remove(ref(db,"absensi/"+p.id));
+      }
+    };
+
+    daftarBody.appendChild(tr);
+  });
+}
+
+// ================= USER =================
+addUserBtn.onclick = ()=>{
+  const nama = newUserInput.value.trim();
+  if(!nama) return alert("Nama kosong!");
+  push(ref(db,"userList/"), nama);
+  newUserInput.value="";
+};
+
+onValue(ref(db,"userList/"), snapshot=>{
+  const data = snapshot.val() || {};
+  userListUl.innerHTML="";
+
+  Object.entries(data)
+    .sort((a,b)=>a[1].localeCompare(b[1]))
+    .forEach(([key,nama])=>{
+      const li = document.createElement("li");
+      li.innerHTML = `${nama} <button data-key="${key}">Hapus</button>`;
+      li.querySelector("button").onclick = ()=>{
+        if(confirm("Hapus user?")){
+          remove(ref(db,"userList/"+key));
+        }
+      };
+      userListUl.appendChild(li);
+    });
+});
+
+// ================= EXPORT =================
+exportBtn.onclick = ()=>{
+  const rows = [["Nama","Status","Waktu"]];
+
+  daftarBody.querySelectorAll("tr").forEach(tr=>{
+    const tds = tr.querySelectorAll("td");
+    rows.push([
+      tds[0].textContent,
+      tds[1].textContent,
+      tds[2].textContent
+    ]);
+  });
+
+  const ws = XLSX.utils.aoa_to_sheet(rows);
+  const wb = XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(wb, ws, "Absensi");
+  XLSX.writeFile(wb, "Rekap_Absensi_DKR.xlsx");
+};
