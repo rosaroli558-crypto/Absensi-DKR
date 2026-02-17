@@ -1,7 +1,7 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-import { getDatabase, ref, set, onValue } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
+import { getDatabase, ref, set, onValue, query, orderByChild, equalTo, get } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
 
-// Firebase config
+// 🔹 Firebase config
 const firebaseConfig = {
   apiKey: "AIzaSyC88eNtWMuOQ4eezVriirq_sjjVOkfl8K8",
   authDomain: "absensi-dkr.firebaseapp.com",
@@ -26,24 +26,11 @@ onValue(userRef, snapshot=>{
   namaSelect.innerHTML="";
   Object.values(data).sort((a,b)=> a.localeCompare(b)).forEach(nama=>{
     const option = document.createElement("option");
-    option.value = nama; option.textContent = nama;
+    option.value = nama;
+    option.textContent = nama;
     namaSelect.appendChild(option);
   });
 });
-
-// Fungsi absen
-window.absen = ()=>{
-  const nama = namaSelect.value;
-  const kegiatan = kegiatanSelect.value;
-  if(!nama){ alert("Pilih nama!"); return; }
-
-  const id = `${nama}_${new Date().getTime()}`;
-  set(ref(db,"absensi/"+id),{
-    nama,
-    kegiatan,
-    waktu: new Date().toISOString()
-  });
-};
 
 // Tampilkan 5 data terakhir
 const absensiRef = ref(db,"absensi/");
@@ -59,3 +46,39 @@ onValue(absensiRef, snapshot=>{
     daftar.appendChild(li);
   });
 });
+
+// 🔹 Fungsi absen dengan batas 4 per user per bulan
+window.absen = async ()=>{
+  const nama = namaSelect.value;
+  const kegiatan = kegiatanSelect.value;
+  if(!nama){ alert("Pilih nama!"); return; }
+
+  const now = new Date();
+  const bulan = now.getMonth();
+  const tahun = now.getFullYear();
+
+  // Ambil semua absensi user bulan ini
+  const snapshot = await get(absensiRef);
+  const data = snapshot.val() || {};
+  let countThisMonth = 0;
+
+  Object.values(data).forEach(p=>{
+    const d = new Date(p.waktu);
+    if(p.nama===nama && d.getMonth()===bulan && d.getFullYear()===tahun){
+      countThisMonth++;
+    }
+  });
+
+  if(countThisMonth>=4){
+    alert(`User "${nama}" sudah melakukan 4 absensi bulan ini!`);
+    return;
+  }
+
+  // Simpan absensi baru
+  const id = `${nama}_${now.getTime()}`;
+  set(ref(db,"absensi/"+id),{
+    nama,
+    kegiatan,
+    waktu: now.toISOString()
+  });
+};
