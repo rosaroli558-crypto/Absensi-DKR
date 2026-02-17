@@ -24,42 +24,68 @@ const newUserInput = document.getElementById("newUser");
 const userListUl = document.getElementById("userList");
 const exportBtn = document.getElementById("exportExcel");
 
-// 🔹 References
-const absensiRef = ref(db,"absensi/");
-const userRef = ref(db,"userList/");
+// 🔹 Modal custom
+const modal = document.createElement("div");
+modal.id = "modalConfirm";
+modal.style.cssText = `
+  position: fixed; top:0; left:0; width:100%; height:100%;
+  display:none; justify-content:center; align-items:center;
+  background: rgba(0,0,0,0.5); z-index:1000;
+`;
+const modalBox = document.createElement("div");
+modalBox.style.cssText = `
+  background:white; padding:20px; border-radius:8px; min-width:250px;
+  text-align:center;
+`;
+const modalText = document.createElement("p");
+const btnYes = document.createElement("button");
+btnYes.textContent = "Ya";
+btnYes.style.margin="5px";
+const btnNo = document.createElement("button");
+btnNo.textContent = "Batal";
+btnNo.style.margin="5px";
+modalBox.appendChild(modalText);
+modalBox.appendChild(btnYes);
+modalBox.appendChild(btnNo);
+modal.appendChild(modalBox);
+document.body.appendChild(modal);
+
+function confirmModal(message){
+  return new Promise(resolve=>{
+    modalText.textContent = message;
+    modal.style.display = "flex";
+    btnYes.onclick = ()=> { modal.style.display="none"; resolve(true); };
+    btnNo.onclick = ()=> { modal.style.display="none"; resolve(false); };
+  });
+}
 
 // 🔹 Tambah user
 addUserBtn.addEventListener("click", ()=>{
   const nama = newUserInput.value.trim();
   if(!nama){ alert("Nama kosong"); return; }
-  push(userRef, nama).then(()=> newUserInput.value="");
+  push(ref(db,"userList/"), nama).then(()=> newUserInput.value="");
 });
 
 // 🔹 Daftar user realtime A→Z
-onValue(userRef, snapshot=>{
+onValue(ref(db,"userList/"), snapshot=>{
   const data = snapshot.val() || {};
   userListUl.innerHTML = "";
-
-  Object.entries(data)
-    .sort((a,b)=> a[1].localeCompare(b[1]))
-    .forEach(([key,nama])=>{
-      const li = document.createElement("li");
-      li.textContent = nama + " ";
-
-      const btn = document.createElement("button");
-      btn.textContent = "Hapus";
-      btn.addEventListener("click", ()=>{
-        if(confirm(`Hapus user "${nama}"?`)) remove(ref(db,"userList/"+key));
-      });
-
-      li.appendChild(btn);
-      userListUl.appendChild(li);
+  Object.entries(data).sort((a,b)=>a[1].localeCompare(b[1])).forEach(async ([key,nama])=>{
+    const li = document.createElement("li");
+    li.textContent = nama + " ";
+    const btn = document.createElement("button");
+    btn.textContent = "Hapus";
+    btn.addEventListener("click", async ()=>{
+      if(await confirmModal(`Hapus user "${nama}"?`)) remove(ref(db,"userList/"+key));
+    });
+    li.appendChild(btn);
+    userListUl.appendChild(li);
   });
 });
 
 // 🔹 Ambil data absensi realtime
 let allData = {};
-onValue(absensiRef, snapshot=>{
+onValue(ref(db,"absensi/"), snapshot=>{
   allData = snapshot.val() || {};
   tampilkanDaftar();
 });
@@ -123,8 +149,8 @@ function tampilkanDaftar(){
     const tdAksi = document.createElement("td");
     const delBtn = document.createElement("button");
     delBtn.textContent = "Hapus";
-    delBtn.addEventListener("click", ()=>{
-      if(confirm(`Hapus absensi ${p.nama} | ${p.kegiatan}?`)) remove(ref(db,"absensi/"+p.id));
+    delBtn.addEventListener("click", async ()=>{
+      if(await confirmModal(`Hapus absensi ${p.nama} | ${p.kegiatan}?`)) remove(ref(db,"absensi/"+p.id));
     });
     tdAksi.appendChild(delBtn);
 
