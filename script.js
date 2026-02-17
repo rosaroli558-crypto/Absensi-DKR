@@ -1,97 +1,88 @@
-// ===============================
-// INIT DATA
-// ===============================
+// ==========================
+// FIREBASE CONFIG
+// ==========================
 
-let users = JSON.parse(localStorage.getItem("users")) || [];
-let absensi = JSON.parse(localStorage.getItem("absensi")) || [];
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+import { getDatabase, ref, push, onValue, remove } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
 
-// ===============================
-// SAVE FUNCTION
-// ===============================
+const firebaseConfig = {
+  apiKey: "API_KEY_KAMU",
+  authDomain: "absensi-dkr-default.firebaseapp.com",
+  databaseURL: "https://absensi-dkr-default-default-rtdb.asia-southeast1.firebasedatabase.app",
+  projectId: "absensi-dkr-default",
+  storageBucket: "absensi-dkr-default.appspot.com",
+  messagingSenderId: "MESSAGING_ID_KAMU",
+  appId: "APP_ID_KAMU"
+};
 
-function saveData() {
-  localStorage.setItem("users", JSON.stringify(users));
-  localStorage.setItem("absensi", JSON.stringify(absensi));
-}
+const app = initializeApp(firebaseConfig);
+const db = getDatabase(app);
 
-// ===============================
-// RENDER USER LIST (KIRI)
-// ===============================
+// ==========================
+// USER MANAGEMENT
+// ==========================
 
-function renderUsers() {
+const userRef = ref(db, "users");
+
+function renderUsers(snapshot) {
   const userList = document.getElementById("userList");
   userList.innerHTML = "";
 
-  users.forEach((user, index) => {
+  snapshot.forEach(child => {
     const li = document.createElement("li");
     li.className = "user-item";
 
     li.innerHTML = `
-      ${user}
-      <button onclick="deleteUser(${index})" class="btn-delete">X</button>
+      ${child.val().name}
+      <button onclick="deleteUser('${child.key}')" class="btn-delete">X</button>
     `;
 
     userList.appendChild(li);
   });
 }
 
-// ===============================
-// TAMBAH USER
-// ===============================
+onValue(userRef, snapshot => {
+  renderUsers(snapshot);
+});
 
-function addUser() {
+window.addUser = function() {
   const input = document.getElementById("newUser");
   const name = input.value.trim();
 
-  if (!name) return alert("Nama tidak boleh kosong");
+  if (!name) return alert("Nama kosong");
 
-  if (users.includes(name)) {
-    alert("User sudah ada");
-    return;
-  }
-
-  users.push(name);
-  saveData();
-  renderUsers();
+  push(userRef, { name });
   input.value = "";
 }
 
-// ===============================
-// HAPUS USER
-// ===============================
-
-function deleteUser(index) {
-  if (!confirm("Hapus user ini?")) return;
-
-  const deletedUser = users[index];
-
-  // hapus semua absensi user itu juga
-  absensi = absensi.filter(a => a.nama !== deletedUser);
-
-  users.splice(index, 1);
-  saveData();
-  renderUsers();
-  renderTable();
+window.deleteUser = function(id) {
+  remove(ref(db, "users/" + id));
 }
 
-// ===============================
-// RENDER TABEL ABSENSI (KANAN)
-// ===============================
+// ==========================
+// ABSENSI TABLE
+// ==========================
 
-function renderTable(data = absensi) {
+const absenRef = ref(db, "absensi");
+
+function renderTable(snapshot) {
   const tbody = document.getElementById("absenBody");
   tbody.innerHTML = "";
 
-  data.forEach((item, index) => {
+  let no = 1;
+
+  snapshot.forEach(child => {
+    const data = child.val();
+
     const tr = document.createElement("tr");
 
     tr.innerHTML = `
-      <td>${index + 1}</td>
-      <td>${item.nama}</td>
-      <td>${item.tanggal}</td>
-      <td>${item.keterangan}</td>
+      <td>${no++}</td>
+      <td>${data.nama}</td>
+      <td>${data.tanggal}</td>
+      <td>${data.keterangan}</td>
       <td>
-        <button onclick="deleteAbsensi(${index})" class="btn-delete">
+        <button onclick="deleteAbsensi('${child.key}')" class="btn-delete">
           Hapus
         </button>
       </td>
@@ -101,50 +92,10 @@ function renderTable(data = absensi) {
   });
 }
 
-// ===============================
-// HAPUS PER ABSENSI
-// ===============================
-
-function deleteAbsensi(index) {
-  if (!confirm("Hapus data absensi ini?")) return;
-
-  absensi.splice(index, 1);
-  saveData();
-  renderTable();
-}
-
-// ===============================
-// FILTER DATA
-// ===============================
-
-function filterData() {
-  const cariNama = document.getElementById("searchNama").value.toLowerCase();
-  const tanggal = document.getElementById("searchTanggal").value;
-  const status = document.getElementById("searchStatus").value;
-
-  let filtered = absensi.filter(item => {
-    return (
-      item.nama.toLowerCase().includes(cariNama) &&
-      (tanggal === "" || item.tanggal === tanggal) &&
-      (status === "Semua" || item.keterangan === status)
-    );
-  });
-
-  renderTable(filtered);
-}
-
-function resetFilter() {
-  document.getElementById("searchNama").value = "";
-  document.getElementById("searchTanggal").value = "";
-  document.getElementById("searchStatus").value = "Semua";
-  renderTable();
-}
-
-// ===============================
-// AUTO LOAD SAAT HALAMAN DIBUKA
-// ===============================
-
-document.addEventListener("DOMContentLoaded", function () {
-  renderUsers();
-  renderTable();
+onValue(absenRef, snapshot => {
+  renderTable(snapshot);
 });
+
+window.deleteAbsensi = function(id) {
+  remove(ref(db, "absensi/" + id));
+}
