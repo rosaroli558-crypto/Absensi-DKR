@@ -1,14 +1,12 @@
-// ===============================
-// IMPORT FIREBASE (CDN VERSION)
-// ===============================
+// =============================
+// FIREBASE IMPORT
+// =============================
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+import { getDatabase, ref, push } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
 
-import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
-import { getDatabase, ref, push, onValue, remove } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
-
-// ===============================
-// FIREBASE CONFIG
-// ===============================
-
+// =============================
+// FIREBASE CONFIG (DATA KAMU)
+// =============================
 const firebaseConfig = {
   apiKey: "AIzaSyC88eNtWMuOQ4eezVriirq_sjjVOkfl8K8",
   authDomain: "absensi-dkr.firebaseapp.com",
@@ -16,94 +14,51 @@ const firebaseConfig = {
   projectId: "absensi-dkr",
   storageBucket: "absensi-dkr.firebasestorage.app",
   messagingSenderId: "824325578551",
-  appId: "1:824325578551:web:3fa855eab199686e5d84b2"
+  appId: "1:824325578551:web:3fa855eab199686e5d84b2",
+  measurementId: "G-MYTKHS8FHM"
 };
 
-// ===============================
+// =============================
 // INIT FIREBASE
-// ===============================
-
+// =============================
 const app = initializeApp(firebaseConfig);
 const db = getDatabase(app);
 
-// ===============================
-// USER SECTION
-// ===============================
+// =============================
+// FORM HANDLER
+// =============================
+document.addEventListener("DOMContentLoaded", () => {
 
-const userRef = ref(db, "users");
+  const form = document.getElementById("formAbsensi");
+  if (!form) return;
 
-function renderUsers(snapshot) {
-  const userList = document.getElementById("userList");
-  userList.innerHTML = "";
+  form.addEventListener("submit", async (e) => {
+    e.preventDefault();
 
-  snapshot.forEach(child => {
-    const li = document.createElement("li");
-    li.className = "user-item";
+    const nama = document.getElementById("nama")?.value.trim();
+    const tanggal = document.getElementById("tanggal")?.value;
+    const keterangan = document.getElementById("keterangan")?.value.trim();
 
-    li.innerHTML = `
-      ${child.val().name}
-      <button onclick="deleteUser('${child.key}')" class="btn-delete">X</button>
-    `;
+    if (!nama || !tanggal || !keterangan) {
+      alert("Semua field wajib diisi!");
+      return;
+    }
 
-    userList.appendChild(li);
+    try {
+      await push(ref(db, "absensi"), {
+        nama,
+        tanggal,
+        keterangan,
+        createdAt: Date.now()
+      });
+
+      alert("Absensi berhasil dikirim!");
+      form.reset();
+
+    } catch (error) {
+      console.error("Gagal kirim data:", error);
+      alert("Terjadi kesalahan. Coba lagi.");
+    }
   });
-}
 
-onValue(userRef, snapshot => {
-  renderUsers(snapshot);
 });
-
-window.addUser = function() {
-  const input = document.getElementById("newUser");
-  const name = input.value.trim();
-
-  if (!name) return alert("Nama kosong");
-
-  push(userRef, { name });
-  input.value = "";
-};
-
-window.deleteUser = function(id) {
-  remove(ref(db, "users/" + id));
-};
-
-// ===============================
-// ABSENSI SECTION
-// ===============================
-
-const absenRef = ref(db, "absensi");
-
-function renderTable(snapshot) {
-  const tbody = document.getElementById("absenBody");
-  tbody.innerHTML = "";
-
-  let no = 1;
-
-  snapshot.forEach(child => {
-    const data = child.val();
-
-    const tr = document.createElement("tr");
-
-    tr.innerHTML = `
-      <td>${no++}</td>
-      <td>${data.nama}</td>
-      <td>${data.tanggal}</td>
-      <td>${data.keterangan}</td>
-      <td>
-        <button onclick="deleteAbsensi('${child.key}')" class="btn-delete">
-          Hapus
-        </button>
-      </td>
-    `;
-
-    tbody.appendChild(tr);
-  });
-}
-
-onValue(absenRef, snapshot => {
-  renderTable(snapshot);
-});
-
-window.deleteAbsensi = function(id) {
-  remove(ref(db, "absensi/" + id));
-};
