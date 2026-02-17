@@ -1,150 +1,150 @@
-import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-import { getDatabase, ref, push, remove, onValue } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
+// ===============================
+// INIT DATA
+// ===============================
 
-const firebaseConfig = {
-  apiKey: "YOUR_API_KEY",
-  authDomain: "absensi-dkr.firebaseapp.com",
-  databaseURL: "https://absensi-dkr-default-rtdb.asia-southeast1.firebasedatabase.app",
-  projectId: "absensi-dkr",
-  storageBucket: "absensi-dkr.firebasestorage.app",
-  messagingSenderId: "824325578551",
-  appId: "1:824325578551:web:3fa855eab199686e5d84b2"
-};
+let users = JSON.parse(localStorage.getItem("users")) || [];
+let absensi = JSON.parse(localStorage.getItem("absensi")) || [];
 
-const app = initializeApp(firebaseConfig);
-const db = getDatabase(app);
+// ===============================
+// SAVE FUNCTION
+// ===============================
 
-const tabel = document.getElementById("tabelData");
-const listUser = document.getElementById("listUser");
-
-let semuaData = [];
-
-/* ======================
-   LOAD USER
-====================== */
-onValue(ref(db,"userList/"), snapshot=>{
-  const data = snapshot.val() || {};
-  listUser.innerHTML="";
-  Object.entries(data)
-    .sort((a,b)=>a[1].localeCompare(b[1]))
-    .forEach(([key,nama])=>{
-      listUser.innerHTML += `
-        <li>
-          ${nama}
-          <button onclick="hapusUser('${key}')">Hapus</button>
-        </li>
-      `;
-    });
-});
-
-/* ======================
-   TAMBAH USER
-====================== */
-window.tambahUser = function(){
-  const nama = document.getElementById("namaBaru").value.trim();
-  if(!nama) return alert("Nama kosong");
-
-  push(ref(db,"userList/"), nama);
-  document.getElementById("namaBaru").value="";
+function saveData() {
+  localStorage.setItem("users", JSON.stringify(users));
+  localStorage.setItem("absensi", JSON.stringify(absensi));
 }
 
-/* ======================
-   HAPUS USER
-====================== */
-window.hapusUser = function(key){
-  if(confirm("Yakin hapus user?")){
-    remove(ref(db,"userList/"+key));
-  }
-}
+// ===============================
+// RENDER USER LIST (KIRI)
+// ===============================
 
-/* ======================
-   LOAD ABSENSI
-====================== */
-onValue(ref(db,"absensi/"), snapshot=>{
-  const data = snapshot.val() || {};
+function renderUsers() {
+  const userList = document.getElementById("userList");
+  userList.innerHTML = "";
 
-  semuaData = Object.entries(data).map(([key,val])=>{
-    const tgl = new Date(val.waktu);
-    return {
-      id:key,
-      nama:val.nama,
-      tanggal:tgl,
-      tanggalString:tgl.toISOString().split("T")[0],
-      keterangan:val.keterangan || "Hadir"
-    }
-  })
-  .sort((a,b)=>{
-    if(a.tanggalString === b.tanggalString){
-      return a.nama.localeCompare(b.nama);
-    }
-    return new Date(a.tanggal) - new Date(b.tanggal);
-  });
+  users.forEach((user, index) => {
+    const li = document.createElement("li");
+    li.className = "user-item";
 
-  tampilkanData(semuaData);
-});
-
-/* ======================
-   TAMPILKAN
-====================== */
-function tampilkanData(data){
-  tabel.innerHTML="";
-  data.forEach((d,i)=>{
-    tabel.innerHTML += `
-      <tr>
-        <td>${i+1}</td>
-        <td>${d.nama}</td>
-        <td>${formatTanggal(d.tanggal)}</td>
-        <td>${d.keterangan}</td>
-        <td>
-          <button onclick="hapusAbsensi('${d.id}')">Hapus</button>
-        </td>
-      </tr>
+    li.innerHTML = `
+      ${user}
+      <button onclick="deleteUser(${index})" class="btn-delete">X</button>
     `;
+
+    userList.appendChild(li);
   });
 }
 
-/* ======================
-   HAPUS ABSENSI
-====================== */
-window.hapusAbsensi = function(id){
-  if(confirm("Yakin hapus absensi ini?")){
-    remove(ref(db,"absensi/"+id));
+// ===============================
+// TAMBAH USER
+// ===============================
+
+function addUser() {
+  const input = document.getElementById("newUser");
+  const name = input.value.trim();
+
+  if (!name) return alert("Nama tidak boleh kosong");
+
+  if (users.includes(name)) {
+    alert("User sudah ada");
+    return;
   }
+
+  users.push(name);
+  saveData();
+  renderUsers();
+  input.value = "";
 }
 
-/* ======================
-   FILTER
-====================== */
-window.filterData = function(){
-  const nama = document.getElementById("searchNama").value.toLowerCase();
-  const tanggal = document.getElementById("searchTanggal").value;
-  const ket = document.getElementById("searchKeterangan").value;
+// ===============================
+// HAPUS USER
+// ===============================
 
-  let filtered = semuaData.filter(d=>{
+function deleteUser(index) {
+  if (!confirm("Hapus user ini?")) return;
+
+  const deletedUser = users[index];
+
+  // hapus semua absensi user itu juga
+  absensi = absensi.filter(a => a.nama !== deletedUser);
+
+  users.splice(index, 1);
+  saveData();
+  renderUsers();
+  renderTable();
+}
+
+// ===============================
+// RENDER TABEL ABSENSI (KANAN)
+// ===============================
+
+function renderTable(data = absensi) {
+  const tbody = document.getElementById("absenBody");
+  tbody.innerHTML = "";
+
+  data.forEach((item, index) => {
+    const tr = document.createElement("tr");
+
+    tr.innerHTML = `
+      <td>${index + 1}</td>
+      <td>${item.nama}</td>
+      <td>${item.tanggal}</td>
+      <td>${item.keterangan}</td>
+      <td>
+        <button onclick="deleteAbsensi(${index})" class="btn-delete">
+          Hapus
+        </button>
+      </td>
+    `;
+
+    tbody.appendChild(tr);
+  });
+}
+
+// ===============================
+// HAPUS PER ABSENSI
+// ===============================
+
+function deleteAbsensi(index) {
+  if (!confirm("Hapus data absensi ini?")) return;
+
+  absensi.splice(index, 1);
+  saveData();
+  renderTable();
+}
+
+// ===============================
+// FILTER DATA
+// ===============================
+
+function filterData() {
+  const cariNama = document.getElementById("searchNama").value.toLowerCase();
+  const tanggal = document.getElementById("searchTanggal").value;
+  const status = document.getElementById("searchStatus").value;
+
+  let filtered = absensi.filter(item => {
     return (
-      (nama==="" || d.nama.toLowerCase().includes(nama)) &&
-      (tanggal==="" || d.tanggalString===tanggal) &&
-      (ket==="" || d.keterangan===ket)
+      item.nama.toLowerCase().includes(cariNama) &&
+      (tanggal === "" || item.tanggal === tanggal) &&
+      (status === "Semua" || item.keterangan === status)
     );
   });
 
-  tampilkanData(filtered);
+  renderTable(filtered);
 }
 
-window.resetFilter = function(){
-  document.getElementById("searchNama").value="";
-  document.getElementById("searchTanggal").value="";
-  document.getElementById("searchKeterangan").value="";
-  tampilkanData(semuaData);
+function resetFilter() {
+  document.getElementById("searchNama").value = "";
+  document.getElementById("searchTanggal").value = "";
+  document.getElementById("searchStatus").value = "Semua";
+  renderTable();
 }
 
-/* ======================
-   FORMAT TANGGAL
-====================== */
-function formatTanggal(date){
-  return date.toLocaleDateString("id-ID",{
-    day:"2-digit",
-    month:"long",
-    year:"numeric"
-  });
-}
+// ===============================
+// AUTO LOAD SAAT HALAMAN DIBUKA
+// ===============================
+
+document.addEventListener("DOMContentLoaded", function () {
+  renderUsers();
+  renderTable();
+});
