@@ -178,12 +178,16 @@ filterKegiatan.addEventListener("change", applyFilter);
 /* ================= EXPORT CSV ================= */
 
 function exportCSV(data) {
+
   if (!data.length) {
     alert("Tidak ada data untuk export.");
     return;
   }
 
-  const sorted = sortData([...data]);
+  // Urutkan berdasarkan Nama A-Z
+  const sorted = [...data].sort((a, b) =>
+    a.nama.localeCompare(b.nama, "id", { sensitivity: "base" })
+  );
 
   let csv = "Nama,Kegiatan,Tanggal,Jam\n";
 
