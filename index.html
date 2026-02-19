@@ -1,23 +1,27 @@
 <!DOCTYPE html>
 <html lang="id">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Absensi DKR</title>
-<link rel="stylesheet" href="style.css">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Absensi DKR Batulicin</title>
+  <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
-<div class="container">
+<div class="container user-page">
+
+  <!-- LOGO -->
   <div class="logo-container">
-    <img src="logo.png" alt="Logo">
+    <img src="logo.png" alt="Logo DKR" class="logo">
   </div>
 
-  <h1>Absensi Kegiatan</h1>
+  <h1>Absensi Kegiatan DKR Batulicin</h1>
 
-  <div class="absen-form">
+  <!-- FORM ABSENSI -->
+  <div class="absen-card">
+
     <select id="nama">
-      <option value="">Memuat nama...</option>
+      <option value="">Memuat daftar anggota...</option>
     </select>
 
     <select id="kegiatan">
@@ -27,11 +31,18 @@
       <option value="Alfa">Alfa</option>
     </select>
 
-    <button id="btnAbsen">Absen</button>
+    <button id="btnAbsen">Absen Sekarang</button>
+
+    <p id="statusMsg" class="status-msg"></p>
+
   </div>
 
-  <h2>Daftar Hadir (5 Terakhir)</h2>
-  <ul id="daftar"></ul>
+  <!-- RIWAYAT TERAKHIR -->
+  <div class="riwayat-card">
+    <h3>5 Absensi Terakhir</h3>
+    <ul id="daftar"></ul>
+  </div>
+
 </div>
 
 <script type="module" src="script.js"></script>
