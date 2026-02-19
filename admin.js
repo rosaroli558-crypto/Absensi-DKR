@@ -45,6 +45,7 @@ const listUser = document.getElementById("listUser");
 /* ================= STATE ================= */
 
 let globalAbsensi = [];
+let filteredData = [];
 
 /* ================= SORT DATA ================= */
 
@@ -134,26 +135,30 @@ function renderRekap(data) {
 /* ================= FILTER ================= */
 
 function applyFilter() {
+
   let data = [...globalAbsensi];
 
   const bulan = filterBulan.value;
   const kegiatan = filterKegiatan.value;
 
+  // Filter Bulan
   if (bulan) {
     data = data.filter(item =>
-      item.timestamp.startsWith(bulan)
+      item.timestamp && item.timestamp.startsWith(bulan)
     );
   }
 
+  // Filter Kegiatan
   if (kegiatan) {
     data = data.filter(item =>
       item.kegiatan === kegiatan
     );
   }
 
-  const sorted = sortData(data);
-  renderTable(sorted);
-  renderRekap(sorted);
+  filteredData = sortData(data);
+
+  renderTable(filteredData);
+  renderRekap(filteredData);
 }
 
 /* ================= EXPORT CSV ================= */
@@ -281,6 +286,12 @@ filterBulan.addEventListener("change", applyFilter);
 filterKegiatan.addEventListener("change", applyFilter);
 
 exportBtn.addEventListener("click", () => {
-  applyFilter();
-  exportCSV([...globalAbsensi]);
+
+  if (!filteredData.length) {
+    alert("Tidak ada data untuk export.");
+    return;
+  }
+
+  exportCSV(filteredData);
 });
+
