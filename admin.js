@@ -260,10 +260,12 @@ function renderUsers(data) {
 /* ================= FIREBASE LISTENER ================= */
 
 onValue(absensiRef, snapshot => {
+
   const data = snapshot.val();
 
   if (!data) {
     globalAbsensi = [];
+    filteredData = [];
     applyFilter();
     return;
   }
