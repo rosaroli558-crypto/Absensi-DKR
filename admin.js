@@ -342,12 +342,5 @@ filterBulan.addEventListener("change", applyFilter);
 filterKegiatan.addEventListener("change", applyFilter);
 
 exportBtn.addEventListener("click", () => {
-
-  if (!filteredData.length) {
-    alert("Tidak ada data untuk export.");
-    return;
-  }
-
-  exportCSV(filteredData);
+  exportExcel(filteredData);
 });
-
