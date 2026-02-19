@@ -100,7 +100,7 @@ btnAbsen.addEventListener("click", () => {
     minute: "2-digit"
   });
 
-  const timestamp = now.toISOString();
+  const timestamp = new Date().toISOString();
 
   const newAbsensiRef = push(absensiRef);
 
