@@ -177,33 +177,69 @@ filterKegiatan.addEventListener("change", applyFilter);
 
 /* ================= EXPORT CSV ================= */
 
-function exportCSV(data) {
+function exportExcel(data) {
 
   if (!data.length) {
     alert("Tidak ada data untuk export.");
     return;
   }
 
-  // Urutkan berdasarkan Nama A-Z
-  const sorted = [...data].sort((a, b) =>
-    a.nama.localeCompare(b.nama, "id", { sensitivity: "base" })
-  );
+  // Urut profesional
+  const sorted = [...data].sort((a, b) => {
+    const namaCompare = a.nama.localeCompare(b.nama, "id", {
+      sensitivity: "base"
+    });
 
-  let csv = "Nama,Kegiatan,Tanggal,Jam\n";
+    if (namaCompare !== 0) return namaCompare;
 
-  sorted.forEach(item => {
-    csv += `${item.nama},${item.kegiatan},${item.tanggal},${item.jam}\n`;
+    return new Date(b.timestamp) - new Date(a.timestamp);
   });
 
-  const blob = new Blob([csv], { type: "text/csv" });
-  const url = URL.createObjectURL(blob);
+  // Ambil periode filter
+  const bulan = filterBulan.value || "Semua Bulan";
+  const kegiatan = filterKegiatan.value || "Semua Keterangan";
 
-  const a = document.createElement("a");
-  a.href = url;
-  a.download = "rekap_absensi.csv";
-  a.click();
+  // Data untuk sheet
+  const sheetData = [];
 
-  URL.revokeObjectURL(url);
+  // Judul
+  sheetData.push(["REKAP ABSENSI DKR BATULICIN"]);
+  sheetData.push([`Periode: ${bulan}`]);
+  sheetData.push([`Keterangan: ${kegiatan}`]);
+  sheetData.push([]);
+
+  // Header tabel
+  sheetData.push(["No", "Nama", "Keterangan", "Tanggal", "Jam"]);
+
+  sorted.forEach((item, index) => {
+    sheetData.push([
+      index + 1,
+      item.nama,
+      item.kegiatan,
+      item.tanggal,
+      item.jam
+    ]);
+  });
+
+  sheetData.push([]);
+  sheetData.push(["Total Data:", sorted.length]);
+
+  // Buat workbook
+  const wb = XLSX.utils.book_new();
+  const ws = XLSX.utils.aoa_to_sheet(sheetData);
+
+  // Auto width kolom
+  ws["!cols"] = [
+    { wch: 5 },
+    { wch: 25 },
+    { wch: 15 },
+    { wch: 15 },
+    { wch: 10 }
+  ];
+
+  XLSX.utils.book_append_sheet(wb, ws, "Rekap Absensi");
+
+  XLSX.writeFile(wb, "Rekap_Absensi_DKR.xlsx");
 }
 
 /* ================= USERS CRUD ================= */
