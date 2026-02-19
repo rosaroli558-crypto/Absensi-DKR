@@ -203,6 +203,7 @@ function exportExcel(data) {
   const sheetData = [];
 
   // Judul
+  sheetData.push([]);
   sheetData.push(["REKAP ABSENSI DKR BATULICIN"]);
   sheetData.push([`Periode: ${bulan}`]);
   sheetData.push([`Keterangan: ${kegiatan}`]);
