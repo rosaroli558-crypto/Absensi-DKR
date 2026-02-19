@@ -138,17 +138,28 @@ function applyFilter() {
 
   let data = [...globalAbsensi];
 
-  const bulan = filterBulan.value;
+  const bulan = filterBulan.value;   // format: 2026-02
   const kegiatan = filterKegiatan.value;
 
-  // Filter Bulan
+  // ================= FILTER BULAN =================
   if (bulan) {
-    data = data.filter(item =>
-      item.timestamp && item.timestamp.startsWith(bulan)
-    );
+
+    const [tahunFilter, bulanFilter] = bulan.split("-");
+
+    data = data.filter(item => {
+
+      if (!item.timestamp) return false;
+
+      const date = new Date(item.timestamp);
+
+      const tahunData = date.getFullYear().toString();
+      const bulanData = (date.getMonth() + 1).toString().padStart(2, "0");
+
+      return tahunData === tahunFilter && bulanData === bulanFilter;
+    });
   }
 
-  // Filter Kegiatan
+  // ================= FILTER KEGIATAN =================
   if (kegiatan) {
     data = data.filter(item =>
       item.kegiatan === kegiatan
@@ -160,6 +171,7 @@ function applyFilter() {
   renderTable(filteredData);
   renderRekap(filteredData);
 }
+
 
 /* ================= EXPORT CSV ================= */
 
