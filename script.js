@@ -1,19 +1,16 @@
-// =============================
-// FIREBASE IMPORT
-// =============================
-import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-import { 
-  getDatabase, 
-  ref, 
-  push, 
-  onValue, 
-  query, 
-  limitToLast 
-} from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+import {
+  getDatabase,
+  ref,
+  onValue,
+  push,
+  set,
+  query,
+  limitToLast
+} from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
 
-// =============================
-// FIREBASE CONFIG
-// =============================
+/* ================= FIREBASE CONFIG ================= */
+
 const firebaseConfig = {
   apiKey: "AIzaSyC88eNtWMuOQ4eezVriirq_sjjVOkfl8K8",
   authDomain: "absensi-dkr.firebaseapp.com",
@@ -21,124 +18,137 @@ const firebaseConfig = {
   projectId: "absensi-dkr",
   storageBucket: "absensi-dkr.firebasestorage.app",
   messagingSenderId: "824325578551",
-  appId: "1:824325578551:web:3fa855eab199686e5d84b2",
-  measurementId: "G-MYTKHS8FHM"
+  appId: "1:824325578551:web:3fa855eab199686e5d84b2"
 };
 
-// =============================
-// INIT FIREBASE
-// =============================
 const app = initializeApp(firebaseConfig);
 const db = getDatabase(app);
 
-// =============================
-// LOAD NAMA DARI DATABASE
-// =============================
-function loadUsers() {
+/* ================= REFERENCES ================= */
 
-  const selectNama = document.getElementById("nama");
-  if (!selectNama) return;
+const usersRef = ref(db, "users");
+const absensiRef = ref(db, "absensi");
 
-  const userRef = ref(db, "users");
+/* ================= ELEMENT ================= */
 
-  onValue(userRef, (snapshot) => {
+const namaSelect = document.getElementById("nama");
+const kegiatanSelect = document.getElementById("kegiatan");
+const btnAbsen = document.getElementById("btnAbsen");
+const daftar = document.getElementById("daftar");
+const statusMsg = document.getElementById("statusMsg");
 
-    selectNama.innerHTML = `<option value="">-- Pilih Nama --</option>`;
+/* ================= LOAD USERS ================= */
 
-    if (!snapshot.exists()) {
-      selectNama.innerHTML = `<option value="">Belum ada user</option>`;
-      return;
-    }
+onValue(usersRef, snapshot => {
 
-    snapshot.forEach(child => {
-      const data = child.val();
-      if (!data?.name) return;
+  const data = snapshot.val();
 
-      const option = document.createElement("option");
-      option.value = data.name;
-      option.textContent = data.name;
+  namaSelect.innerHTML = "";
 
-      selectNama.appendChild(option);
-    });
-
-  });
-}
-
-// =============================
-// KIRIM ABSENSI
-// =============================
-function handleAbsen() {
-
-  const nama = document.getElementById("nama")?.value;
-  const kegiatan = document.getElementById("kegiatan")?.value;
-
-  if (!nama) {
-    alert("Silakan pilih nama terlebih dahulu.");
+  if (!data) {
+    namaSelect.innerHTML = "<option value=''>Belum ada anggota</option>";
     return;
   }
 
-  push(ref(db, "absensi"), {
-    nama: nama,
-    status: kegiatan,
-    waktu: new Date().toLocaleString(),
-    createdAt: Date.now()
-  })
-  .then(() => {
-    alert("Absensi berhasil!");
-  })
-  .catch((error) => {
-    console.error(error);
-    alert("Gagal menyimpan data.");
-  });
-}
+  const aktifUsers = Object.keys(data)
+    .filter(key => data[key].aktif)
+    .map(key => ({
+      id: key,
+      nama: data[key].nama
+    }))
+    .sort((a, b) =>
+      a.nama.localeCompare(b.nama, "id", { sensitivity: "base" })
+    );
 
-// =============================
-// LOAD 5 DATA TERAKHIR
-// =============================
-function loadLastFive() {
-
-  const list = document.getElementById("daftar");
-  if (!list) return;
-
-  const q = query(ref(db, "absensi"), limitToLast(5));
-
-  onValue(q, (snapshot) => {
-
-    list.innerHTML = "";
-
-    if (!snapshot.exists()) {
-      list.innerHTML = "<li>Belum ada data</li>";
-      return;
-    }
-
-    const dataArr = [];
-
-    snapshot.forEach(child => {
-      dataArr.push(child.val());
-    });
-
-    dataArr.reverse();
-
-    dataArr.forEach(data => {
-      const li = document.createElement("li");
-      li.textContent = `${data.nama} - ${data.status} (${data.waktu})`;
-      list.appendChild(li);
-    });
-
-  });
-}
-
-// =============================
-// INIT SAAT HALAMAN DIBUKA
-// =============================
-document.addEventListener("DOMContentLoaded", () => {
-
-  loadUsers();
-  loadLastFive();
-
-  const btn = document.getElementById("btnAbsen");
-  if (btn) {
-    btn.addEventListener("click", handleAbsen);
+  if (!aktifUsers.length) {
+    namaSelect.innerHTML = "<option value=''>Tidak ada anggota aktif</option>";
+    return;
   }
+
+  namaSelect.innerHTML = "<option value=''>Pilih Nama</option>";
+
+  aktifUsers.forEach(user => {
+    const option = document.createElement("option");
+    option.value = user.id;
+    option.textContent = user.nama;
+    namaSelect.appendChild(option);
+  });
+
+});
+
+/* ================= ABSEN ================= */
+
+btnAbsen.addEventListener("click", () => {
+
+  const userId = namaSelect.value;
+  const kegiatan = kegiatanSelect.value;
+
+  if (!userId) {
+    statusMsg.textContent = "Pilih nama terlebih dahulu.";
+    statusMsg.style.color = "red";
+    return;
+  }
+
+  const userName =
+    namaSelect.options[namaSelect.selectedIndex].text;
+
+  const now = new Date();
+
+  const tanggal = now.toLocaleDateString("id-ID");
+  const jam = now.toLocaleTimeString("id-ID", {
+    hour: "2-digit",
+    minute: "2-digit"
+  });
+
+  const timestamp = now.toISOString();
+
+  const newAbsensiRef = push(absensiRef);
+
+  set(newAbsensiRef, {
+    userId,
+    nama: userName,
+    kegiatan,
+    tanggal,
+    jam,
+    timestamp
+  });
+
+  statusMsg.textContent = "Absensi berhasil dicatat.";
+  statusMsg.style.color = "green";
+
+  namaSelect.value = "";
+
+});
+
+/* ================= 5 DATA TERAKHIR ================= */
+
+const lastFiveQuery = query(absensiRef, limitToLast(5));
+
+onValue(lastFiveQuery, snapshot => {
+
+  const data = snapshot.val();
+
+  daftar.innerHTML = "";
+
+  if (!data) {
+    daftar.innerHTML = "<li>Belum ada absensi</li>";
+    return;
+  }
+
+  const list = Object.keys(data).map(key => data[key]);
+
+  list.sort((a, b) =>
+    new Date(b.timestamp) - new Date(a.timestamp)
+  );
+
+  list.forEach(item => {
+
+    const li = document.createElement("li");
+
+    li.textContent =
+      `${item.nama} - ${item.kegiatan} (${item.tanggal} ${item.jam})`;
+
+    daftar.appendChild(li);
+  });
 
 });
