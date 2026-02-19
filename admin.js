@@ -138,13 +138,11 @@ function applyFilter() {
 
   let data = [...globalAbsensi];
 
-  const bulan = filterBulan.value;   // format: 2026-02
+  const bulan = filterBulan.value;
   const kegiatan = filterKegiatan.value;
 
   // ================= FILTER BULAN =================
   if (bulan) {
-
-    const [tahunFilter, bulanFilter] = bulan.split("-");
 
     data = data.filter(item => {
 
@@ -152,10 +150,12 @@ function applyFilter() {
 
       const date = new Date(item.timestamp);
 
-      const tahunData = date.getFullYear().toString();
-      const bulanData = (date.getMonth() + 1).toString().padStart(2, "0");
+      const yearMonth =
+        date.getFullYear() +
+        "-" +
+        (date.getMonth() + 1).toString().padStart(2, "0");
 
-      return tahunData === tahunFilter && bulanData === bulanFilter;
+      return yearMonth === bulan;
     });
   }
 
@@ -172,6 +172,8 @@ function applyFilter() {
   renderRekap(filteredData);
 }
 
+filterBulan.addEventListener("change", applyFilter);
+filterKegiatan.addEventListener("change", applyFilter);
 
 /* ================= EXPORT CSV ================= */
 
