@@ -209,10 +209,11 @@ function exportExcel(data) {
   sheetData.push([]);
 
   // Header tabel
-  sheetData.push(["No", "Nama", "Keterangan", "Tanggal", "Jam"]);
+  sheetData.push(["","No", "Nama", "Keterangan", "Tanggal", "Jam"]);
 
   sorted.forEach((item, index) => {
     sheetData.push([
+      item,
       index + 1,
       item.nama,
       item.kegiatan,
@@ -221,9 +222,6 @@ function exportExcel(data) {
     ]);
   });
 
-  sheetData.push([]);
-  sheetData.push(["Total Data:", sorted.length]);
-
   // Buat workbook
   const wb = XLSX.utils.book_new();
   const ws = XLSX.utils.aoa_to_sheet(sheetData);
@@ -231,6 +229,7 @@ function exportExcel(data) {
   // Auto width kolom
   ws["!cols"] = [
     { wch: 5 },
+    { wch: 3 },
     { wch: 25 },
     { wch: 15 },
     { wch: 15 },
