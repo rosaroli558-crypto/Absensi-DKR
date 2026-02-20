@@ -28,6 +28,12 @@ const db = getDatabase(app);
 
 const absensiRef = ref(db, "absensi");
 const usersRef = ref(db, "users");
+const jamMulaiInput = document.getElementById("jamMulai");
+const jamSelesaiInput = document.getElementById("jamSelesai");
+const btnSimpanJam = document.getElementById("btnSimpanJam");
+const statusJam = document.getElementById("statusJam");
+
+const jamRef = ref(db, "settings/jamAbsen");
 
 /* ================= ELEMENTS ================= */
 
@@ -390,6 +396,52 @@ onValue(absensiRef, snapshot => {
 
 onValue(usersRef, snapshot => {
   renderUsers(snapshot.val());
+});
+
+/* ================= LOCK JAM ================= */
+
+onValue(jamRef, snapshot => {
+
+  const data = snapshot.val();
+
+  if (!data) return;
+
+  jamMulaiInput.value = data.mulai;
+  jamSelesaiInput.value = data.selesai;
+
+});
+
+/* ================= SIMPAN JAM ================= */
+
+btnSimpanJam.addEventListener("click", () => {
+
+  const mulai = parseInt(jamMulaiInput.value);
+  const selesai = parseInt(jamSelesaiInput.value);
+
+  if (
+    isNaN(mulai) || isNaN(selesai) ||
+    mulai < 0 || mulai > 23 ||
+    selesai < 0 || selesai > 23
+  ) {
+    statusJam.textContent = "Jam harus angka 0 sampai 23.";
+    statusJam.style.color = "red";
+    return;
+  }
+
+  if (mulai >= selesai) {
+    statusJam.textContent = "Jam selesai harus lebih besar dari jam mulai.";
+    statusJam.style.color = "red";
+    return;
+  }
+
+  set(jamRef, {
+    mulai,
+    selesai
+  });
+
+  statusJam.textContent = "Jam absensi berhasil disimpan.";
+  statusJam.style.color = "green";
+
 });
 
 /* ================= EVENTS ================= */
