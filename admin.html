@@ -8,10 +8,26 @@
 </head>
 <body>
 
-<h2>ADMIN PANEL - ABSENSI DKR BATULICIN 2025–2028</h2>
+<h2>ADMIN - ABSENSI DKR BATULICIN 2025–2028</h2>
 
 <div class="layout">
   
+<h3>Pengaturan Jam Absensi</h3>
+
+<div style="margin-bottom:10px;">
+  <label>Jam Mulai (0-23)</label><br>
+  <input type="number" id="jamMulai" min="0" max="23">
+</div>
+
+<div style="margin-bottom:10px;">
+  <label>Jam Selesai (0-23)</label><br>
+  <input type="number" id="jamSelesai" min="0" max="23">
+</div>
+
+<button id="btnSimpanJam">Simpan Jam</button>
+
+<p id="statusJam"></p>
+
   <!-- ================= SIDEBAR ================= -->
   <div class="sidebar">
 
