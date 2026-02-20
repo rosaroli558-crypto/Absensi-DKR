@@ -233,25 +233,27 @@ function exportToExcel(data, periodeText) {
 
   const range = XLSX.utils.decode_range(ws["!ref"]);
 
-  for (let R = range.s.r; R <= range.e.r; ++R) {
-    for (let C = range.s.c; C <= range.e.c; ++C) {
-      const cell_address = XLSX.utils.encode_cell({ r: R, c: C });
-      if (!ws[cell_address]) continue;
+for (let R = 4; R <= range.e.r; ++R) {   // mulai dari baris header
+  for (let C = 1; C <= 5; ++C) {        // mulai dari kolom B (1) sampai F (5)
 
-      ws[cell_address].s = {
-        alignment: {
-          horizontal: "center",
-          vertical: "center"
-        },
-        border: {
-          top: { style: "thin" },
-          bottom: { style: "thin" },
-          left: { style: "thin" },
-          right: { style: "thin" }
-        }
-      };
-    }
+    const cell_address = XLSX.utils.encode_cell({ r: R, c: C });
+
+    if (!ws[cell_address]) continue;
+
+    ws[cell_address].s = {
+      alignment: {
+        horizontal: "center",
+        vertical: "center"
+      },
+      border: {
+        top: { style: "thin" },
+        bottom: { style: "thin" },
+        left: { style: "thin" },
+        right: { style: "thin" }
+      }
+    };
   }
+}
 
   // Style Judul
   ws["B2"].s = {
