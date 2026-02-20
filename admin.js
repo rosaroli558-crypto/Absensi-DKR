@@ -177,72 +177,63 @@ filterKegiatan.addEventListener("change", applyFilter);
 
 /* ================= EXPORT CSV ================= */
 
-function exportExcel(data) {
+function exportToExcel(data, periodeText) {
+  const wb = XLSX.utils.book_new();
 
-  if (!data.length) {
-    alert("Tidak ada data untuk export.");
-    return;
-  }
-
-  // Urut profesional
-  const sorted = [...data].sort((a, b) => {
-    const namaCompare = a.nama.localeCompare(b.nama, "id", {
-      sensitivity: "base"
-    });
-
-    if (namaCompare !== 0) return namaCompare;
-
-    return new Date(b.timestamp) - new Date(a.timestamp);
+  // Urutkan nama A-Z lalu timestamp terbaru
+  data.sort((a, b) => {
+    const nameCompare = a.nama.localeCompare(b.nama);
+    if (nameCompare !== 0) return nameCompare;
+    return b.timestamp - a.timestamp;
   });
 
-  // Ambil periode filter
-  const bulan = filterBulan.value || "Semua Bulan";
-  const kegiatan = filterKegiatan.value || "Semua Keterangan";
+  const rows = [];
 
-  // Data untuk sheet
-  const sheetData = [];
-
-  // Judul
-  sheetData.push([]);
-  sheetData.push(["REKAP ABSENSI DKR BATULICIN"]);
-  sheetData.push([`Periode: ${bulan}`]);
-  sheetData.push([`Keterangan: ${kegiatan}`]);
-  sheetData.push([]);
+  // Judul (nanti kita merge)
+  rows.push([]);
+  rows.push(["LAPORAN ABSENSI DEWAN KERJA RANTING BATULICIN"]);
+  rows.push([`Periode: ${periodeText}`]);
+  rows.push([]);
 
   // Header tabel
-  sheetData.push(["","No", "Nama", "Keterangan", "Tanggal", "Jam"]);
+  rows.push(["","No", "Nama", "Kegiatan", "Tanggal", "Jam"]);
 
-  sorted.forEach((item, index) => {
-    sheetData.push([
-      item,
+  data.forEach((item, index) => {
+    const date = new Date(item.timestamp);
+    rows.push([
+      index,
       index + 1,
       item.nama,
       item.kegiatan,
-      item.tanggal,
-      item.jam
+      date.toLocaleDateString("id-ID"),
+      date.toLocaleTimeString("id-ID", { hour: '2-digit', minute: '2-digit' })
     ]);
   });
 
-  // Buat workbook
-  const wb = XLSX.utils.book_new();
-  const ws = XLSX.utils.aoa_to_sheet(sheetData);
+  rows.push([]);
+  rows.push(["","Total Data:", data.length]);
 
-  // Auto width kolom
+  const ws = XLSX.utils.aoa_to_sheet(rows);
+
+  // Merge Judul & Periode
+  ws["!merges"] = [
+    { s: { r: 0, c: 0 }, e: { r: 0, c: 4 } },
+    { s: { r: 1, c: 0 }, e: { r: 1, c: 4 } }
+  ];
+
+  // Lebar kolom
   ws["!cols"] = [
+    { wch: 10 },
     { wch: 5 },
-    { wch: 3 },
     { wch: 25 },
-    { wch: 15 },
+    { wch: 25 },
     { wch: 15 },
     { wch: 10 }
   ];
 
-  XLSX.utils.book_append_sheet(wb, ws, "Rekap Absensi");
-
-  XLSX.writeFile(wb, "Rekap_Absensi_DKR.xlsx");
-}
-
-/* ================= USERS CRUD ================= */
+  XLSX.utils.book_append_sheet(wb, ws, "Laporan Absensi");
+  XLSX.writeFile(wb, `Laporan_Absensi_${periodeText}.xlsx`);
+}/* ================= USERS CRUD ================= */
 
 btnTambahUser.addEventListener("click", () => {
   const nama = namaUserInput.value.trim();
