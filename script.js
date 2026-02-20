@@ -3,8 +3,8 @@ import {
   getDatabase,
   ref,
   onValue,
-  push,
   set,
+  get,
   query,
   limitToLast
 } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
@@ -81,7 +81,7 @@ onValue(usersRef, snapshot => {
 
 /* ================= ABSEN ================= */
 
-btnAbsen.addEventListener("click", () => {
+btnAbsen.addEventListener("click", async () => {
 
   const userId = namaSelect.value;
   const kegiatan = kegiatanSelect.value;
@@ -97,30 +97,34 @@ btnAbsen.addEventListener("click", () => {
 
   const now = new Date();
 
-  const tanggal = now.toLocaleDateString("id-ID");
+  const today = now.toISOString().split("T")[0]; // format 2026-02-21
+
   const jam = now.toLocaleTimeString("id-ID", {
     hour: "2-digit",
     minute: "2-digit"
   });
 
-  const timestamp = new Date().toISOString();
+  const absensiUserRef = ref(db, `absensi/${today}/${userId}`);
 
-  const newAbsensiRef = push(absensiRef);
+  const snapshot = await get(absensiUserRef);
 
-  set(newAbsensiRef, {
-    userId,
+  if (snapshot.exists()) {
+    statusMsg.textContent = "User ini sudah absen hari ini.";
+    statusMsg.style.color = "red";
+    return;
+  }
+
+  await set(absensiUserRef, {
     nama: userName,
     kegiatan,
-    tanggal,
     jam,
-    timestamp
+    timestamp: now.toISOString()
   });
 
   statusMsg.textContent = "Absensi berhasil dicatat.";
   statusMsg.style.color = "green";
 
   namaSelect.value = "";
-
 });
 
 /* ================= 5 DATA TERAKHIR ================= */
