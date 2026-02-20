@@ -225,7 +225,7 @@ function exportToExcel(data, periodeText) {
   rows.push([]);
 
   // Total Data
-  rows.push(["", "Total Data:", data.length]);
+  rows.push(["","", "Total Data:", data.length]);
 
   const ws = XLSX.utils.aoa_to_sheet(rows);
 
@@ -239,7 +239,7 @@ function exportToExcel(data, periodeText) {
   ws["!cols"] = [
     { wch: 5 },   // A (kosong margin)
     { wch: 5 },   // B No
-    { wch: 25 },  // C Nama
+    { wch: 30 },  // C Nama
     { wch: 25 },  // D Kegiatan
     { wch: 15 },  // E Tanggal
     { wch: 10 }   // F Jam
