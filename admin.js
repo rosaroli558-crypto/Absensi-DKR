@@ -181,7 +181,6 @@ function exportToExcel(data, periodeText) {
 
   const wb = XLSX.utils.book_new();
 
-  // Urutkan Nama A-Z lalu timestamp terbaru
   data.sort((a, b) => {
     const nameCompare = a.nama.localeCompare(b.nama);
     if (nameCompare !== 0) return nameCompare;
@@ -190,19 +189,10 @@ function exportToExcel(data, periodeText) {
 
   const rows = [];
 
-  // Baris kosong pertama (Row 1)
   rows.push([]);
-
-  // Row 2 → Judul (mulai dari kolom B)
   rows.push(["", "LAPORAN ABSENSI DEWAN KERJA RANTING BATULICIN"]);
-
-  // Row 3 → Periode
   rows.push(["", `Periode: ${periodeText}`]);
-
-  // Row 4 kosong
   rows.push([]);
-
-  // Row 5 → Header tabel mulai dari kolom B
   rows.push(["", "No", "Nama", "Kegiatan", "Tanggal", "Jam"]);
 
   data.forEach((item, index) => {
@@ -221,29 +211,67 @@ function exportToExcel(data, periodeText) {
     ]);
   });
 
-  // Baris kosong
   rows.push([]);
-
-  // Total Data
   rows.push(["","", "Total Data:", data.length]);
 
   const ws = XLSX.utils.aoa_to_sheet(rows);
 
-  // ✅ Merge Judul B2–F2
+  // MERGE B2–F2 & B3–F3
   ws["!merges"] = [
-    { s: { r: 1, c: 1 }, e: { r: 1, c: 5 } }, // B2-F2
-    { s: { r: 2, c: 1 }, e: { r: 2, c: 5 } }  // B3-F3
+    { s: { r: 1, c: 1 }, e: { r: 1, c: 5 } },
+    { s: { r: 2, c: 1 }, e: { r: 2, c: 5 } }
   ];
 
-  // Lebar Kolom (A sampai F)
   ws["!cols"] = [
-    { wch: 5 },   // A (kosong margin)
-    { wch: 5 },   // B No
-    { wch: 30 },  // C Nama
-    { wch: 25 },  // D Kegiatan
-    { wch: 15 },  // E Tanggal
-    { wch: 10 }   // F Jam
+    { wch: 5 },
+    { wch: 6 },
+    { wch: 30 },
+    { wch: 25 },
+    { wch: 15 },
+    { wch: 12 }
   ];
+
+  const range = XLSX.utils.decode_range(ws["!ref"]);
+
+  for (let R = range.s.r; R <= range.e.r; ++R) {
+    for (let C = range.s.c; C <= range.e.c; ++C) {
+      const cell_address = XLSX.utils.encode_cell({ r: R, c: C });
+      if (!ws[cell_address]) continue;
+
+      ws[cell_address].s = {
+        alignment: {
+          horizontal: "center",
+          vertical: "center"
+        },
+        border: {
+          top: { style: "thin" },
+          bottom: { style: "thin" },
+          left: { style: "thin" },
+          right: { style: "thin" }
+        }
+      };
+    }
+  }
+
+  // Style Judul
+  ws["B2"].s = {
+    font: { bold: true, sz: 16 },
+    alignment: { horizontal: "center", vertical: "center" }
+  };
+
+  ws["B3"].s = {
+    font: { bold: true, sz: 12 },
+    alignment: { horizontal: "center", vertical: "center" }
+  };
+
+  // Header bold
+  const headerRow = 4;
+  for (let col = 1; col <= 5; col++) {
+    const cell = XLSX.utils.encode_cell({ r: headerRow, c: col });
+    if (ws[cell]) {
+      ws[cell].s.font = { bold: true };
+    }
+  }
 
   XLSX.utils.book_append_sheet(wb, ws, "Laporan Absensi");
   XLSX.writeFile(wb, `Laporan_Absensi_${periodeText}.xlsx`);
