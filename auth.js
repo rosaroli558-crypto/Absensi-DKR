@@ -1,8 +1,7 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-import { getAuth, signInWithEmailAndPassword, onAuthStateChanged } 
+import { getAuth, signInWithEmailAndPassword, onAuthStateChanged, signOut }
 from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
 
-// CONFIG FIREBASE KAMU (paste config lama di sini)
 const firebaseConfig = {
   apiKey: "AIzaSyC88eNtWMuOQ4eezVriirq_sjjVOkfl8K8",
   authDomain: "absensi-dkr.firebaseapp.com",
@@ -16,16 +15,40 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 
-// LOGIN
-document.getElementById("loginBtn").addEventListener("click", () => {
-  const email = document.getElementById("email").value;
-  const password = document.getElementById("password").value;
+// ================= LOGIN =================
+const loginBtn = document.getElementById("loginBtn");
 
-  signInWithEmailAndPassword(auth, email, password)
-    .then(() => {
-      window.location.href = "admin.html";
-    })
-    .catch((error) => {
-      alert("Login gagal: " + error.message);
-    });
+if (loginBtn) {
+  loginBtn.addEventListener("click", () => {
+    const email = document.getElementById("email").value;
+    const password = document.getElementById("password").value;
+
+    signInWithEmailAndPassword(auth, email, password)
+      .then(() => {
+        window.location.href = "admin.html";
+      })
+      .catch((error) => {
+        alert("Login gagal: " + error.message);
+      });
+  });
+}
+
+// ================= PROTEKSI ADMIN =================
+onAuthStateChanged(auth, (user) => {
+  if (window.location.pathname.includes("admin.html")) {
+    if (!user) {
+      window.location.href = "login.html";
+    }
+  }
 });
+
+// ================= LOGOUT =================
+const logoutBtn = document.getElementById("logoutBtn");
+
+if (logoutBtn) {
+  logoutBtn.addEventListener("click", () => {
+    signOut(auth).then(() => {
+      window.location.href = "login.html";
+    });
+  });
+}
