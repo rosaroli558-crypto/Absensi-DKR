@@ -354,23 +354,36 @@ onValue(absensiRef, snapshot => {
 
   const data = snapshot.val();
 
+  globalAbsensi = [];
+
   if (!data) {
-    globalAbsensi = [];
     filteredData = [];
     applyFilter();
     return;
   }
 
-  globalAbsensi = Object.keys(data).map(key => ({
-    id: key,
-    ...data[key]
-  }));
+  Object.keys(data).forEach(tanggal => {
+
+    const users = data[tanggal];
+
+    Object.keys(users).forEach(uid => {
+
+      const item = users[uid];
+
+      globalAbsensi.push({
+        id: `${tanggal}/${uid}`,   // penting untuk hapus
+        nama: item.nama,
+        kegiatan: item.kegiatan,
+        tanggal: tanggal,
+        jam: item.jam,
+        timestamp: item.timestamp
+      });
+
+    });
+
+  });
 
   applyFilter();
-});
-
-onValue(usersRef, snapshot => {
-  renderUsers(snapshot.val());
 });
 
 /* ================= EVENTS ================= */
