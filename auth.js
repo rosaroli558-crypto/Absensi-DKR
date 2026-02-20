@@ -4,12 +4,13 @@ from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
 
 // CONFIG FIREBASE KAMU (paste config lama di sini)
 const firebaseConfig = {
-  apiKey: "ISI_APIKEY_KAMU",
-  authDomain: "ISI_DOMAIN_KAMU",
-  projectId: "ISI_PROJECTID_KAMU",
-  storageBucket: "ISI_STORAGE_KAMU",
-  messagingSenderId: "ISI_SENDERID_KAMU",
-  appId: "ISI_APPID_KAMU"
+  apiKey: "AIzaSyC88eNtWMuOQ4eezVriirq_sjjVOkfl8K8",
+  authDomain: "absensi-dkr.firebaseapp.com",
+  databaseURL: "https://absensi-dkr-default-rtdb.asia-southeast1.firebasedatabase.app",
+  projectId: "absensi-dkr",
+  storageBucket: "absensi-dkr.firebasestorage.app",
+  messagingSenderId: "824325578551",
+  appId: "1:824325578551:web:3fa855eab199686e5d84b2"
 };
 
 const app = initializeApp(firebaseConfig);
