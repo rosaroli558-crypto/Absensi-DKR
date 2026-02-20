@@ -31,6 +31,10 @@ const auth = getAuth(app);
 
 const usersRef = ref(db, "users");
 const absensiRef = ref(db, "absensi");
+const jamRef = ref(db, "settings/jamAbsen");
+
+let jamMulai = 16;
+let jamSelesai = 18;
 
 /* ================= ELEMENT ================= */
 
@@ -40,6 +44,49 @@ const btnAbsen = document.getElementById("btnAbsen");
 const daftar = document.getElementById("daftar");
 const statusMsg = document.getElementById("statusMsg");
 
+/* ================= LOCK JAM ABSEN ================= */
+
+function checkJamAbsen() {
+
+  const now = new Date();
+  const jamSekarang = now.getHours();
+
+  if (jamSekarang >= jamMulai && jamSekarang <= jamSelesai) {
+
+    btnAbsen.disabled = false;
+    statusMsg.textContent = "";
+    return true;
+
+  } else {
+
+    btnAbsen.disabled = true;
+
+    statusMsg.textContent =
+      `Absensi hanya dibuka pukul ${jamMulai}:00 - ${jamSelesai}:59.`;
+
+    statusMsg.style.color = "red";
+
+    return false;
+  }
+}
+
+onValue(jamRef, snapshot => {
+
+  const data = snapshot.val();
+
+  if (!data) return;
+
+  jamMulai = data.mulai;
+  jamSelesai = data.selesai;
+
+  checkJamAbsen();
+});
+
+// cek saat pertama load
+checkJamAbsen();
+
+// cek ulang setiap 30 detik
+setInterval(checkJamAbsen, 30000);
 /* ================= LOAD USERS ================= */
 
 onValue(usersRef, snapshot => {
@@ -82,6 +129,8 @@ onValue(usersRef, snapshot => {
 /* ================= ABSEN ================= */
 
 btnAbsen.addEventListener("click", async () => {
+
+  if (!checkJamAbsen()) return;
 
   const userId = namaSelect.value;
   const kegiatan = kegiatanSelect.value;
