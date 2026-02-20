@@ -62,9 +62,13 @@ function checkJamAbsen() {
     btnAbsen.disabled = true;
 
     statusMsg.textContent =
-      `Absensi hanya dibuka pukul ${jamMulai}:00 - ${jamSelesai}:59.`;
+  `⛔ ABSENSI DIBUKA PUKUL ${jamMulai}:00 - ${jamSelesai}:59`;
 
-    statusMsg.style.color = "red";
+    statusMsg.style.color = "#b30000";
+    statusMsg.style.fontSize = "20px";
+    statusMsg.style.fontWeight = "bold";
+    statusMsg.style.textAlign = "center";
+    statusMsg.style.marginTop = "15px";
 
     return false;
   }
