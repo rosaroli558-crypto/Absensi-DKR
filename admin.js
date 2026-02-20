@@ -329,9 +329,18 @@ onValue(usersRef, snapshot => {
 
 /* ================= EVENTS ================= */
 
-filterBulan.addEventListener("change", applyFilter);
-filterKegiatan.addEventListener("change", applyFilter);
-
 exportBtn.addEventListener("click", () => {
-  exportExcel(filteredData);
+
+  if (!filteredData.length) {
+    alert("Data kosong!");
+    return;
+  }
+
+  let periodeText = "Semua Data";
+
+  if (filterBulan.value) {
+    periodeText = filterBulan.value;
+  }
+
+  exportToExcel(filteredData, periodeText);
 });
