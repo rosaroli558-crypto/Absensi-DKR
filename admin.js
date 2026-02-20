@@ -178,9 +178,10 @@ filterKegiatan.addEventListener("change", applyFilter);
 /* ================= EXPORT CSV ================= */
 
 function exportToExcel(data, periodeText) {
+
   const wb = XLSX.utils.book_new();
 
-  // Urutkan nama A-Z lalu timestamp terbaru
+  // Urutkan Nama A-Z lalu timestamp terbaru
   data.sort((a, b) => {
     const nameCompare = a.nama.localeCompare(b.nama);
     if (nameCompare !== 0) return nameCompare;
@@ -189,51 +190,66 @@ function exportToExcel(data, periodeText) {
 
   const rows = [];
 
-  // Judul (nanti kita merge)
-  rows.push([]);
-  rows.push(["LAPORAN ABSENSI DEWAN KERJA RANTING BATULICIN"]);
-  rows.push([`Periode: ${periodeText}`]);
+  // Baris kosong pertama (Row 1)
   rows.push([]);
 
-  // Header tabel
-  rows.push(["","No", "Nama", "Kegiatan", "Tanggal", "Jam"]);
+  // Row 2 → Judul (mulai dari kolom B)
+  rows.push(["", "LAPORAN ABSENSI DEWAN KERJA RANTING BATULICIN"]);
+
+  // Row 3 → Periode
+  rows.push(["", `Periode: ${periodeText}`]);
+
+  // Row 4 kosong
+  rows.push([]);
+
+  // Row 5 → Header tabel mulai dari kolom B
+  rows.push(["", "No", "Nama", "Kegiatan", "Tanggal", "Jam"]);
 
   data.forEach((item, index) => {
     const date = new Date(item.timestamp);
+
     rows.push([
-      index,
+      "",
       index + 1,
       item.nama,
       item.kegiatan,
       date.toLocaleDateString("id-ID"),
-      date.toLocaleTimeString("id-ID", { hour: '2-digit', minute: '2-digit' })
+      date.toLocaleTimeString("id-ID", {
+        hour: "2-digit",
+        minute: "2-digit"
+      })
     ]);
   });
 
+  // Baris kosong
   rows.push([]);
-  rows.push(["","Total Data:", data.length]);
+
+  // Total Data
+  rows.push(["", "Total Data:", data.length]);
 
   const ws = XLSX.utils.aoa_to_sheet(rows);
 
-  // Merge Judul & Periode
+  // ✅ Merge Judul B2–F2
   ws["!merges"] = [
-    { s: { r: 0, c: 0 }, e: { r: 0, c: 4 } },
-    { s: { r: 1, c: 0 }, e: { r: 1, c: 4 } }
+    { s: { r: 1, c: 1 }, e: { r: 1, c: 5 } }, // B2-F2
+    { s: { r: 2, c: 1 }, e: { r: 2, c: 5 } }  // B3-F3
   ];
 
-  // Lebar kolom
+  // Lebar Kolom (A sampai F)
   ws["!cols"] = [
-    { wch: 10 },
-    { wch: 5 },
-    { wch: 25 },
-    { wch: 25 },
-    { wch: 15 },
-    { wch: 10 }
+    { wch: 5 },   // A (kosong margin)
+    { wch: 5 },   // B No
+    { wch: 25 },  // C Nama
+    { wch: 25 },  // D Kegiatan
+    { wch: 15 },  // E Tanggal
+    { wch: 10 }   // F Jam
   ];
 
   XLSX.utils.book_append_sheet(wb, ws, "Laporan Absensi");
   XLSX.writeFile(wb, `Laporan_Absensi_${periodeText}.xlsx`);
-}/* ================= USERS CRUD ================= */
+}
+
+/* ================= USERS CRUD ================= */
 
 btnTambahUser.addEventListener("click", () => {
   const nama = namaUserInput.value.trim();
