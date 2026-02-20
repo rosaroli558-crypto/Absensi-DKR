@@ -1,4 +1,4 @@
-import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+eimport { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
 import {
   getDatabase,
   ref,
@@ -384,6 +384,12 @@ onValue(absensiRef, snapshot => {
   });
 
   applyFilter();
+});
+
+/* ================= LOAD USERS ================= */
+
+onValue(usersRef, snapshot => {
+  renderUsers(snapshot.val());
 });
 
 /* ================= EVENTS ================= */
