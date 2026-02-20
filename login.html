@@ -2,18 +2,89 @@
 <html>
 <head>
   <title>Login Admin DKR</title>
-  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js"></script>
-  <script type="module" src="auth.js"></script>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <style>
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background: linear-gradient(135deg, #0066cc, #003366);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+    }
+
+    .login-box {
+      background: white;
+      padding: 40px;
+      width: 320px;
+      border-radius: 12px;
+      box-shadow: 0 15px 30px rgba(0,0,0,0.2);
+      text-align: center;
+    }
+
+    .login-box h2 {
+      margin-bottom: 20px;
+      color: #003366;
+    }
+
+    .login-box input {
+      width: 100%;
+      padding: 12px;
+      margin: 10px 0;
+      border-radius: 8px;
+      border: 1px solid #ccc;
+      font-size: 14px;
+      box-sizing: border-box;
+    }
+
+    .login-box input:focus {
+      border-color: #0066cc;
+      outline: none;
+    }
+
+    .login-box button {
+      width: 100%;
+      padding: 12px;
+      margin-top: 15px;
+      border: none;
+      border-radius: 8px;
+      background: #0066cc;
+      color: white;
+      font-size: 15px;
+      cursor: pointer;
+      transition: 0.3s;
+    }
+
+    .login-box button:hover {
+      background: #004c99;
+    }
+
+    .footer {
+      margin-top: 15px;
+      font-size: 12px;
+      color: #666;
+    }
+  </style>
 </head>
+
 <body>
 
-  <h2>Login Admin</h2>
-  <input type="email" id="email" placeholder="Email">
-  <br><br>
-  <input type="password" id="password" placeholder="Password">
-  <br><br>
-  <button id="loginBtn">Login</button>
+  <div class="login-box">
+    <h2>Admin DKR</h2>
+
+    <input type="email" id="email" placeholder="Email Admin">
+    <input type="password" id="password" placeholder="Password">
+
+    <button id="loginBtn">Login</button>
+
+    <div class="footer">
+      Sistem Absensi DKR
+    </div>
+  </div>
+
+  <script type="module" src="auth.js"></script>
 
 </body>
 </html>
