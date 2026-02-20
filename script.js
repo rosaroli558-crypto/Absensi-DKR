@@ -129,12 +129,9 @@ btnAbsen.addEventListener("click", async () => {
 
 /* ================= 5 DATA TERAKHIR ================= */
 
-const lastFiveQuery = query(absensiRef, limitToLast(5));
-
-onValue(lastFiveQuery, snapshot => {
+onValue(absensiRef, snapshot => {
 
   const data = snapshot.val();
-
   daftar.innerHTML = "";
 
   if (!data) {
@@ -142,13 +139,37 @@ onValue(lastFiveQuery, snapshot => {
     return;
   }
 
-  const list = Object.keys(data).map(key => data[key]);
+  let allData = [];
 
-  list.sort((a, b) =>
+  Object.keys(data).forEach(tanggal => {
+
+    const users = data[tanggal];
+
+    Object.keys(users).forEach(uid => {
+
+      const item = users[uid];
+
+      allData.push({
+        nama: item.nama,
+        kegiatan: item.kegiatan,
+        jam: item.jam,
+        tanggal: tanggal,
+        timestamp: item.timestamp
+      });
+
+    });
+
+  });
+
+  // Urutkan terbaru
+  allData.sort((a, b) =>
     new Date(b.timestamp) - new Date(a.timestamp)
   );
 
-  list.forEach(item => {
+  // Ambil 5 terakhir
+  const lastFive = allData.slice(0, 5);
+
+  lastFive.forEach(item => {
 
     const li = document.createElement("li");
 
@@ -156,6 +177,7 @@ onValue(lastFiveQuery, snapshot => {
       `${item.nama} - ${item.kegiatan} (${item.tanggal} ${item.jam})`;
 
     daftar.appendChild(li);
+
   });
 
 });
