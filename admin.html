@@ -9,182 +9,92 @@
 
 <body>
 
-  <h2>ADMIN - ABSENSI DKR BATULICIN 2025–2028</h2>
-
-  <div class="layout">
-
-    <!-- ================= SIDEBAR ================= -->
-    <div class="sidebar">
-
-      <!-- PENGATURAN JAM -->
-      <!DOCTYPE html>
-<html lang="id">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Admin - Absensi DKR Batulicin</title>
-</head>
-<body>
-
 <h2>ADMIN - ABSENSI DKR BATULICIN 2025–2028</h2>
 
-<!-- ================= PENGATURAN JAM ================= -->
-<h3>Pengaturan Jam Absensi</h3>
-<input type="number" id="jamMulai" placeholder="Jam Mulai (0-23)" min="0" max="23">
-<input type="number" id="jamSelesai" placeholder="Jam Selesai (0-23)" min="0" max="23">
-<button onclick="setJam()">Simpan Jam</button>
+<div class="layout">
 
-<hr>
+  <!-- ================= SIDEBAR ================= -->
+  <div class="sidebar">
 
-<!-- ================= TAMBAH USER ================= -->
-<h3>Tambah Anggota</h3>
-<input type="text" id="namaUser" placeholder="Nama Anggota">
-<button onclick="tambahUser()">Tambah</button>
+    <!-- PENGATURAN JAM -->
+    <div class="card">
+      <h3>Pengaturan Jam Absensi</h3>
+      <input type="number" id="jamMulai" placeholder="Jam Mulai (0-23)" min="0" max="23">
+      <input type="number" id="jamSelesai" placeholder="Jam Selesai (0-23)" min="0" max="23">
+      <button onclick="setJam()">Simpan Jam</button>
+    </div>
 
-<h3>Daftar Anggota</h3>
-<table border="1">
-  <thead>
-    <tr>
-      <th>Nama</th>
-      <th>Aksi</th>
-    </tr>
-  </thead>
-  <tbody id="tabelUser"></tbody>
-</table>
+    <!-- TAMBAH USER -->
+    <div class="card">
+      <h3>Tambah Anggota</h3>
+      <input type="text" id="namaUser" placeholder="Nama Anggota">
+      <button onclick="tambahUser()">Tambah</button>
+    </div>
 
-<hr>
-
-<!-- ================= FILTER ABSENSI ================= -->
-<h3>Filter Absensi per Tanggal</h3>
-<input type="date" id="filterTanggal">
-<button onclick="handleFilter()">Tampilkan</button>
-
-<table border="1">
-  <thead>
-    <tr>
-      <th>Nama</th>
-      <th>Tanggal</th>
-      <th>Aksi</th>
-    </tr>
-  </thead>
-  <tbody id="tabelAbsensi"></tbody>
-</table>
-
-<hr>
-
-<!-- ================= VALIDASI BULANAN ================= -->
-<h3>Validasi Bulanan</h3>
-<input type="month" id="bulanValidasi">
-<button onclick="handleValidasi()">Cek</button>
-
-<table border="1">
-  <thead>
-    <tr>
-      <th>Nama</th>
-      <th>Jumlah</th>
-      <th>Status</th>
-    </tr>
-  </thead>
-  <tbody id="tabelValidasi"></tbody>
-</table>
-
-<hr>
-  
-<!-- ================= EXPORT ================= -->
-<button onclick="exportExcel()">Export CSV</button>
-
-<script type="module" src="admin.js"></script>
-</body>
-</html>
-      <!-- TAMBAH USER -->
-      <div class="card">
-        <h3>Tambah Anggota</h3>
-        <input type="text" id="namaUser" placeholder="Nama Anggota">
-        <input type="text" id="jabatanUser" placeholder="Jabatan (opsional)">
-        <button id="btnTambahUser">Tambah</button>
-      </div>
-
-      <!-- LIST USER -->
-      <div class="card">
-        <h3>Daftar Anggota</h3>
+    <!-- LIST USER -->
+    <div class="card">
+      <h3>Daftar Anggota</h3>
+      <table>
+        <thead>
+          <tr>
+            <th>Nama</th>
+            <th>Aksi</th>
+          </tr>
+        </thead>
         <tbody id="tabelUser"></tbody>
-      </div>
-
+      </table>
     </div>
 
-
-    <!-- ================= MAIN AREA ================= -->
-    <div class="main-area">
-
-      <!-- FILTER -->
-      <div class="card">
-        <h3>Filter Data</h3>
-        <div class="filter-grid">
-          <input type="month" id="filterBulan">
-          <select id="filterKegiatan">
-            <option value="">Semua Keterangan</option>
-            <option value="Hadir">Hadir</option>
-            <option value="Izin">Izin</option>
-            <option value="Sakit">Sakit</option>
-            <option value="Alfa">Alfa</option>
-          </select>
-        </div>
-      </div>
-
-      <!-- REKAP -->
-      <div class="card">
-        <h3>Rekap Kehadiran</h3>
-        <div id="rekapData">Memuat data...</div>
-      </div>
-
-      <!-- TABEL ABSENSI -->
-      <div class="card">
-        <h3>Data Absensi</h3>
-        <div class="table-wrapper">
-          <table>
-            <thead>
-              <tr>
-                <th>Nama</th>
-                <th>Keterangan</th>
-                <th>Tanggal</th>
-                <th>Jam</th>
-                <th>Aksi</th>
-              </tr>
-            </thead>
-            <tbody id="adminTable"></tbody>
-          </table>
-        </div>
-
-        <br>
-        <button id="exportExcel">Export Excel</button>
-        <button id="logoutBtn">Logout</button>
-      </div>
-
-      <!-- VALIDASI BULANAN -->
-      <div class="card">
-        <h3>Validasi Bulanan</h3>
-        <input type="month" id="bulanValidasi">
-        <button onclick="handleValidasi()">Cek</button>
-
-        <table>
-          <thead>
-            <tr>
-              <th>Nama</th>
-              <th>Jumlah</th>
-              <th>Status</th>
-            </tr>
-          </thead>
-          <tbody id="tabelValidasi"></tbody>
-        </table>
-      </div>
-
-    </div>
   </div>
 
-  <!-- SCRIPT -->
-  <script src="https://cdn.jsdelivr.net/npm/xlsx-js-style/dist/xlsx.bundle.js"></script>
-  <script type="module" src="auth.js"></script>
-  <script type="module" src="admin.js"></script>
+  <!-- ================= MAIN AREA ================= -->
+  <div class="main-area">
+
+    <!-- FILTER ABSENSI -->
+    <div class="card">
+      <h3>Filter Absensi per Tanggal</h3>
+      <input type="date" id="filterTanggal">
+      <button onclick="handleFilter()">Tampilkan</button>
+
+      <table>
+        <thead>
+          <tr>
+            <th>Nama</th>
+            <th>Tanggal</th>
+            <th>Aksi</th>
+          </tr>
+        </thead>
+        <tbody id="tabelAbsensi"></tbody>
+      </table>
+    </div>
+
+    <!-- VALIDASI BULANAN -->
+    <div class="card">
+      <h3>Validasi Bulanan</h3>
+      <input type="month" id="bulanValidasi">
+      <button onclick="handleValidasi()">Cek</button>
+
+      <table>
+        <thead>
+          <tr>
+            <th>Nama</th>
+            <th>Jumlah</th>
+            <th>Status</th>
+          </tr>
+        </thead>
+        <tbody id="tabelValidasi"></tbody>
+      </table>
+    </div>
+
+    <!-- EXPORT -->
+    <div class="card">
+      <button onclick="exportExcel()">Export CSV</button>
+    </div>
+
+  </div>
+</div>
+
+<script type="module" src="admin.js"></script>
 
 </body>
 </html>
