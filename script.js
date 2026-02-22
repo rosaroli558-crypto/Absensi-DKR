@@ -1,4 +1,4 @@
-import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
 import {
   getDatabase,
   ref,
@@ -7,7 +7,7 @@ import {
   get,
   query,
   limitToLast
-} from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
+} from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
 
 import { getAuth } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
 
