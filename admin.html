@@ -2,52 +2,72 @@
 <html lang="id">
 <head>
   <meta charset="UTF-8">
+  <title>Admin DKR</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Admin - Absensi DKR Batulicin</title>
-  <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
-<h2>ADMIN - ABSENSI DKR BATULICIN 2025–2028</h2>
+  <h1>Panel Admin DKR</h1>
 
-<div class="layout">
+  <!-- ================= DATA ABSENSI ================= -->
+  <h2>Data Absensi</h2>
+  <input type="date" id="filterTanggal">
+  <button onclick="handleFilter()">Filter</button>
 
-  <h3>Pengaturan Jam Absensi</h3>
-
-  <div>
-    <label>Jam Mulai (0-23)</label><br>
-    <input type="number" id="jamMulai" min="0" max="23">
-  </div>
-
-  <div>
-    <label>Jam Selesai (0-23)</label><br>
-    <input type="number" id="jamSelesai" min="0" max="23">
-  </div>
-
-  <button id="btnSimpanJam">Simpan Jam</button>
-  <p id="statusJam"></p>
-
-  <hr>
-
-  <h3>Validasi Bulanan</h3>
-  <input type="month" id="bulanValidasi">
-  <button id="btnValidasi">Cek</button>
-
-  <table border="1" cellpadding="6" style="margin-top:10px;">
+  <table border="1">
     <thead>
       <tr>
         <th>Nama</th>
-        <th>Jumlah</th>
+        <th>Tanggal</th>
+        <th>Aksi</th>
+      </tr>
+    </thead>
+    <tbody id="tabelAbsensi"></tbody>
+  </table>
+
+  <hr>
+
+  <!-- ================= TAMBAH USER ================= -->
+  <h2>Tambah Anggota</h2>
+  <input type="text" id="namaUser" placeholder="Nama">
+  <button onclick="tambahUser()">Tambah</button>
+
+  <table border="1">
+    <thead>
+      <tr>
+        <th>Nama</th>
+        <th>Aksi</th>
+      </tr>
+    </thead>
+    <tbody id="tabelUser"></tbody>
+  </table>
+
+  <hr>
+
+  <!-- ================= VALIDASI BULAN ================= -->
+  <h2>Validasi Bulanan</h2>
+
+  <input type="month" id="bulanValidasi">
+  <button onclick="handleValidasi()">Validasi</button>
+
+  <table border="1">
+    <thead>
+      <tr>
+        <th>Nama</th>
+        <th>Total Hadir</th>
         <th>Status</th>
       </tr>
     </thead>
     <tbody id="tabelValidasi"></tbody>
   </table>
 
-</div>
+  <hr>
 
-<script src="https://cdn.jsdelivr.net/npm/xlsx-js-style/dist/xlsx.bundle.js"></script>
-<script type="module" src="admin.js"></script>
+  <!-- ================= EXPORT ================= -->
+  <h2>Export Data</h2>
+  <button onclick="exportExcel()">Export Excel</button>
+
+  <script type="module" src="admin.js"></script>
 
 </body>
 </html>
