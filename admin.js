@@ -461,3 +461,65 @@ exportBtn.addEventListener("click", () => {
 
   exportToExcel(filteredData, periodeText);
 });
+
+async function validasiBulanan(bulan) {
+  const absensiRef = ref(db, "absensi");
+  const userRef = ref(db, "users");
+
+  const absSnapshot = await get(absensiRef);
+  const userSnapshot = await get(userRef);
+
+  if (!absSnapshot.exists() || !userSnapshot.exists()) return;
+
+  const absData = absSnapshot.val();
+  const users = userSnapshot.val();
+
+  let rekap = {};
+
+  // Inisialisasi semua user 0
+  Object.keys(users).forEach(uid => {
+    rekap[uid] = 0;
+  });
+
+  // Hitung absensi per bulan
+  Object.keys(absData).forEach(tanggal => {
+    if (tanggal.startsWith(bulan)) {
+      Object.keys(absData[tanggal]).forEach(uid => {
+        if (rekap[uid] !== undefined) {
+          rekap[uid]++;
+        }
+      });
+    }
+  });
+
+  tampilkanValidasi(rekap, users);
+}
+
+function tampilkanValidasi(rekap, users) {
+  const tabel = document.getElementById("tabelValidasi");
+  tabel.innerHTML = "";
+
+  Object.keys(users).forEach(uid => {
+    const jumlah = rekap[uid];
+    let status = "";
+
+    if (jumlah >= 4) status = "Lengkap";
+    else if (jumlah > 0) status = "Kurang";
+    else status = "Tidak Absen";
+
+    tabel.innerHTML += `
+      <tr>
+        <td>${users[uid].nama}</td>
+        <td>${jumlah}</td>
+        <td>${status}</td>
+      </tr>
+    `;
+  });
+}
+
+function handleValidasi() {
+  const bulan = document.getElementById("bulanValidasi").value;
+  if (!bulan) return alert("Pilih bulan dulu");
+
+  validasiBulanan(bulan);
+}
