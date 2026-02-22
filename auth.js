@@ -1,6 +1,6 @@
-import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
 import { getAuth, signInWithEmailAndPassword, onAuthStateChanged, signOut }
-from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
 
 const firebaseConfig = {
   apiKey: "AIzaSyC88eNtWMuOQ4eezVriirq_sjjVOkfl8K8",
@@ -35,11 +35,17 @@ if (loginBtn) {
 
 // ================= PROTEKSI ADMIN =================
 onAuthStateChanged(auth, (user) => {
-  if (window.location.pathname.includes("admin.html")) {
-    if (!user) {
-      window.location.href = "login.html";
-    }
+
+  const isLoginPage = window.location.pathname.includes("login.html");
+
+  if (!user && !isLoginPage) {
+    window.location.href = "login.html";
   }
+
+  if (user && isLoginPage) {
+    window.location.href = "admin.html";
+  }
+
 });
 
 // ================= LOGOUT =================
