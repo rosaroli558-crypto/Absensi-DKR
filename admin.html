@@ -11,116 +11,43 @@
 <h2>ADMIN - ABSENSI DKR BATULICIN 2025–2028</h2>
 
 <div class="layout">
-  
-<h3>Pengaturan Jam Absensi</h3>
 
-<div style="margin-bottom:10px;">
-  <label>Jam Mulai (0-23)</label><br>
-  <input type="number" id="jamMulai" min="0" max="23">
-</div>
+  <h3>Pengaturan Jam Absensi</h3>
 
-<div style="margin-bottom:10px;">
-  <label>Jam Selesai (0-23)</label><br>
-  <input type="number" id="jamSelesai" min="0" max="23">
-</div>
-
-<button id="btnSimpanJam">Simpan Jam</button>
-
-<p id="statusJam"></p>
-
-  <!-- ================= SIDEBAR ================= -->
-  <div class="sidebar">
-
-    <!-- CARD TAMBAH USER -->
-    <div class="card">
-      <h3>Tambah Anggota</h3>
-
-      <input type="text" id="namaUser" placeholder="Nama Anggota">
-      <input type="text" id="jabatanUser" placeholder="Jabatan (opsional)">
-      <button id="btnTambahUser">Tambah</button>
-    </div>
-
-    <!-- CARD LIST USER -->
-    <div class="card">
-      <h3>Daftar Anggota</h3>
-      <ul id="listUser"></ul>
-    </div>
-
+  <div>
+    <label>Jam Mulai (0-23)</label><br>
+    <input type="number" id="jamMulai" min="0" max="23">
   </div>
 
-  <!-- ================= MAIN AREA ================= -->
-  <div class="main-area">
-
-    <!-- FILTER -->
-    <div class="card">
-      <h3>Filter Data</h3>
-
-      <div class="filter-grid">
-        <input type="month" id="filterBulan">
-        <select id="filterKegiatan">
-          <option value="">Semua Keterangan</option>
-          <option value="Hadir">Hadir</option>
-          <option value="Izin">Izin</option>
-          <option value="Sakit">Sakit</option>
-          <option value="Alfa">Alfa</option>
-        </select>
-      </div>
-    </div>
-
-    <!-- REKAP -->
-    <div class="card">
-      <h3>Rekap Kehadiran</h3>
-      <div id="rekapData">Memuat data...</div>
-    </div>
-
-    <!-- TABEL ABSENSI -->
-    <div class="card">
-      <h3>Data Absensi</h3>
-
-      <div class="table-wrapper">
-        <table>
-          <thead>
-            <tr>
-              <th>Nama</th>
-              <th>Keterangan</th>
-              <th>Tanggal</th>
-              <th>Jam</th>
-              <th>Aksi</th>
-            </tr>
-          </thead>
-          <tbody id="adminTable"></tbody>
-        </table>
-      </div>
-
-      <br>
-      <button id="exportExcel">Export Excel</button>
-      <button id="logoutBtn">Logout</button>
-
-    </div>
-
+  <div>
+    <label>Jam Selesai (0-23)</label><br>
+    <input type="number" id="jamSelesai" min="0" max="23">
   </div>
 
+  <button id="btnSimpanJam">Simpan Jam</button>
+  <p id="statusJam"></p>
+
+  <hr>
+
+  <h3>Validasi Bulanan</h3>
+  <input type="month" id="bulanValidasi">
+  <button id="btnValidasi">Cek</button>
+
+  <table border="1" cellpadding="6" style="margin-top:10px;">
+    <thead>
+      <tr>
+        <th>Nama</th>
+        <th>Jumlah</th>
+        <th>Status</th>
+      </tr>
+    </thead>
+    <tbody id="tabelValidasi"></tbody>
+  </table>
+
 </div>
-  
+
 <script src="https://cdn.jsdelivr.net/npm/xlsx-js-style/dist/xlsx.bundle.js"></script>
-
-<script type="module" src="auth.js"></script>
 <script type="module" src="admin.js"></script>
-
-<h3>Validasi Bulanan</h3>
-<input type="month" id="bulanValidasi">
-<button onclick="handleValidasi()">Cek</button>
-
-<table>
-  <thead>
-    <tr>
-      <th>Nama</th>
-      <th>Jumlah</th>
-      <th>Status</th>
-    </tr>
-  </thead>
-  <tbody id="tabelValidasi"></tbody>
-</table>
 
 </body>
 </html>
