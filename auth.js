@@ -48,11 +48,10 @@ onAuthStateChanged(auth, (user) => {
 
 /* ================= LOGOUT ================= */
 
-const logoutBtn = document.getElementById("logoutBtn");
-
 if (logoutBtn) {
   logoutBtn.addEventListener("click", () => {
     signOut(auth).then(() => {
       window.location.href = "login.html";
     });
   });
+}
