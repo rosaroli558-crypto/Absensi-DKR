@@ -522,4 +522,6 @@ function handleValidasi() {
   if (!bulan) return alert("Pilih bulan dulu");
 
   validasiBulanan(bulan);
+
+window.handleValidasi = handleValidasi;
 }
