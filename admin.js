@@ -38,7 +38,9 @@ onValue(ref(db, "users"), snapshot => {
     tabelUser.innerHTML += `
       <tr>
         <td>${users[uid].nama}</td>
-        <td><button onclick="hapusUser('${uid}')">Hapus</button></td>
+        <td>
+          <button onclick="hapusUser('${uid}')">Hapus</button>
+        </td>
       </tr>
     `;
   });
@@ -83,14 +85,16 @@ window.handleFilter = async function () {
       <tr>
         <td>${users[uid]?.nama || "-"}</td>
         <td>${tanggal}</td>
-        <td><button onclick="hapusAbsen('${tanggal}','${uid}')">Hapus</button></td>
+        <td>
+          <button onclick="hapusAbsen('${tanggal}','${uid}')">Hapus</button>
+        </td>
       </tr>
     `;
   });
 };
 
 window.hapusAbsen = function (tanggal, uid) {
-  remove(ref(db, "absensi/" + tanggal + "/" + uid));
+  remove(ref(db, `absensi/${tanggal}/${uid}`));
 };
 
 /* ================= VALIDASI BULANAN ================= */
@@ -118,9 +122,10 @@ window.handleValidasi = async function () {
       }
     });
 
-    let status = total >= 4 ? "Lengkap" :
-                 total > 0 ? "Kurang" :
-                 "Tidak Absen";
+    let status =
+      total >= 4 ? "Lengkap" :
+      total > 0 ? "Kurang" :
+      "Tidak Absen";
 
     tabel.innerHTML += `
       <tr>
@@ -155,11 +160,15 @@ window.exportExcel = async function () {
   if (!snapshot.exists()) return;
 
   const data = snapshot.val();
-  let csv = "Tanggal,UID\n";
+  let csv = "Tanggal,Nama\n";
+
+  const usersSnapshot = await get(ref(db, "users"));
+  const users = usersSnapshot.val();
 
   Object.keys(data).forEach(tanggal => {
     Object.keys(data[tanggal]).forEach(uid => {
-      csv += `${tanggal},${uid}\n`;
+      const nama = users[uid]?.nama || uid;
+      csv += `${tanggal},${nama}\n`;
     });
   });
 
