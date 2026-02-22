@@ -3,7 +3,6 @@
 <head>
   <meta charset="UTF-8">
   <title>Admin DKR</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
 </head>
 <body>
 
@@ -27,9 +26,9 @@
 
   <hr>
 
-  <!-- ================= TAMBAH USER ================= -->
+  <!-- ================= TAMBAH ANGGOTA ================= -->
   <h2>Tambah Anggota</h2>
-  <input type="text" id="namaUser" placeholder="Nama">
+  <input type="text" id="namaUser" placeholder="Nama anggota">
   <button onclick="tambahUser()">Tambah</button>
 
   <table border="1">
@@ -44,9 +43,8 @@
 
   <hr>
 
-  <!-- ================= VALIDASI BULAN ================= -->
+  <!-- ================= VALIDASI BULANAN ================= -->
   <h2>Validasi Bulanan</h2>
-
   <input type="month" id="bulanValidasi">
   <button onclick="handleValidasi()">Validasi</button>
 
@@ -60,6 +58,14 @@
     </thead>
     <tbody id="tabelValidasi"></tbody>
   </table>
+
+  <hr>
+
+  <!-- ================= LOCK JAM ================= -->
+  <h2>Pengaturan Jam Absen</h2>
+  <input type="time" id="jamMulai">
+  <input type="time" id="jamSelesai">
+  <button onclick="setJam()">Simpan Jam</button>
 
   <hr>
 
