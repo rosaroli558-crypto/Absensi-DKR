@@ -12,13 +12,13 @@ import {
 /* ================= FIREBASE CONFIG ================= */
 
 const firebaseConfig = {
-  apiKey: "ISI_API_KEY",
-  authDomain: "ISI_DOMAIN",
-  databaseURL: "ISI_DATABASE_URL",
-  projectId: "ISI_PROJECT_ID",
-  storageBucket: "ISI_BUCKET",
-  messagingSenderId: "ISI_SENDER",
-  appId: "ISI_APP_ID"
+  apiKey: "AIzaSyC88eNtWMuOQ4eezVriirq_sjjVOkfl8K8",
+  authDomain: "absensi-dkr.firebaseapp.com",
+  databaseURL: "https://absensi-dkr-default-rtdb.asia-southeast1.firebasedatabase.app",
+  projectId: "absensi-dkr",
+  storageBucket: "absensi-dkr.firebasestorage.app",
+  messagingSenderId: "824325578551",
+  appId: "1:824325578551:web:3fa855eab199686e5d84b2"
 };
 
 const app = initializeApp(firebaseConfig);
