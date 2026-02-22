@@ -6,365 +6,168 @@ import {
   remove,
   push,
   set,
-  update,
   get
 } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
 
 /* ================= FIREBASE CONFIG ================= */
 
 const firebaseConfig = {
-  apiKey: "AIzaSyC88eNtWMuOQ4eezVriirq_sjjVOkfl8K8",
-  authDomain: "absensi-dkr.firebaseapp.com",
-  databaseURL: "https://absensi-dkr-default-rtdb.asia-southeast1.firebasedatabase.app",
-  projectId: "absensi-dkr",
-  storageBucket: "absensi-dkr.firebasestorage.app",
-  messagingSenderId: "824325578551",
-  appId: "1:824325578551:web:3fa855eab199686e5d84b2"
+  apiKey: "ISI_API_KEY",
+  authDomain: "ISI_DOMAIN",
+  databaseURL: "ISI_DATABASE_URL",
+  projectId: "ISI_PROJECT_ID",
+  storageBucket: "ISI_BUCKET",
+  messagingSenderId: "ISI_SENDER",
+  appId: "ISI_APP_ID"
 };
 
 const app = initializeApp(firebaseConfig);
 const db = getDatabase(app);
 
-/* ================= REFERENCES ================= */
+/* ================= LOAD USERS ================= */
 
-const absensiRef = ref(db, "absensi");
-const usersRef = ref(db, "users");
-const jamRef = ref(db, "settings/jamAbsen");
+const tabelUser = document.getElementById("tabelUser");
 
-/* ================= ELEMENTS ================= */
+onValue(ref(db, "users"), snapshot => {
+  tabelUser.innerHTML = "";
+  if (!snapshot.exists()) return;
 
-const tableBody = document.getElementById("adminTable");
-const filterBulan = document.getElementById("filterBulan");
-const filterKegiatan = document.getElementById("filterKegiatan");
-const rekapBox = document.getElementById("rekapData");
-const exportBtn = document.getElementById("exportExcel");
+  const users = snapshot.val();
 
-const namaUserInput = document.getElementById("namaUser");
-const jabatanUserInput = document.getElementById("jabatanUser");
-const btnTambahUser = document.getElementById("btnTambahUser");
-const listUser = document.getElementById("listUser");
-
-const jamMulaiInput = document.getElementById("jamMulai");
-const jamSelesaiInput = document.getElementById("jamSelesai");
-const btnSimpanJam = document.getElementById("btnSimpanJam");
-const statusJam = document.getElementById("statusJam");
-
-const btnValidasi = document.getElementById("btnValidasi");
-
-/* ================= STATE ================= */
-
-let globalAbsensi = [];
-let filteredData = [];
-
-/* ================= SORT ================= */
-
-function sortData(data) {
-  return data.sort((a, b) =>
-    new Date(b.timestamp) - new Date(a.timestamp)
-  );
-}
-
-/* ================= RENDER TABLE ================= */
-
-function renderTable(data) {
-  tableBody.innerHTML = "";
-
-  if (!data.length) {
-    tableBody.innerHTML = "<tr><td colspan='5'>Tidak ada data</td></tr>";
-    return;
-  }
-
-  data.forEach(item => {
-    const tr = document.createElement("tr");
-
-    tr.innerHTML = `
-      <td>${item.nama}</td>
-      <td>${item.kegiatan}</td>
-      <td>${item.tanggal}</td>
-      <td>${item.jam}</td>
-      <td><button data-id="${item.id}">Hapus</button></td>
-    `;
-
-    tr.querySelector("button").addEventListener("click", () => {
-      if (confirm("Yakin hapus data ini?")) {
-        remove(ref(db, "absensi/" + item.id));
-      }
-    });
-
-    tableBody.appendChild(tr);
-  });
-}
-
-/* ================= RENDER REKAP ================= */
-
-function renderRekap(data) {
-
-  const rekap = {};
-
-  data.forEach(item => {
-
-    if (!rekap[item.nama]) {
-      rekap[item.nama] = {
-        Hadir: 0,
-        Izin: 0,
-        Sakit: 0,
-        Alfa: 0,
-        Total: 0
-      };
-    }
-
-    rekap[item.nama][item.kegiatan]++;
-    rekap[item.nama].Total++;
-  });
-
-  const sortedNama = Object.keys(rekap)
-    .sort((a, b) => a.localeCompare(b, "id"));
-
-  let html = "";
-
-  sortedNama.forEach(nama => {
-    const r = rekap[nama];
-
-    html += `
-      <p>
-        <strong>${nama}</strong><br>
-        Hadir: ${r.Hadir} |
-        Izin: ${r.Izin} |
-        Sakit: ${r.Sakit} |
-        Alfa: ${r.Alfa} |
-        Total: ${r.Total}
-      </p><hr>
+  Object.keys(users).forEach(uid => {
+    tabelUser.innerHTML += `
+      <tr>
+        <td>${users[uid].nama}</td>
+        <td><button onclick="hapusUser('${uid}')">Hapus</button></td>
+      </tr>
     `;
   });
+});
 
-  rekapBox.innerHTML = html || "Belum ada data";
-}
+/* ================= TAMBAH USER ================= */
 
-/* ================= FILTER ================= */
+window.tambahUser = function () {
+  const namaInput = document.getElementById("namaUser");
+  const nama = namaInput.value.trim();
+  if (!nama) return alert("Isi nama dulu");
 
-function applyFilter() {
+  const newUserRef = push(ref(db, "users"));
+  set(newUserRef, { nama });
 
-  let data = [...globalAbsensi];
+  namaInput.value = "";
+};
 
-  const bulan = filterBulan.value;
-  const kegiatan = filterKegiatan.value;
+window.hapusUser = function (uid) {
+  remove(ref(db, "users/" + uid));
+};
 
-  if (bulan) {
-    data = data.filter(item => {
-      const date = new Date(item.timestamp);
-      const ym =
-        date.getFullYear() + "-" +
-        (date.getMonth() + 1).toString().padStart(2, "0");
-      return ym === bulan;
-    });
-  }
+/* ================= FILTER ABSENSI ================= */
 
-  if (kegiatan) {
-    data = data.filter(item => item.kegiatan === kegiatan);
-  }
+const tabelAbsensi = document.getElementById("tabelAbsensi");
 
-  filteredData = sortData(data);
-  renderTable(filteredData);
-  renderRekap(filteredData);
-}
+window.handleFilter = async function () {
+  const tanggal = document.getElementById("filterTanggal").value;
+  if (!tanggal) return alert("Pilih tanggal");
 
-filterBulan?.addEventListener("change", applyFilter);
-filterKegiatan?.addEventListener("change", applyFilter);
+  const snapshot = await get(ref(db, "absensi/" + tanggal));
+  tabelAbsensi.innerHTML = "";
+
+  if (!snapshot.exists()) return;
+
+  const data = snapshot.val();
+  const usersSnapshot = await get(ref(db, "users"));
+  const users = usersSnapshot.val();
+
+  Object.keys(data).forEach(uid => {
+    tabelAbsensi.innerHTML += `
+      <tr>
+        <td>${users[uid]?.nama || "-"}</td>
+        <td>${tanggal}</td>
+        <td><button onclick="hapusAbsen('${tanggal}','${uid}')">Hapus</button></td>
+      </tr>
+    `;
+  });
+};
+
+window.hapusAbsen = function (tanggal, uid) {
+  remove(ref(db, "absensi/" + tanggal + "/" + uid));
+};
 
 /* ================= VALIDASI BULANAN ================= */
 
-async function validasiBulanan(bulan) {
+window.handleValidasi = async function () {
+  const bulan = document.getElementById("bulanValidasi").value;
+  if (!bulan) return alert("Pilih bulan");
 
-  const absSnapshot = await get(absensiRef);
-  const userSnapshot = await get(usersRef);
+  const absSnapshot = await get(ref(db, "absensi"));
+  const userSnapshot = await get(ref(db, "users"));
 
   if (!absSnapshot.exists() || !userSnapshot.exists()) return;
 
   const absData = absSnapshot.val();
   const users = userSnapshot.val();
-
-  let rekap = {};
-
-  Object.keys(users).forEach(uid => {
-    rekap[uid] = 0;
-  });
-
-  Object.keys(absData).forEach(tanggal => {
-
-    if (tanggal.startsWith(bulan)) {
-
-      Object.keys(absData[tanggal]).forEach(uid => {
-        if (rekap[uid] !== undefined) {
-          rekap[uid]++;
-        }
-      });
-
-    }
-
-  });
-
-  tampilkanValidasi(rekap, users);
-}
-
-function tampilkanValidasi(rekap, users) {
-
   const tabel = document.getElementById("tabelValidasi");
   tabel.innerHTML = "";
 
   Object.keys(users).forEach(uid => {
+    let total = 0;
 
-    const jumlah = rekap[uid];
-    let status = "";
+    Object.keys(absData).forEach(tanggal => {
+      if (tanggal.startsWith(bulan) && absData[tanggal][uid]) {
+        total++;
+      }
+    });
 
-    if (jumlah >= 4) status = "Lengkap";
-    else if (jumlah > 0) status = "Kurang";
-    else status = "Tidak Absen";
+    let status = total >= 4 ? "Lengkap" :
+                 total > 0 ? "Kurang" :
+                 "Tidak Absen";
 
     tabel.innerHTML += `
       <tr>
         <td>${users[uid].nama}</td>
-        <td>${jumlah}</td>
+        <td>${total}</td>
         <td>${status}</td>
       </tr>
     `;
   });
-}
-
-btnValidasi?.addEventListener("click", () => {
-
-  const bulan = document.getElementById("bulanValidasi").value;
-
-  if (!bulan) {
-    alert("Pilih bulan dulu");
-    return;
-  }
-
-  validasiBulanan(bulan);
-});
-
-/* ================= FIREBASE LISTENER ================= */
-
-onValue(absensiRef, snapshot => {
-
-  const data = snapshot.val();
-  globalAbsensi = [];
-
-  if (!data) {
-    applyFilter();
-    return;
-  }
-
-  Object.keys(data).forEach(tanggal => {
-
-    const users = data[tanggal];
-
-    Object.keys(users).forEach(uid => {
-
-      const item = users[uid];
-
-      globalAbsensi.push({
-        id: `${tanggal}/${uid}`,
-        nama: item.nama,
-        kegiatan: item.kegiatan,
-        tanggal,
-        jam: item.jam,
-        timestamp: item.timestamp
-      });
-
-    });
-
-  });
-
-  applyFilter();
-});
-
-/* ================= LOAD USERS ================= */
-
-onValue(usersRef, snapshot => {
-  renderUsers(snapshot.val());
-});
-
-/* ================= USERS CRUD ================= */
-
-btnTambahUser?.addEventListener("click", () => {
-
-  const nama = namaUserInput.value.trim();
-  const jabatan = jabatanUserInput.value.trim();
-
-  if (!nama) return alert("Nama tidak boleh kosong");
-
-  const newUserRef = push(usersRef);
-
-  set(newUserRef, {
-    nama,
-    jabatan: jabatan || "-",
-    aktif: true,
-    dibuat: new Date().toISOString()
-  });
-
-  namaUserInput.value = "";
-  jabatanUserInput.value = "";
-});
-
-function renderUsers(data) {
-
-  listUser.innerHTML = "";
-
-  if (!data) {
-    listUser.innerHTML = "<li>Belum ada anggota</li>";
-    return;
-  }
-
-  Object.keys(data).forEach(key => {
-
-    const user = data[key];
-
-    const li = document.createElement("li");
-
-    li.innerHTML = `
-      ${user.nama} (${user.jabatan})
-      <button class="toggle">${user.aktif ? "Nonaktifkan" : "Aktifkan"}</button>
-      <button class="hapus">Hapus</button>
-    `;
-
-    li.querySelector(".toggle").addEventListener("click", () => {
-      update(ref(db, "users/" + key), {
-        aktif: !user.aktif
-      });
-    });
-
-    li.querySelector(".hapus").addEventListener("click", () => {
-      if (confirm("Yakin hapus anggota ini?")) {
-        remove(ref(db, "users/" + key));
-      }
-    });
-
-    listUser.appendChild(li);
-  });
-}
+};
 
 /* ================= LOCK JAM ================= */
 
-onValue(jamRef, snapshot => {
+window.setJam = function () {
+  const mulai = document.getElementById("jamMulai").value;
+  const selesai = document.getElementById("jamSelesai").value;
+
+  if (!mulai || !selesai) return alert("Isi jam mulai & selesai");
+
+  set(ref(db, "pengaturanJam"), {
+    mulai,
+    selesai
+  });
+
+  alert("Jam berhasil disimpan");
+};
+
+/* ================= EXPORT ================= */
+
+window.exportExcel = async function () {
+  const snapshot = await get(ref(db, "absensi"));
+  if (!snapshot.exists()) return;
+
   const data = snapshot.val();
-  if (!data) return;
-  jamMulaiInput.value = data.mulai;
-  jamSelesaiInput.value = data.selesai;
-});
+  let csv = "Tanggal,UID\n";
 
-btnSimpanJam?.addEventListener("click", () => {
+  Object.keys(data).forEach(tanggal => {
+    Object.keys(data[tanggal]).forEach(uid => {
+      csv += `${tanggal},${uid}\n`;
+    });
+  });
 
-  const mulai = parseInt(jamMulaiInput.value);
-  const selesai = parseInt(jamSelesaiInput.value);
+  const blob = new Blob([csv], { type: "text/csv" });
+  const url = URL.createObjectURL(blob);
 
-  if (isNaN(mulai) || isNaN(selesai) || mulai >= selesai) {
-    statusJam.textContent = "Jam tidak valid";
-    statusJam.style.color = "red";
-    return;
-  }
-
-  set(jamRef, { mulai, selesai });
-
-  statusJam.textContent = "Jam disimpan";
-  statusJam.style.color = "green";
-});
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = "absensi.csv";
+  a.click();
+};
