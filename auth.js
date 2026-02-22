@@ -1,6 +1,6 @@
-import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
 import { getAuth, signInWithEmailAndPassword, onAuthStateChanged, signOut }
-from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+from "https://www.gstatic.com/firebasejs/10.2.0/firebase-auth.js";
 
 const firebaseConfig = {
   apiKey: "AIzaSyC88eNtWMuOQ4eezVriirq_sjjVOkfl8K8",
@@ -15,7 +15,8 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 
-// ================= LOGIN =================
+/* ================= LOGIN ================= */
+
 const loginBtn = document.getElementById("loginBtn");
 
 if (loginBtn) {
@@ -24,16 +25,13 @@ if (loginBtn) {
     const password = document.getElementById("password").value;
 
     signInWithEmailAndPassword(auth, email, password)
-      .then(() => {
-        window.location.href = "admin.html";
-      })
-      .catch((error) => {
-        alert("Login gagal: " + error.message);
-      });
+      .then(() => window.location.href = "admin.html")
+      .catch(err => alert("Login gagal: " + err.message));
   });
 }
 
-// ================= PROTEKSI ADMIN =================
+/* ================= PROTEKSI GLOBAL ================= */
+
 onAuthStateChanged(auth, (user) => {
 
   const isLoginPage = window.location.pathname.includes("login.html");
@@ -48,7 +46,8 @@ onAuthStateChanged(auth, (user) => {
 
 });
 
-// ================= LOGOUT =================
+/* ================= LOGOUT ================= */
+
 const logoutBtn = document.getElementById("logoutBtn");
 
 if (logoutBtn) {
