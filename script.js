@@ -173,8 +173,10 @@ btnAbsen.addEventListener("click", async () => {
 
   const now = new Date();
 
-  const today = now.toISOString().split("T")[0]; // format 2026-02-21
-
+  const today = now.toLocaleDateString("sv-SE", {
+  timeZone: "Asia/Makassar"
+  });
+  
   const jam = now.toLocaleTimeString("id-ID", {
     hour: "2-digit",
     minute: "2-digit"
