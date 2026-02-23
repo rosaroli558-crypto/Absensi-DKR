@@ -130,6 +130,35 @@ onValue(usersRef, snapshot => {
 
 });
 
+/* ================= CEK JUMLAH BULANAN ================= */
+
+async function cekJumlahBulanan(userId) {
+  const snapshot = await get(absensiRef);
+
+  if (!snapshot.exists()) return 0;
+
+  const data = snapshot.val();
+  const now = new Date();
+  const bulan = now.getMonth();
+  const tahun = now.getFullYear();
+
+  let total = 0;
+
+  Object.keys(data).forEach(tanggal => {
+    const tgl = new Date(tanggal);
+
+    if (
+      tgl.getMonth() === bulan &&
+      tgl.getFullYear() === tahun &&
+      data[tanggal][userId]
+    ) {
+      total++;
+    }
+  });
+
+  return total;
+}
+
 /* ================= ABSEN ================= */
 
 btnAbsen.addEventListener("click", async () => {
@@ -156,7 +185,22 @@ btnAbsen.addEventListener("click", async () => {
     hour: "2-digit",
     minute: "2-digit"
   });
+  
+namaSelect.addEventListener("change", async () => {
+  const userId = namaSelect.value;
+  if (!userId) return;
 
+  const total = await cekJumlahBulanan(userId);
+
+  if (total >= 4) {
+    btnAbsen.disabled = true;
+    statusMsg.textContent = "Batas 4x bulan ini sudah tercapai.";
+    statusMsg.style.color = "red";
+  } else {
+    checkJamAbsen();
+  }
+});
+  
   const absensiUserRef = ref(db, `absensi/${today}/${userId}`);
 
   const snapshot = await get(absensiUserRef);
@@ -166,7 +210,7 @@ btnAbsen.addEventListener("click", async () => {
     statusMsg.style.color = "red";
     return;
   }
-
+  
   await set(absensiUserRef, {
     nama: userName,
     kegiatan,
