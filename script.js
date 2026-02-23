@@ -79,7 +79,15 @@ function checkJamAbsen() {
 }
 
 // cek saat pertama load
-checkJamAbsen();
+onValue(jamRef, snapshot => {
+  const data = snapshot.val();
+  if (!data) return;
+
+  jamMulai = data.mulai;
+  jamSelesai = data.selesai;
+
+  checkJamAbsen();
+});
 
 // cek ulang setiap 30 detik
 setInterval(checkJamAbsen, 30000);
