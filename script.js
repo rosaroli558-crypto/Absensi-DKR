@@ -133,25 +133,19 @@ onValue(usersRef, snapshot => {
 /* ================= CEK JUMLAH BULANAN ================= */
 
 async function cekJumlahBulanan(userId) {
-  const snapshot = await get(absensiRef);
+
+  const now = new Date();
+  const bulan = now.toISOString().substring(0, 7); // 2026-02
+
+  const snapshot = await get(ref(db, `absensi/${bulan}`));
 
   if (!snapshot.exists()) return 0;
 
   const data = snapshot.val();
-  const now = new Date();
-  const bulan = now.getMonth();
-  const tahun = now.getFullYear();
-
   let total = 0;
 
   Object.keys(data).forEach(tanggal => {
-    const tgl = new Date(tanggal);
-
-    if (
-      tgl.getMonth() === bulan &&
-      tgl.getFullYear() === tahun &&
-      data[tanggal][userId]
-    ) {
+    if (data[tanggal][userId]) {
       total++;
     }
   });
@@ -201,7 +195,8 @@ namaSelect.addEventListener("change", async () => {
   }
 });
   
-  const absensiUserRef = ref(db, `absensi/${today}/${userId}`);
+  const bulan = today.substring(0, 7);
+  const absensiUserRef = ref(db, `absensi/${bulan}/${today}/${userId}`);
 
   const snapshot = await get(absensiUserRef);
 
@@ -226,8 +221,10 @@ namaSelect.addEventListener("change", async () => {
 
 /* ================= 5 DATA TERAKHIR ================= */
 
-onValue(absensiRef, snapshot => {
-
+Object.keys(data).forEach(bulan => {
+  Object.keys(data[bulan]).forEach(tanggal => {
+    Object.keys(data[bulan][tanggal]).forEach(uid => {
+      
   const data = snapshot.val();
   daftar.innerHTML = "";
 
