@@ -221,10 +221,8 @@ namaSelect.addEventListener("change", async () => {
 
 /* ================= 5 DATA TERAKHIR ================= */
 
-Object.keys(data).forEach(bulan => {
-  Object.keys(data[bulan]).forEach(tanggal => {
-    Object.keys(data[bulan][tanggal]).forEach(uid => {
-      
+onValue(absensiRef, snapshot => {
+
   const data = snapshot.val();
   daftar.innerHTML = "";
 
@@ -235,20 +233,22 @@ Object.keys(data).forEach(bulan => {
 
   let allData = [];
 
-  Object.keys(data).forEach(tanggal => {
+  Object.keys(data).forEach(bulan => {
 
-    const users = data[tanggal];
+    Object.keys(data[bulan]).forEach(tanggal => {
 
-    Object.keys(users).forEach(uid => {
+      Object.keys(data[bulan][tanggal]).forEach(uid => {
 
-      const item = users[uid];
+        const item = data[bulan][tanggal][uid];
 
-      allData.push({
-        nama: item.nama,
-        kegiatan: item.kegiatan,
-        jam: item.jam,
-        tanggal: tanggal,
-        timestamp: item.timestamp
+        allData.push({
+          nama: item.nama,
+          kegiatan: item.kegiatan,
+          jam: item.jam,
+          tanggal: tanggal,
+          timestamp: item.timestamp
+        });
+
       });
 
     });
@@ -260,7 +260,6 @@ Object.keys(data).forEach(bulan => {
     new Date(b.timestamp) - new Date(a.timestamp)
   );
 
-  // Ambil 5 terakhir
   const lastFive = allData.slice(0, 5);
 
   lastFive.forEach(item => {
