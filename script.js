@@ -39,7 +39,7 @@ let jamSelesai = 18;
 /* ================= ELEMENT ================= */
 
 const namaSelect = document.getElementById("nama");
-const kegiatanSelect = document.getElementById("kegiatan");
+const keteranganSelect = document.getElementById("keterangan");
 const btnAbsen = document.getElementById("btnAbsen");
 const daftar = document.getElementById("daftar");
 const statusMsg = document.getElementById("statusMsg");
@@ -160,7 +160,7 @@ btnAbsen.addEventListener("click", async () => {
   if (!checkJamAbsen()) return;
 
   const userId = namaSelect.value;
-  const kegiatan = kegiatanSelect.value;
+  const keterangan = keteranganSelect.value;
 
   if (!userId) {
     statusMsg.textContent = "Pilih nama terlebih dahulu.";
@@ -210,7 +210,7 @@ namaSelect.addEventListener("change", async () => {
   
   await set(absensiUserRef, {
     nama: userName,
-    kegiatan,
+    keterangan,
     jam,
     timestamp: now.toISOString()
   });
@@ -245,7 +245,7 @@ onValue(absensiRef, snapshot => {
 
         allData.push({
           nama: item.nama,
-          kegiatan: item.kegiatan,
+          keterangan: item.keterangan,
           jam: item.jam,
           tanggal: tanggal,
           timestamp: item.timestamp
@@ -269,7 +269,7 @@ onValue(absensiRef, snapshot => {
     const li = document.createElement("li");
 
     li.textContent =
-      `${item.nama} - ${item.kegiatan} (${item.tanggal} ${item.jam})`;
+      `${item.nama} - ${item.keterangan} (${item.tanggal} ${item.jam})`;
 
     daftar.appendChild(li);
 
