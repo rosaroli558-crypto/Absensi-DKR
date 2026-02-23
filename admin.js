@@ -97,9 +97,13 @@ window.handleFilter = async function () {
   });
 };
 
-window.hapusAbsen = function (tanggal, uid) {
+window.hapusAbsen = async function (tanggal, uid) {
+
   const bulan = tanggal.substring(0, 7);
-  remove(ref(db, `absensi/${bulan}/${tanggal}/${uid}`));
+
+  await remove(ref(db, `absensi/${bulan}/${tanggal}/${uid}`));
+
+  handleFilter(); // refresh ulang tabel
 };
 
 /* ================= VALIDASI BULANAN ================= */
