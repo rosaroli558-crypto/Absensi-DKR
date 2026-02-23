@@ -49,9 +49,13 @@ const statusMsg = document.getElementById("statusMsg");
 function checkJamAbsen() {
 
   const now = new Date();
-  const jamSekarang = now.getHours();
 
-  if (jamSekarang >= jamMulai && jamSekarang <= jamSelesai) {
+  const totalMenitSekarang = now.getHours() * 60 + now.getMinutes();
+  const totalMenitMulai = jamMulai * 60;
+  const totalMenitSelesai = jamSelesai * 60;
+
+  if (totalMenitSekarang >= totalMenitMulai &&
+      totalMenitSekarang < totalMenitSelesai) {
 
     btnAbsen.disabled = false;
     statusMsg.textContent = "";
@@ -62,7 +66,7 @@ function checkJamAbsen() {
     btnAbsen.disabled = true;
 
     statusMsg.textContent =
-  `⛔ ABSENSI DIBUKA PUKUL ${jamMulai}:00 - ${jamSelesai}:59`;
+      `⛔ ABSENSI DIBUKA PUKUL ${jamMulai}:00 - ${jamSelesai}:00`;
 
     statusMsg.style.color = "#b30000";
     statusMsg.style.fontSize = "20px";
@@ -73,18 +77,6 @@ function checkJamAbsen() {
     return false;
   }
 }
-
-onValue(jamRef, snapshot => {
-
-  const data = snapshot.val();
-
-  if (!data) return;
-
-  jamMulai = data.mulai;
-  jamSelesai = data.selesai;
-
-  checkJamAbsen();
-});
 
 // cek saat pertama load
 checkJamAbsen();
