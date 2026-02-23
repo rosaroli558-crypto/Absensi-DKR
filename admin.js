@@ -54,7 +54,10 @@ window.tambahUser = function () {
   if (!nama) return alert("Isi nama dulu");
 
   const newUserRef = push(ref(db, "users"));
-  set(newUserRef, { nama });
+  set(newUserRef, {
+    nama,
+    aktif: true
+  });
 
   namaInput.value = "";
 };
@@ -145,10 +148,10 @@ window.setJam = function () {
 
   if (!mulai || !selesai) return alert("Isi jam mulai & selesai");
 
-  set(ref(db, "pengaturanJam"), {
-    mulai,
-    selesai
-  });
+    set(ref(db, "settings/jamAbsen"), {
+      mulai: Number(mulai),
+      selesai: Number(selesai)
+    });
 
   alert("Jam berhasil disimpan");
 };
