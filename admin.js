@@ -74,7 +74,8 @@ window.handleFilter = async function () {
   const tanggal = document.getElementById("filterTanggal").value;
   if (!tanggal) return alert("Pilih tanggal");
 
-  const snapshot = await get(ref(db, "absensi/" + tanggal));
+  const bulan = tanggal.substring(0, 7);
+  const snapshot = await get(ref(db, `absensi/${bulan}/${tanggal}`));
   tabelAbsensi.innerHTML = "";
 
   if (!snapshot.exists()) return;
@@ -97,7 +98,8 @@ window.handleFilter = async function () {
 };
 
 window.hapusAbsen = function (tanggal, uid) {
-  remove(ref(db, `absensi/${tanggal}/${uid}`));
+  const bulan = tanggal.substring(0, 7);
+  remove(ref(db, `absensi/${bulan}/${tanggal}/${uid}`));
 };
 
 /* ================= VALIDASI BULANAN ================= */
@@ -117,18 +119,21 @@ window.handleValidasi = async function () {
   tabel.innerHTML = "";
 
   Object.keys(users).forEach(uid => {
-    let total = 0;
 
+  let total = 0;
+
+  if (absData) {
     Object.keys(absData).forEach(tanggal => {
-      if (tanggal.startsWith(bulan) && absData[tanggal][uid]) {
+      if (absData[tanggal][uid]) {
         total++;
       }
     });
+  }
 
-    let status =
-      total >= 4 ? "Lengkap" :
-      total > 0 ? "Kurang" :
-      "Tidak Absen";
+  let status =
+    total >= 4 ? "Lengkap" :
+    total > 0 ? "Kurang" :
+    "Tidak Absen";
 
     tabel.innerHTML += `
       <tr>
