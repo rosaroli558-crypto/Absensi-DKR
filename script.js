@@ -105,14 +105,14 @@ onValue(usersRef, snapshot => {
   }
 
   const aktifUsers = Object.keys(data)
-    .filter(key => data[key].aktif)
-    .map(key => ({
-      id: key,
-      nama: data[key].nama
-    }))
-    .sort((a, b) =>
-      a.nama.localeCompare(b.nama, "id", { sensitivity: "base" })
-    );
+  .filter(key => data[key].aktif !== false)
+  .map(key => ({
+    id: key,
+    nama: data[key].nama
+  }))
+  .sort((a, b) =>
+    a.nama.localeCompare(b.nama, "id", { sensitivity: "base" })
+  );
 
   if (!aktifUsers.length) {
     namaSelect.innerHTML = "<option value=''>Tidak ada anggota aktif</option>";
