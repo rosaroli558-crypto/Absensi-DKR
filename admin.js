@@ -173,48 +173,71 @@ window.exportExcel = async function () {
   if (!bulan) return alert("Pilih bulan dulu");
 
   const snapshot = await get(ref(db, `absensi/${bulan}`));
+  const usersSnapshot = await get(ref(db, "users"));
 
-  if (!snapshot.exists()) {
-    return alert("Tidak ada data di bulan ini");
+  if (!usersSnapshot.exists()) {
+    return alert("Data user kosong");
   }
 
-  const data = snapshot.val();
-  const usersSnapshot = await get(ref(db, "users"));
   const users = usersSnapshot.val();
+  const absensi = snapshot.exists() ? snapshot.val() : {};
 
-  let rows = [];
+  let rekap = {};
 
-  Object.keys(data).forEach(tanggal => {
-    Object.keys(data[tanggal]).forEach(uid => {
+  // siapkan semua user
+  Object.keys(users).forEach(uid => {
+    rekap[uid] = {
+      nama: users[uid].nama,
+      keterangan: [],
+      tanggal: [],
+      totalHadir: 0
+    };
+  });
 
-      const item = data[tanggal][uid];
-      const nama = users[uid]?.nama || item.nama || "-";
+  // ambil data absensi bulan itu
+  Object.keys(absensi).forEach(tanggal => {
+    Object.keys(absensi[tanggal]).forEach(uid => {
 
-      rows.push({
-        tanggal,
-        nama,
-        kegiatan: item.kegiatan,
-        jam: item.jam,
-        timestamp: item.timestamp
-      });
+      const dataUser = absensi[tanggal][uid];
+      const status = dataUser.keterangan;
+
+      if (rekap[uid]) {
+
+        rekap[uid].keterangan.push(status);
+        rekap[uid].tanggal.push(tanggal.split("-")[2]); // ambil tanggal saja
+
+        if (status?.toLowerCase() === "hadir") {
+          rekap[uid].totalHadir++;
+        }
+
+      }
 
     });
   });
 
-  rows.sort((a, b) =>
-    new Date(a.timestamp) - new Date(b.timestamp)
-  );
+  // buat CSV
+  let csv = "";
+  csv += "ABSENSI DKR BATULICIN\n";
+  csv += `Periode: ${bulan}\n\n`;
+  csv += "No,Nama,Keterangan (4),Tanggal Absen (4),Total Hadir\n";
 
-  let csv = "Tanggal,Nama,Kegiatan,Jam\n";
+  let no = 1;
 
-  rows.forEach(r => {
-    csv += `${r.tanggal},${r.nama},${r.kegiatan},${r.jam}\n`;
+  Object.values(rekap).forEach(user => {
+
+    const ket = user.keterangan.join(" | ");
+    const tgl = user.tanggal.join(" | ");
+
+    csv += `${no},${user.nama},${ket},${tgl},${user.totalHadir}\n`;
+    no++;
+
   });
 
   const blob = new Blob([csv], { type: "text/csv" });
   const url = URL.createObjectURL(blob);
+
   const a = document.createElement("a");
   a.href = url;
-  a.download = `absensi-${bulan}.csv`;
+  a.download = `Rekap Absensi DKR ${bulan}.csv`;
   a.click();
 };
