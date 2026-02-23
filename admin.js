@@ -106,7 +106,7 @@ window.handleValidasi = async function () {
   const bulan = document.getElementById("bulanValidasi").value;
   if (!bulan) return alert("Pilih bulan");
 
-  const absSnapshot = await get(ref(db, "absensi"));
+  const absSnapshot = await get(ref(db, "absensi/" + bulan));
   const userSnapshot = await get(ref(db, "users"));
 
   if (!absSnapshot.exists() || !userSnapshot.exists()) return;
