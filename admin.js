@@ -168,26 +168,53 @@ window.setJam = function () {
 /* ================= EXPORT ================= */
 
 window.exportExcel = async function () {
-  const snapshot = await get(ref(db, "absensi"));
-  if (!snapshot.exists()) return;
+
+  const bulan = document.getElementById("bulanExport").value;
+  if (!bulan) return alert("Pilih bulan dulu");
+
+  const snapshot = await get(ref(db, `absensi/${bulan}`));
+
+  if (!snapshot.exists()) {
+    return alert("Tidak ada data di bulan ini");
+  }
 
   const data = snapshot.val();
-  let csv = "Tanggal,Nama\n";
-
   const usersSnapshot = await get(ref(db, "users"));
   const users = usersSnapshot.val();
 
+  let rows = [];
+
   Object.keys(data).forEach(tanggal => {
     Object.keys(data[tanggal]).forEach(uid => {
-      const nama = users[uid]?.nama || uid;
-      csv += `${tanggal},${nama}\n`;
+
+      const item = data[tanggal][uid];
+      const nama = users[uid]?.nama || item.nama || "-";
+
+      rows.push({
+        tanggal,
+        nama,
+        kegiatan: item.kegiatan,
+        jam: item.jam,
+        timestamp: item.timestamp
+      });
+
     });
+  });
+
+  rows.sort((a, b) =>
+    new Date(a.timestamp) - new Date(b.timestamp)
+  );
+
+  let csv = "Tanggal,Nama,Kegiatan,Jam\n";
+
+  rows.forEach(r => {
+    csv += `${r.tanggal},${r.nama},${r.kegiatan},${r.jam}\n`;
   });
 
   const blob = new Blob([csv], { type: "text/csv" });
   const url = URL.createObjectURL(blob);
   const a = document.createElement("a");
   a.href = url;
-  a.download = "absensi.csv";
+  a.download = `absensi-${bulan}.csv`;
   a.click();
 };
