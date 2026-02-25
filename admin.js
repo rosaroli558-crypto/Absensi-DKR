@@ -327,7 +327,24 @@ function exportToExcel(data, periodeText) {
             }
         };
     }
+  
+    const range = XLSX.utils.decode_range(ws["!ref"]);
+    for (let R = 0; R <= range.e.r; ++R) {
+      for (let C = 0; C <= range.e.c; ++C) {
 
+        const cellAddress = XLSX.utils.encode_cell({ r: R, c: C });
+        if (!ws[cellAddress]) continue;
+      
+        ws[cellAddress].s = {
+          ...ws[cellAddress].s,
+          alignment: {
+            horizontal: "center",
+            vertical: "center"
+          }
+        };
+      }
+    }
+  
     XLSX.utils.book_append_sheet(wb, ws, "Laporan Absensi");
     XLSX.writeFile(wb, `Laporan_Absensi_${periodeText}.xlsx`);
 }
