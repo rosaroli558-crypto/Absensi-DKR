@@ -208,10 +208,10 @@ window.handleExport = async function () {
       });
     });
   // ⬅️ PINDAH KE SINI
-  exportToExcel(data, bulan);
+  exportToExcel(rekap, bulan);
 };
 
-function exportToExcel(data, periodeText) {
+function exportToExcel(rekap, periodeText) {
 
     const wb = XLSX.utils.book_new();
 
