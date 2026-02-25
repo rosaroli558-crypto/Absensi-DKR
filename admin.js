@@ -169,17 +169,38 @@ window.setJam = function () {
 
 // ===== EXPORT TO EXCEL =====
 
-function handleExport() {
-    const data = JSON.parse(localStorage.getItem("absensi")) || [];
-    const periodeText = "Semua Data";
+// ================= EXPORT EXCEL =================
 
-    if (data.length === 0) {
-        alert("Data kosong");
-        return;
-    }
+window.handleExport = async function () {
 
-    exportToExcel(data, periodeText);
-}
+  const bulan = document.getElementById("bulanExport").value;
+  if (!bulan) return alert("Pilih bulan dulu");
+
+  const absSnapshot = await get(ref(db, "absensi/" + bulan));
+  const userSnapshot = await get(ref(db, "users"));
+
+  if (!absSnapshot.exists() || !userSnapshot.exists()) {
+    alert("Data tidak ditemukan");
+    return;
+  }
+
+  const absData = absSnapshot.val();
+  const users = userSnapshot.val();
+
+  const data = [];
+
+  Object.keys(absData).forEach(tanggal => {
+    Object.keys(absData[tanggal]).forEach(uid => {
+      data.push({
+        nama: users[uid]?.nama || "-",
+        keterangan: "Hadir",
+        timestamp: new Date(tanggal).getTime()
+      });
+    });
+  });
+
+  exportToExcel(data, bulan);
+};
 
 function exportToExcel(data, periodeText) {
 
