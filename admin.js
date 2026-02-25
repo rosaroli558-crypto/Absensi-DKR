@@ -239,6 +239,12 @@ function exportToExcel(rekap, periodeText) {
 
     user.list.slice(0, 4).forEach(item => {
       
+      const format2Baris = (arr) => {
+        const baris1 = arr.slice(0, 2).join(" | ");
+        const baris2 = arr.slice(2, 4).join(" | ");
+        return [baris1, baris2].filter(Boolean).join("\n");
+      };
+      
       const date = new Date(item.timestamp);
       
       keter.push(item.keterangan);
@@ -262,9 +268,9 @@ function exportToExcel(rekap, periodeText) {
       "",
       no++,
       user.nama,
-      keter.join("\n"),
-      tanggal.join("\n"),
-      jam.join("\n")
+      format2Baris(keter),
+      format2Baris(tanggal),
+      format2Baris(jam)
     ]);
   });
 
