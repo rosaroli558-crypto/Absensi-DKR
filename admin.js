@@ -191,13 +191,15 @@ window.handleExport = async function () {
 
   Object.keys(absData).forEach(tanggal => {
     Object.keys(absData[tanggal]).forEach(uid => {
+
+      const item = absData[tanggal][uid];
+
       data.push({
-        nama: users[uid]?.nama || "-",
-        keterangan: "Hadir",
-        timestamp: new Date(tanggal).getTime()
+        nama: item.nama || users[uid]?.nama || "-",
+        keterangan: item.keterangan || "Hadir",
+        timestamp: new Date(item.timestamp).getTime()
       });
     });
-  });
 
   exportToExcel(data, bulan);
 };
