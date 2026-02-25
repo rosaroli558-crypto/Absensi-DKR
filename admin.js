@@ -168,10 +168,24 @@ window.setJam = function () {
 // ADMIN.JS
 
 // ===== EXPORT TO EXCEL =====
+
+function handleExport() {
+    const data = JSON.parse(localStorage.getItem("absensi")) || [];
+    const periodeText = "Semua Data";
+
+    if (data.length === 0) {
+        alert("Data kosong");
+        return;
+    }
+
+    exportToExcel(data, periodeText);
+}
+
 function exportToExcel(data, periodeText) {
+
     const wb = XLSX.utils.book_new();
 
-    // SORT: Nama A-Z, lalu Timestamp terbaru
+    // SORT
     data.sort((a, b) => {
         const nameCompare = a.nama.localeCompare(b.nama);
         if (nameCompare !== 0) return nameCompare;
@@ -180,14 +194,12 @@ function exportToExcel(data, periodeText) {
 
     const rows = [];
 
-    // HEADER ATAS
     rows.push([]);
     rows.push(["", "LAPORAN ABSENSI DEWAN KERJA RANTING BATULICIN"]);
     rows.push(["", "Periode: " + periodeText]);
     rows.push([]);
     rows.push(["", "No", "Nama", "Kegiatan", "Tanggal", "Jam"]);
 
-    // DATA
     data.forEach((item, index) => {
         const date = new Date(item.timestamp);
 
@@ -209,13 +221,13 @@ function exportToExcel(data, periodeText) {
 
     const ws = XLSX.utils.aoa_to_sheet(rows);
 
-    // ===== MERGE JUDUL =====
+    // MERGE JUDUL
     ws["!merges"] = [
         { s: { r: 1, c: 1 }, e: { r: 1, c: 5 } },
         { s: { r: 2, c: 1 }, e: { r: 2, c: 5 } }
     ];
 
-    // ===== LEBAR KOLOM =====
+    // LEBAR KOLOM
     ws["!cols"] = [
         { wch: 5 },
         { wch: 6 },
@@ -225,7 +237,6 @@ function exportToExcel(data, periodeText) {
         { wch: 12 }
     ];
 
-    // ===== TINGGI BARIS =====
     ws["!rows"] = [
         {},
         { hpt: 30 },
@@ -234,13 +245,13 @@ function exportToExcel(data, periodeText) {
 
     const range = XLSX.utils.decode_range(ws["!ref"]);
 
-    // ===== BORDER + CENTER UNTUK SEMUA DATA =====
+    // BORDER + CENTER
     for (let R = 4; R <= range.e.r; ++R) {
         for (let C = 1; C <= 5; ++C) {
-            const cellAddress = XLSX.utils.encode_cell({ r: R, c: C });
-            if (!ws[cellAddress]) continue;
+            const cell = XLSX.utils.encode_cell({ r: R, c: C });
+            if (!ws[cell]) continue;
 
-            ws[cellAddress].s = {
+            ws[cell].s = {
                 alignment: {
                     horizontal: "center",
                     vertical: "center"
@@ -255,7 +266,7 @@ function exportToExcel(data, periodeText) {
         }
     }
 
-    // ===== STYLE JUDUL =====
+    // STYLE JUDUL
     ws["B2"].s = {
         font: { bold: true, sz: 16 },
         alignment: { horizontal: "center", vertical: "center" }
@@ -266,37 +277,25 @@ function exportToExcel(data, periodeText) {
         alignment: { horizontal: "center", vertical: "center" }
     };
 
-    // ===== HEADER TABLE STYLE =====
+    // HEADER STYLE
     const headerRow = 4;
     for (let col = 1; col <= 5; col++) {
         const cell = XLSX.utils.encode_cell({ r: headerRow, c: col });
-        if (ws[cell]) {
-            ws[cell].s = {
-                font: { bold: true },
-                alignment: {
-                    horizontal: "center",
-                    vertical: "center"
-                },
-                fill: {
-                    patternType: "solid",
-                    fgColor: { rgb: "DDDDDD" }
-                },
-                border: {
-                    top: { style: "thin" },
-                    bottom: { style: "thin" },
-                    left: { style: "thin" },
-                    right: { style: "thin" }
-                }
-            };
-        }
-    }
+        if (!ws[cell]) continue;
 
-    // ===== TOTAL DATA STYLE =====
-    const totalRowIndex = rows.length - 1;
-    const totalCell = XLSX.utils.encode_cell({ r: totalRowIndex, c: 2 });
-    if (ws[totalCell]) {
-        ws[totalCell].s = {
-            font: { bold: true }
+        ws[cell].s = {
+            font: { bold: true },
+            alignment: { horizontal: "center", vertical: "center" },
+            fill: {
+                patternType: "solid",
+                fgColor: { rgb: "DDDDDD" }
+            },
+            border: {
+                top: { style: "thin" },
+                bottom: { style: "thin" },
+                left: { style: "thin" },
+                right: { style: "thin" }
+            }
         };
     }
 
