@@ -280,11 +280,11 @@ function exportToExcel(rekap, periodeText) {
     // LEBAR KOLOM
     ws["!cols"] = [
         { wch: 5 },
-        { wch: 6 },
-        { wch: 30 },
+        { wch: 3 },
+        { wch: 35 },
         { wch: 25 },
-        { wch: 15 },
-        { wch: 12 }
+        { wch: 25 },
+        { wch: 25 }
     ];
 
     const range = XLSX.utils.decode_range(ws["!ref"]);
