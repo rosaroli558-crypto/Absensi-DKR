@@ -212,7 +212,7 @@ namaSelect.addEventListener("change", async () => {
     nama: userName,
     keterangan,
     jam,
-    timestamp: now.toISOString()
+    timestamp: Date.now()
   });
 
   statusMsg.textContent = "Absensi berhasil dicatat.";
