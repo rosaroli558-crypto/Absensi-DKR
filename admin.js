@@ -215,13 +215,6 @@ function exportToExcel(rekap, periodeText) {
 
     const wb = XLSX.utils.book_new();
 
-    // SORT
-    data.sort((a, b) => {
-        const nameCompare = a.nama.localeCompare(b.nama);
-        if (nameCompare !== 0) return nameCompare;
-        return b.timestamp - a.timestamp;
-    });
-
     const rows = [];
 
     rows.push([]);
@@ -231,10 +224,11 @@ function exportToExcel(rekap, periodeText) {
     rows.push(["", "No", "Nama", "Kegiatan", "Tanggal", "Jam"]);
   
   let no = 1;
-
-  Object.keys(rekap).forEach(uid => {
-
-    const user = rekap[uid];
+  Object.keys(rekap)
+    .sort((a, b) => rekap[a].nama.localeCompare(rekap[b].nama))
+    .forEach(uid => {
+      
+      const user = rekap[uid];
 
     // urutkan berdasarkan waktu
     user.list.sort((a, b) => a.timestamp - b.timestamp);
@@ -291,12 +285,6 @@ function exportToExcel(rekap, periodeText) {
         { wch: 25 },
         { wch: 15 },
         { wch: 12 }
-    ];
-
-    ws["!rows"] = [
-        {},
-        { hpt: 30 },
-        { hpt: 20 }
     ];
 
     const range = XLSX.utils.decode_range(ws["!ref"]);
