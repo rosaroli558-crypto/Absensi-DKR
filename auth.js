@@ -14,6 +14,7 @@ const firebaseConfig = {
 
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
+const ADMIN_EMAIL = "admin.dkr@2025.local";
 
 /* ================= LOGIN ================= */
 
@@ -38,6 +39,14 @@ onAuthStateChanged(auth, (user) => {
 
   if (!user && !isLoginPage) {
     window.location.href = "login.html";
+    return;
+  }
+
+  if (user && user.email !== ADMIN_EMAIL) {
+    signOut(auth);
+    alert("Anda bukan admin.");
+    window.location.href = "login.html";
+    return;
   }
 
   if (user && isLoginPage) {
