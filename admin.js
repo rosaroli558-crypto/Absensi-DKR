@@ -165,79 +165,141 @@ window.setJam = function () {
   alert("Jam berhasil disimpan");
 };
 
-/* ================= EXPORT ================= */
+// ADMIN.JS
 
-window.exportExcel = async function () {
+// ===== EXPORT TO EXCEL =====
+function exportToExcel(data, periodeText) {
+    const wb = XLSX.utils.book_new();
 
-  const bulan = document.getElementById("bulanExport").value;
-  if (!bulan) return alert("Pilih bulan dulu");
-
-  const snapshot = await get(ref(db, `absensi/${bulan}`));
-  const usersSnapshot = await get(ref(db, "users"));
-
-  if (!usersSnapshot.exists()) {
-    return alert("Data user kosong");
-  }
-
-  const users = usersSnapshot.val();
-  const absensi = snapshot.exists() ? snapshot.val() : {};
-
-  let rekap = {};
-
-  // siapkan semua user
-  Object.keys(users).forEach(uid => {
-    rekap[uid] = {
-      nama: users[uid].nama,
-      keterangan: [],
-      tanggal: [],
-      totalHadir: 0
-    };
-  });
-
-  // ambil data absensi bulan itu
-  Object.keys(absensi).forEach(tanggal => {
-    Object.keys(absensi[tanggal]).forEach(uid => {
-
-      const dataUser = absensi[tanggal][uid];
-      const status = dataUser.keterangan;
-
-      if (rekap[uid]) {
-
-        rekap[uid].keterangan.push(status);
-        rekap[uid].tanggal.push(tanggal.split("-")[2]); // ambil tanggal saja
-
-        if (status?.toLowerCase() === "hadir") {
-          rekap[uid].totalHadir++;
-        }
-
-      }
-
+    // SORT: Nama A-Z, lalu Timestamp terbaru
+    data.sort((a, b) => {
+        const nameCompare = a.nama.localeCompare(b.nama);
+        if (nameCompare !== 0) return nameCompare;
+        return b.timestamp - a.timestamp;
     });
-  });
 
-  // buat CSV
-  let csv = "";
-  csv += "ABSENSI DKR BATULICIN\n";
-  csv += `Periode: ${bulan}\n\n`;
-  csv += "No,Nama,Keterangan (4),Tanggal Absen (4),Total Hadir\n";
+    const rows = [];
 
-  let no = 1;
+    // HEADER ATAS
+    rows.push([]);
+    rows.push(["", "LAPORAN ABSENSI DEWAN KERJA RANTING BATULICIN"]);
+    rows.push(["", "Periode: " + periodeText]);
+    rows.push([]);
+    rows.push(["", "No", "Nama", "Kegiatan", "Tanggal", "Jam"]);
 
-  Object.values(rekap).forEach(user => {
+    // DATA
+    data.forEach((item, index) => {
+        const date = new Date(item.timestamp);
 
-    const ket = user.keterangan.join(" | ");
-    const tgl = user.tanggal.join(" | ");
+        rows.push([
+            "",
+            index + 1,
+            item.nama,
+            item.keterangan,
+            date.toLocaleDateString("id-ID"),
+            date.toLocaleTimeString("id-ID", {
+                hour: "2-digit",
+                minute: "2-digit"
+            })
+        ]);
+    });
 
-    csv += `${no},${user.nama},${ket},${tgl},${user.totalHadir}\n`;
-    no++;
+    rows.push([]);
+    rows.push(["", "", "Total Data:", data.length]);
 
-  });
+    const ws = XLSX.utils.aoa_to_sheet(rows);
 
-  const blob = new Blob([csv], { type: "text/csv" });
-  const url = URL.createObjectURL(blob);
+    // ===== MERGE JUDUL =====
+    ws["!merges"] = [
+        { s: { r: 1, c: 1 }, e: { r: 1, c: 5 } },
+        { s: { r: 2, c: 1 }, e: { r: 2, c: 5 } }
+    ];
 
-  const a = document.createElement("a");
-  a.href = url;
-  a.download = `Rekap Absensi DKR ${bulan}.csv`;
-  a.click();
-};
+    // ===== LEBAR KOLOM =====
+    ws["!cols"] = [
+        { wch: 5 },
+        { wch: 6 },
+        { wch: 30 },
+        { wch: 25 },
+        { wch: 15 },
+        { wch: 12 }
+    ];
+
+    // ===== TINGGI BARIS =====
+    ws["!rows"] = [
+        {},
+        { hpt: 30 },
+        { hpt: 20 }
+    ];
+
+    const range = XLSX.utils.decode_range(ws["!ref"]);
+
+    // ===== BORDER + CENTER UNTUK SEMUA DATA =====
+    for (let R = 4; R <= range.e.r; ++R) {
+        for (let C = 1; C <= 5; ++C) {
+            const cellAddress = XLSX.utils.encode_cell({ r: R, c: C });
+            if (!ws[cellAddress]) continue;
+
+            ws[cellAddress].s = {
+                alignment: {
+                    horizontal: "center",
+                    vertical: "center"
+                },
+                border: {
+                    top: { style: "thin" },
+                    bottom: { style: "thin" },
+                    left: { style: "thin" },
+                    right: { style: "thin" }
+                }
+            };
+        }
+    }
+
+    // ===== STYLE JUDUL =====
+    ws["B2"].s = {
+        font: { bold: true, sz: 16 },
+        alignment: { horizontal: "center", vertical: "center" }
+    };
+
+    ws["B3"].s = {
+        font: { bold: true, sz: 12 },
+        alignment: { horizontal: "center", vertical: "center" }
+    };
+
+    // ===== HEADER TABLE STYLE =====
+    const headerRow = 4;
+    for (let col = 1; col <= 5; col++) {
+        const cell = XLSX.utils.encode_cell({ r: headerRow, c: col });
+        if (ws[cell]) {
+            ws[cell].s = {
+                font: { bold: true },
+                alignment: {
+                    horizontal: "center",
+                    vertical: "center"
+                },
+                fill: {
+                    patternType: "solid",
+                    fgColor: { rgb: "DDDDDD" }
+                },
+                border: {
+                    top: { style: "thin" },
+                    bottom: { style: "thin" },
+                    left: { style: "thin" },
+                    right: { style: "thin" }
+                }
+            };
+        }
+    }
+
+    // ===== TOTAL DATA STYLE =====
+    const totalRowIndex = rows.length - 1;
+    const totalCell = XLSX.utils.encode_cell({ r: totalRowIndex, c: 2 });
+    if (ws[totalCell]) {
+        ws[totalCell].s = {
+            font: { bold: true }
+        };
+    }
+
+    XLSX.utils.book_append_sheet(wb, ws, "Laporan Absensi");
+    XLSX.writeFile(wb, `Laporan_Absensi_${periodeText}.xlsx`);
+}
