@@ -199,7 +199,7 @@ window.exportExcel = async function () {
     Object.keys(absensi[tanggal]).forEach(uid => {
 
       const dataUser = absensi[tanggal][uid];
-      const status = dataUser.kegiatan;
+      const status = dataUser.keterangan;
 
       if (rekap[uid]) {
 
