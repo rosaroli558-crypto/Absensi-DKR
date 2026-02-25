@@ -187,22 +187,26 @@ window.handleExport = async function () {
   const absData = absSnapshot.val();
   const users = userSnapshot.val();
 
-  const data = [];
+  const rekap = {};
 
-  Object.keys(absData).forEach(tanggal => {
-    Object.keys(absData[tanggal]).forEach(uid => {
-
-      const item = absData[tanggal][uid];
-
-      data.push({
-        nama: item.nama || users[uid]?.nama || "-",
-        keterangan: item.keterangan || "Hadir",
-        timestamp: item.timestamp
+    Object.keys(absData).forEach(tanggal => {
+      Object.keys(absData[tanggal]).forEach(uid => {
+        
+        const item = absData[tanggal][uid];
+        
+        if (!rekap[uid]) {
+          rekap[uid] = {
+            nama: users[uid]?.nama || "-",
+            list: []
+          };
+        }
+        
+        rekap[uid].list.push({
+          keterangan: item.keterangan || "Hadir",
+          timestamp: item.timestamp
+        });
       });
-
     });
-  });
-
   // ⬅️ PINDAH KE SINI
   exportToExcel(data, bulan);
 };
@@ -225,31 +229,54 @@ function exportToExcel(data, periodeText) {
     rows.push(["", "Periode: " + periodeText]);
     rows.push([]);
     rows.push(["", "No", "Nama", "Kegiatan", "Tanggal", "Jam"]);
+  
+  let no = 1;
 
-    data.forEach((item, index) => {
-        const date = new Date(item.timestamp);
+  Object.keys(rekap).forEach(uid => {
 
-        rows.push([
-            "",
-            index + 1,
-            item.nama,
-            item.keterangan,
-            date.toLocaleDateString("id-ID", {
-              timeZone: "Asia/Makassar"
-            }),
-            date.toLocaleTimeString("id-ID", {
-              hour: "2-digit",
-              minute: "2-digit",
-              timeZone: "Asia/Makassar"
-            })
-        ]);
+    const user = rekap[uid];
+
+    // urutkan berdasarkan waktu
+    user.list.sort((a, b) => a.timestamp - b.timestamp);
+    
+    const keter = [];
+    const tanggal = [];
+    const jam = [];
+
+    user.list.slice(0, 4).forEach(item => {
+      
+      const date = new Date(item.timestamp);
+      
+      keter.push(item.keterangan);
+      
+      tanggal.push(
+        date.toLocaleDateString("id-ID", {
+          timeZone: "Asia/Makassar"
+        })
+      );
+      
+      jam.push(
+        date.toLocaleTimeString("id-ID", {
+          hour: "2-digit",
+          minute: "2-digit",
+          timeZone: "Asia/Makassar"
+        })
+      );
     });
-
-    rows.push([]);
-    rows.push(["", "", "Total Data:", data.length]);
+    
+    rows.push([
+      "",
+      no++,
+      user.nama,
+      keter.join("\n"),
+      tanggal.join("\n"),
+      jam.join("\n")
+    ]);
+  });
 
     const ws = XLSX.utils.aoa_to_sheet(rows);
-
+  
+    ws["!rows"] = rows.map(() => ({ hpt: 40 }));
     // MERGE JUDUL
     ws["!merges"] = [
         { s: { r: 1, c: 1 }, e: { r: 1, c: 5 } },
@@ -275,17 +302,23 @@ function exportToExcel(data, periodeText) {
     const range = XLSX.utils.decode_range(ws["!ref"]);
 
     // BORDER + CENTER
-  for (let R = 0; R <= range.e.r; ++R) {
-    for (let C = 0; C <= range.e.c; ++C) {
+  for (let R = 4; R <= range.e.r; ++R) {
+    for (let C = 1; C <= 5; ++C) {
       
-      const cellAddress = XLSX.utils.encode_cell({ r: R, c: C });
-      if (!ws[cellAddress]) continue;
-      
-      ws[cellAddress].s = {
-        ...ws[cellAddress].s,
+      const cell = XLSX.utils.encode_cell({ r: R, c: C });
+      if (!ws[cell]) continue;
+
+      ws[cell].s = {
         alignment: {
           horizontal: "center",
-          vertical: "center"
+          vertical: "center",
+          wrapText: true
+        },
+        border: {
+          top: { style: "thin" },
+          bottom: { style: "thin" },
+          left: { style: "thin" },
+          right: { style: "thin" }
         }
       };
     }
