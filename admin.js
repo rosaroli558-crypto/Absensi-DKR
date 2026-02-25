@@ -199,8 +199,11 @@ window.handleExport = async function () {
         keterangan: item.keterangan || "Hadir",
         timestamp: item.timestamp
       });
-    });
 
+    });
+  });
+
+  // ⬅️ PINDAH KE SINI
   exportToExcel(data, bulan);
 };
 
