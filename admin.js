@@ -197,7 +197,7 @@ window.handleExport = async function () {
       data.push({
         nama: item.nama || users[uid]?.nama || "-",
         keterangan: item.keterangan || "Hadir",
-        timestamp: new Date(item.timestamp).getTime()
+        timestamp: item.timestamp
       });
     });
 
@@ -231,10 +231,13 @@ function exportToExcel(data, periodeText) {
             index + 1,
             item.nama,
             item.keterangan,
-            date.toLocaleDateString("id-ID"),
+            date.toLocaleDateString("id-ID", {
+              timeZone: "Asia/Makassar"
+            }),
             date.toLocaleTimeString("id-ID", {
-                hour: "2-digit",
-                minute: "2-digit"
+              hour: "2-digit",
+              minute: "2-digit",
+              timeZone: "Asia/Makassar"
             })
         ]);
     });
