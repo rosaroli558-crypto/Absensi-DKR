@@ -275,25 +275,21 @@ function exportToExcel(data, periodeText) {
     const range = XLSX.utils.decode_range(ws["!ref"]);
 
     // BORDER + CENTER
-    for (let R = 4; R <= range.e.r; ++R) {
-        for (let C = 1; C <= 5; ++C) {
-            const cell = XLSX.utils.encode_cell({ r: R, c: C });
-            if (!ws[cell]) continue;
-
-            ws[cell].s = {
-                alignment: {
-                    horizontal: "center",
-                    vertical: "center"
-                },
-                border: {
-                    top: { style: "thin" },
-                    bottom: { style: "thin" },
-                    left: { style: "thin" },
-                    right: { style: "thin" }
-                }
-            };
+  for (let R = 0; R <= range.e.r; ++R) {
+    for (let C = 0; C <= range.e.c; ++C) {
+      
+      const cellAddress = XLSX.utils.encode_cell({ r: R, c: C });
+      if (!ws[cellAddress]) continue;
+      
+      ws[cellAddress].s = {
+        ...ws[cellAddress].s,
+        alignment: {
+          horizontal: "center",
+          vertical: "center"
         }
+      };
     }
+  }
 
     // STYLE JUDUL
     ws["B2"].s = {
@@ -328,7 +324,6 @@ function exportToExcel(data, periodeText) {
         };
     }
   
-    const range = XLSX.utils.decode_range(ws["!ref"]);
     for (let R = 0; R <= range.e.r; ++R) {
       for (let C = 0; C <= range.e.c; ++C) {
 
