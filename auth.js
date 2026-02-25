@@ -37,19 +37,21 @@ onAuthStateChanged(auth, (user) => {
 
   const isLoginPage = window.location.pathname.includes("login.html");
 
+  // Belum login dan bukan di login page
   if (!user && !isLoginPage) {
     window.location.href = "login.html";
     return;
   }
 
+  // Sudah login tapi bukan admin
   if (user && user.email !== ADMIN_EMAIL) {
-    signOut(auth);
     alert("Anda bukan admin.");
-    window.location.href = "login.html";
+    signOut(auth);
     return;
   }
 
-  if (user && isLoginPage) {
+  // Sudah login dan admin tapi masih di login page
+  if (user && user.email === ADMIN_EMAIL && isLoginPage) {
     window.location.href = "admin.html";
   }
 
