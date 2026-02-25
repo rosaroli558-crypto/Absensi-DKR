@@ -237,13 +237,13 @@ function exportToExcel(rekap, periodeText) {
     const tanggal = [];
     const jam = [];
 
+    const format2Baris = (arr) => {
+      const baris1 = arr.slice(0, 2).join(" | ");
+      const baris2 = arr.slice(2, 4).join(" | ");
+      return [baris1, baris2].filter(Boolean).join("\n");
+    };
+
     user.list.slice(0, 4).forEach(item => {
-      
-      const format2Baris = (arr) => {
-        const baris1 = arr.slice(0, 2).join(" | ");
-        const baris2 = arr.slice(2, 4).join(" | ");
-        return [baris1, baris2].filter(Boolean).join("\n");
-      };
       
       const date = new Date(item.timestamp);
       
