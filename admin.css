@@ -215,6 +215,19 @@ tbody tr:hover{
   font-size:14px;
 }
 
+table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+th, td {
+  text-align: center;
+  padding: 10px;
+}
+
+tbody tr {
+  border-bottom: 1px solid #ddd;
+}
 /* ================= RESPONSIVE ================= */
 
 @media(max-width:900px){
