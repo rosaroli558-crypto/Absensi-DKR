@@ -283,7 +283,7 @@ function exportToExcel(rekap, periodeText) {
       const user = rekap[uid];
 
       // SORT AMAN
-      user.list.sort((a, b) => (a.timestamp || 0) - (b.timestamp || 0));
+      user.list.sort((a, b) => (a.waktu || 0) - (b.waktu || 0));
 
       const keter = [];
       const tanggal = [];
@@ -297,19 +297,19 @@ function exportToExcel(rekap, periodeText) {
 
       user.list.slice(0, 4).forEach(item => {
 
-        if (!item.timestamp) return;
-
-        const date = new Date(item.timestamp);
+        if (!item.waktu) return;
+      
+        const date = new Date(item.waktu);
         if (isNaN(date.getTime())) return;
-
+      
         keter.push(item.keterangan || "-");
-
+      
         tanggal.push(
           date.toLocaleDateString("id-ID", {
             timeZone: "Asia/Makassar"
           })
         );
-
+      
         jam.push(
           date.toLocaleTimeString("id-ID", {
             hour: "2-digit",
