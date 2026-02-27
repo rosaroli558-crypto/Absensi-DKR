@@ -282,21 +282,27 @@ function exportToExcel(rekap, periodeText) {
 
       const user = rekap[uid];
 
-      user.list.sort((a, b) => (a.waktu || 0) - (b.waktu || 0));
+      // SORT AMAN
+      user.list.sort((a, b) => (a.timestamp || 0) - (b.timestamp || 0));
 
       const keter = [];
       const tanggal = [];
       const jam = [];
 
+      const format2Baris = (arr) => {
+        const baris1 = arr.slice(0, 2).join(" | ");
+        const baris2 = arr.slice(2, 4).join(" | ");
+        return [baris1, baris2].filter(Boolean).join("\n");
+      };
+
       user.list.slice(0, 4).forEach(item => {
 
-        if (!item.waktu) return;
+        if (!item.timestamp) return;
 
-        const date = new Date(item.waktu);
-
+        const date = new Date(item.timestamp);
         if (isNaN(date.getTime())) return;
 
-        keter.push(item.keterangan);
+        keter.push(item.keterangan || "-");
 
         tanggal.push(
           date.toLocaleDateString("id-ID", {
@@ -317,13 +323,97 @@ function exportToExcel(rekap, periodeText) {
         "",
         no++,
         user.nama,
-        keter.join(" | "),
-        tanggal.join(" | "),
-        jam.join(" | ")
+        format2Baris(keter),
+        format2Baris(tanggal),
+        format2Baris(jam)
       ]);
     });
 
   const ws = XLSX.utils.aoa_to_sheet(rows);
+
+  /* ===== TINGGI BARIS ===== */
+  ws["!rows"] = rows.map(() => ({ hpt: 40 }));
+
+  /* ===== MERGE JUDUL ===== */
+  ws["!merges"] = [
+    { s: { r: 1, c: 1 }, e: { r: 1, c: 5 } },
+    { s: { r: 2, c: 1 }, e: { r: 2, c: 5 } }
+  ];
+
+  /* ===== LEBAR KOLOM ===== */
+  ws["!cols"] = [
+    { wch: 5 },
+    { wch: 3 },
+    { wch: 35 },
+    { wch: 25 },
+    { wch: 25 },
+    { wch: 25 }
+  ];
+
+  const range = XLSX.utils.decode_range(ws["!ref"]);
+
+  /* ===== BORDER + CENTER DATA ===== */
+  for (let R = 4; R <= range.e.r; ++R) {
+    for (let C = 1; C <= 5; ++C) {
+
+      const cell = XLSX.utils.encode_cell({ r: R, c: C });
+      if (!ws[cell]) continue;
+
+      ws[cell].s = {
+        alignment: {
+          horizontal: "center",
+          vertical: "center",
+          wrapText: true
+        },
+        border: {
+          top: { style: "thin" },
+          bottom: { style: "thin" },
+          left: { style: "thin" },
+          right: { style: "thin" }
+        }
+      };
+    }
+  }
+
+  /* ===== STYLE JUDUL ===== */
+  ws["B2"].s = {
+    font: { bold: true, sz: 16 },
+    alignment: { horizontal: "center", vertical: "center" }
+  };
+
+  ws["B3"].s = {
+    font: { bold: true, sz: 12 },
+    alignment: { horizontal: "center", vertical: "center" }
+  };
+
+  /* ===== HEADER STYLE ===== */
+  const headerRow = 4;
+
+  for (let col = 1; col <= 5; col++) {
+
+    const cell = XLSX.utils.encode_cell({ r: headerRow, c: col });
+    if (!ws[cell]) continue;
+
+    ws[cell].s = {
+      font: { bold: true },
+      alignment: {
+        horizontal: "center",
+        vertical: "center",
+        wrapText: true
+      },
+      fill: {
+        patternType: "solid",
+        fgColor: { rgb: "DDDDDD" }
+      },
+      border: {
+        top: { style: "thin" },
+        bottom: { style: "thin" },
+        left: { style: "thin" },
+        right: { style: "thin" }
+      }
+    };
+  }
+
   XLSX.utils.book_append_sheet(wb, ws, "Laporan Absensi");
   XLSX.writeFile(wb, `Laporan_Absensi_${periodeText}.xlsx`);
 }
