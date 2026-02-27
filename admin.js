@@ -85,7 +85,14 @@ window.handleFilter = async function () {
 
   tabelAbsensi.innerHTML = "";
 
-  if (!snapshot.exists()) return;
+  if (!snapshot.exists()) {
+    tabelAbsensi.innerHTML = `
+      <tr>
+        <td colspan="5">Tidak ada data</td>
+      </tr>
+    `;
+    return;
+  }
 
   const data = snapshot.val();
   const users = usersSnapshot.val();
@@ -94,15 +101,22 @@ window.handleFilter = async function () {
 
     const absen = data[uid];
 
-    const waktuObj = new Date(absen.waktu);
-    const tanggalLengkap = waktuObj.toLocaleString("id-ID", {
-      year: "numeric",
-      month: "2-digit",
-      day: "2-digit",
-      hour: "2-digit",
-      minute: "2-digit"
-    });
+    let tanggalLengkap = "-";
 
+    if (absen.waktu) {
+      const waktuObj = new Date(absen.waktu);
+    
+      if (!isNaN(waktuObj)) {
+        tanggalLengkap = waktuObj.toLocaleString("id-ID", {
+          timeZone: "Asia/Makassar",
+          year: "numeric",
+          month: "2-digit",
+          day: "2-digit",
+          hour: "2-digit",
+          minute: "2-digit"
+        });
+      }
+    }
     const lat = absen.latitude;
     const lng = absen.longitude;
 
