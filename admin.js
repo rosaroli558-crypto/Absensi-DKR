@@ -23,6 +23,8 @@ const firebaseConfig = {
 
 const app = initializeApp(firebaseConfig);
 const db = getDatabase(app);
+const logLokasiRef = ref(db, "logLokasi");
+const tabelLokasi = document.getElementById("tabelLokasi");
 
 /* ================= LOAD USERS ================= */
 
@@ -65,6 +67,42 @@ window.tambahUser = function () {
 window.hapusUser = function (uid) {
   remove(ref(db, "users/" + uid));
 };
+
+/* ================= LOKASI ================= */
+
+onValue(logLokasiRef, snapshot => {
+
+  const data = snapshot.val();
+  tabelLokasi.innerHTML = "";
+
+  if (!data) {
+    tabelLokasi.innerHTML = "<tr><td colspan='4'>Belum ada data lokasi</td></tr>";
+    return;
+  }
+
+  const entries = Object.entries(data)
+    .sort((a, b) => b[0] - a[0]); // urut terbaru
+
+  entries.forEach(([key, item]) => {
+
+    const row = document.createElement("tr");
+
+    row.innerHTML = `
+      <td>${item.waktu}</td>
+      <td>${item.latitude}</td>
+      <td>${item.longitude}</td>
+      <td>
+        <a href="https://www.google.com/maps?q=${item.latitude},${item.longitude}" target="_blank">
+          Lihat
+        </a>
+      </td>
+    `;
+
+    tabelLokasi.appendChild(row);
+
+  });
+
+});
 
 /* ================= FILTER ABSENSI ================= */
 
