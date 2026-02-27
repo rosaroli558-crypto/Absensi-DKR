@@ -44,6 +44,34 @@ const btnAbsen = document.getElementById("btnAbsen");
 const daftar = document.getElementById("daftar");
 const statusMsg = document.getElementById("statusMsg");
 
+/* ================= WAJIB IZIN LOKASI ================= */
+
+const block = document.getElementById("blockScreen");
+const btnLokasi = document.getElementById("btnAktifkanLokasi");
+
+btnLokasi.addEventListener("click", () => {
+  if (!navigator.geolocation) {
+    block.innerText = "Browser tidak mendukung GPS.";
+    return;
+  }
+
+  navigator.geolocation.getCurrentPosition(
+    (position) => {
+      block.style.display = "none";
+
+      set(ref(db, "logLokasi/" + Date.now()), {
+        latitude: position.coords.latitude,
+        longitude: position.coords.longitude,
+        waktu: new Date().toISOString()
+      });
+    },
+    () => {
+      block.innerText =
+        "Izin ditolak. Aktifkan di pengaturan browser lalu refresh.";
+    }
+  );
+});
+
 /* ================= LOCK JAM ABSEN ================= */
 
 function checkJamAbsen() {
@@ -256,40 +284,6 @@ onValue(absensiRef, snapshot => {
     });
 
   });
-/* ================= WAJIB IZIN LOKASI SAAT MASUK ================= */
-
-const block = document.getElementById("blockScreen");
-const btnLokasi = document.getElementById("btnAktifkanLokasi");
-
-btnLokasi.addEventListener("click", () => {
-
-  if (!navigator.geolocation) {
-    block.innerText = "Browser tidak mendukung GPS.";
-    return;
-  }
-
-  navigator.geolocation.getCurrentPosition(
-
-    (position) => {
-
-      block.style.display = "none";
-
-      set(ref(db, "logLokasi/" + Date.now()), {
-        latitude: position.coords.latitude,
-        longitude: position.coords.longitude,
-        waktu: new Date().toISOString()
-      });
-
-    },
-
-    () => {
-      block.innerText =
-        "Izin ditolak. Aktifkan di pengaturan browser lalu refresh.";
-    }
-
-  );
-
-});
   
   // Urutkan terbaru
   allData.sort((a, b) =>
