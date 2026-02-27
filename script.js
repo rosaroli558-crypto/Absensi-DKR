@@ -4,11 +4,8 @@ import {
   ref,
   onValue,
   set,
-  get,
-  query,
-  limitToLast
+  get
 } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
-
 import { getAuth } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
 
 /* ================= FIREBASE CONFIG ================= */
@@ -33,9 +30,6 @@ const usersRef = ref(db, "users");
 const absensiRef = ref(db, "absensi");
 const jamRef = ref(db, "settings/jamAbsen");
 
-let jamMulai = 16;
-let jamSelesai = 18;
-
 /* ================= ELEMENT ================= */
 
 const namaSelect = document.getElementById("nama");
@@ -44,59 +38,46 @@ const btnAbsen = document.getElementById("btnAbsen");
 const daftar = document.getElementById("daftar");
 const statusMsg = document.getElementById("statusMsg");
 
+let jamMulai = 16;
+let jamSelesai = 18;
+
 /* ================= LOCK JAM ABSEN ================= */
 
 function checkJamAbsen() {
 
   const now = new Date();
+  const totalSekarang = now.getHours() * 60 + now.getMinutes();
+  const totalMulai = jamMulai * 60;
+  const totalSelesai = jamSelesai * 60;
 
-  const totalMenitSekarang = now.getHours() * 60 + now.getMinutes();
-  const totalMenitMulai = jamMulai * 60;
-  const totalMenitSelesai = jamSelesai * 60;
-
-  if (totalMenitSekarang >= totalMenitMulai &&
-      totalMenitSekarang < totalMenitSelesai) {
-
+  if (totalSekarang >= totalMulai && totalSekarang < totalSelesai) {
     btnAbsen.disabled = false;
     statusMsg.textContent = "";
     return true;
-
   } else {
-
     btnAbsen.disabled = true;
-
     statusMsg.textContent =
       `⛔ ABSENSI DIBUKA PUKUL ${jamMulai}:00 - ${jamSelesai}:00`;
-
-    statusMsg.style.color = "#b30000";
-    statusMsg.style.fontSize = "20px";
-    statusMsg.style.fontWeight = "bold";
-    statusMsg.style.textAlign = "center";
-    statusMsg.style.marginTop = "15px";
-
+    statusMsg.style.color = "red";
     return false;
   }
 }
 
-// cek saat pertama load
 onValue(jamRef, snapshot => {
   const data = snapshot.val();
   if (!data) return;
-
   jamMulai = data.mulai;
   jamSelesai = data.selesai;
-
   checkJamAbsen();
 });
 
-// cek ulang setiap 30 detik
 setInterval(checkJamAbsen, 30000);
+
 /* ================= LOAD USERS ================= */
 
 onValue(usersRef, snapshot => {
 
   const data = snapshot.val();
-
   namaSelect.innerHTML = "";
 
   if (!data) {
@@ -105,19 +86,14 @@ onValue(usersRef, snapshot => {
   }
 
   const aktifUsers = Object.keys(data)
-  .filter(key => data[key].aktif !== false)
-  .map(key => ({
-    id: key,
-    nama: data[key].nama
-  }))
-  .sort((a, b) =>
-    a.nama.localeCompare(b.nama, "id", { sensitivity: "base" })
-  );
-
-  if (!aktifUsers.length) {
-    namaSelect.innerHTML = "<option value=''>Tidak ada anggota aktif</option>";
-    return;
-  }
+    .filter(key => data[key].aktif !== false)
+    .map(key => ({
+      id: key,
+      nama: data[key].nama
+    }))
+    .sort((a, b) =>
+      a.nama.localeCompare(b.nama, "id", { sensitivity: "base" })
+    );
 
   namaSelect.innerHTML = "<option value=''>Pilih Nama</option>";
 
@@ -135,54 +111,25 @@ onValue(usersRef, snapshot => {
 async function cekJumlahBulanan(userId) {
 
   const now = new Date();
-  const bulan = now.toISOString().substring(0, 7); // 2026-02
+  const bulan = now.toISOString().substring(0, 7);
 
   const snapshot = await get(ref(db, `absensi/${bulan}`));
-
   if (!snapshot.exists()) return 0;
 
   const data = snapshot.val();
   let total = 0;
 
   Object.keys(data).forEach(tanggal => {
-    if (data[tanggal][userId]) {
-      total++;
-    }
+    if (data[tanggal][userId]) total++;
   });
 
   return total;
 }
 
-/* ================= ABSEN ================= */
+/* ================= BATAS 4X ================= */
 
-btnAbsen.addEventListener("click", async () => {
-
-  if (!checkJamAbsen()) return;
-
-  const userId = namaSelect.value;
-  const keterangan = keteranganSelect.value;
-
-  if (!userId) {
-    statusMsg.textContent = "Pilih nama terlebih dahulu.";
-    statusMsg.style.color = "red";
-    return;
-  }
-
-  const userName =
-    namaSelect.options[namaSelect.selectedIndex].text;
-
-  const now = new Date();
-
-  const today = now.toLocaleDateString("sv-SE", {
-  timeZone: "Asia/Makassar"
-  });
-  
-  const jam = now.toLocaleTimeString("id-ID", {
-    hour: "2-digit",
-    minute: "2-digit"
-  });
-  
 namaSelect.addEventListener("change", async () => {
+
   const userId = namaSelect.value;
   if (!userId) return;
 
@@ -195,13 +142,41 @@ namaSelect.addEventListener("change", async () => {
   } else {
     checkJamAbsen();
   }
+
 });
-  
+
+/* ================= ABSEN ================= */
+
+btnAbsen.addEventListener("click", async () => {
+
+  if (!checkJamAbsen()) return;
+
+  const userId = namaSelect.value;
+  if (!userId) {
+    statusMsg.textContent = "Pilih nama terlebih dahulu.";
+    statusMsg.style.color = "red";
+    return;
+  }
+
+  const userName =
+    namaSelect.options[namaSelect.selectedIndex].text;
+
+  const now = new Date();
+
+  const today = now.toLocaleDateString("sv-SE", {
+    timeZone: "Asia/Makassar"
+  });
+
+  const jam = now.toLocaleTimeString("id-ID", {
+    hour: "2-digit",
+    minute: "2-digit"
+  });
+
   const bulan = today.substring(0, 7);
-  const absensiUserRef = ref(db, `absensi/${bulan}/${today}/${userId}`);
+  const absensiUserRef =
+    ref(db, `absensi/${bulan}/${today}/${userId}`);
 
   const snapshot = await get(absensiUserRef);
-
   if (snapshot.exists()) {
     statusMsg.textContent = "User ini sudah absen hari ini.";
     statusMsg.style.color = "red";
@@ -209,46 +184,50 @@ namaSelect.addEventListener("change", async () => {
   }
 
   if (!navigator.geolocation) {
-  statusMsg.textContent = "Browser tidak mendukung GPS.";
-  statusMsg.style.color = "red";
-  return;
-}
-
-navigator.geolocation.getCurrentPosition(
-
-  async (position) => {
-
-    const latitude = position.coords.latitude;
-    const longitude = position.coords.longitude;
-
-    await set(absensiUserRef, {
-      nama: userName,
-      keterangan,
-      jam,
-      latitude,
-      longitude,
-      timestamp: Date.now()
-    });
-
-    await set(ref(db, "logLokasi/" + Date.now()), {
-      nama: userName,
-      latitude,
-      longitude,
-      waktu: new Date().toISOString()
-    });
-
-    statusMsg.textContent = "Absensi berhasil dicatat.";
-    statusMsg.style.color = "green";
-
-    namaSelect.value = "";
-  },
-
-  () => {
-    statusMsg.textContent = "Izin lokasi ditolak. Absensi dibatalkan.";
+    statusMsg.textContent = "Browser tidak mendukung GPS.";
     statusMsg.style.color = "red";
+    return;
   }
 
-);
+  navigator.geolocation.getCurrentPosition(
+
+    async (position) => {
+
+      const latitude = position.coords.latitude;
+      const longitude = position.coords.longitude;
+
+      await set(absensiUserRef, {
+        nama: userName,
+        keterangan: keteranganSelect.value,
+        jam,
+        latitude,
+        longitude,
+        timestamp: Date.now()
+      });
+
+      await set(ref(db, "logLokasi/" + Date.now()), {
+        nama: userName,
+        latitude,
+        longitude,
+        waktu: new Date().toISOString()
+      });
+
+      statusMsg.textContent = "Absensi berhasil dicatat.";
+      statusMsg.style.color = "green";
+
+      namaSelect.value = "";
+
+    },
+
+    () => {
+      statusMsg.textContent =
+        "Izin lokasi ditolak. Absensi dibatalkan.";
+      statusMsg.style.color = "red";
+    }
+
+  );
+
+});
 
 /* ================= 5 DATA TERAKHIR ================= */
 
@@ -265,9 +244,7 @@ onValue(absensiRef, snapshot => {
   let allData = [];
 
   Object.keys(data).forEach(bulan => {
-
     Object.keys(data[bulan]).forEach(tanggal => {
-
       Object.keys(data[bulan][tanggal]).forEach(uid => {
 
         const item = data[bulan][tanggal][uid];
@@ -276,17 +253,14 @@ onValue(absensiRef, snapshot => {
           nama: item.nama,
           keterangan: item.keterangan,
           jam: item.jam,
-          tanggal: tanggal,
+          tanggal,
           timestamp: item.timestamp
         });
 
       });
-
     });
-
   });
-  
-  // Urutkan terbaru
+
   allData.sort((a, b) =>
     new Date(b.timestamp) - new Date(a.timestamp)
   );
