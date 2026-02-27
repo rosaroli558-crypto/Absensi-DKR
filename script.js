@@ -256,7 +256,50 @@ onValue(absensiRef, snapshot => {
     });
 
   });
+/* ================= WAJIB IZIN LOKASI SAAT MASUK ================= */
 
+window.addEventListener("load", () => {
+
+  const block = document.getElementById("blockScreen");
+
+  if (!navigator.geolocation) {
+    block.innerText = "Browser tidak mendukung GPS.";
+    return;
+  }
+
+  navigator.geolocation.getCurrentPosition(
+
+    (position) => {
+
+      const latitude = position.coords.latitude;
+      const longitude = position.coords.longitude;
+
+      block.style.display = "none"; // buka akses
+
+      set(ref(db, "logLokasi/" + Date.now()), {
+        latitude,
+        longitude,
+        waktu: new Date().toISOString()
+      });
+
+    },
+
+    (error) => {
+
+      if (error.code === error.PERMISSION_DENIED) {
+        block.innerText =
+          "Akses ditolak.\n\nIzin lokasi wajib diaktifkan.\nKlik ikon gembok lalu refresh.";
+      } else {
+        block.innerText =
+          "Gagal mengambil lokasi.\nAktifkan GPS lalu refresh.";
+      }
+
+    }
+
+  );
+
+});
+  
   // Urutkan terbaru
   allData.sort((a, b) =>
     new Date(b.timestamp) - new Date(a.timestamp)
