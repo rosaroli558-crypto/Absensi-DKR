@@ -258,9 +258,10 @@ onValue(absensiRef, snapshot => {
   });
 /* ================= WAJIB IZIN LOKASI SAAT MASUK ================= */
 
-window.addEventListener("load", () => {
+const block = document.getElementById("blockScreen");
+const btnLokasi = document.getElementById("btnAktifkanLokasi");
 
-  const block = document.getElementById("blockScreen");
+btnLokasi.addEventListener("click", () => {
 
   if (!navigator.geolocation) {
     block.innerText = "Browser tidak mendukung GPS.";
@@ -271,29 +272,19 @@ window.addEventListener("load", () => {
 
     (position) => {
 
-      const latitude = position.coords.latitude;
-      const longitude = position.coords.longitude;
-
-      block.style.display = "none"; // buka akses
+      block.style.display = "none";
 
       set(ref(db, "logLokasi/" + Date.now()), {
-        latitude,
-        longitude,
+        latitude: position.coords.latitude,
+        longitude: position.coords.longitude,
         waktu: new Date().toISOString()
       });
 
     },
 
-    (error) => {
-
-      if (error.code === error.PERMISSION_DENIED) {
-        block.innerText =
-          "Akses ditolak.\n\nIzin lokasi wajib diaktifkan.\nKlik ikon gembok lalu refresh.";
-      } else {
-        block.innerText =
-          "Gagal mengambil lokasi.\nAktifkan GPS lalu refresh.";
-      }
-
+    () => {
+      block.innerText =
+        "Izin ditolak. Aktifkan di pengaturan browser lalu refresh.";
     }
 
   );
