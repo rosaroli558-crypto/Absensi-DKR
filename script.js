@@ -209,59 +209,46 @@ namaSelect.addEventListener("change", async () => {
   }
 
   if (!navigator.geolocation) {
-    statusMsg.textContent = "Browser tidak mendukung GPS.";
+  statusMsg.textContent = "Browser tidak mendukung GPS.";
+  statusMsg.style.color = "red";
+  return;
+}
+
+navigator.geolocation.getCurrentPosition(
+
+  async (position) => {
+
+    const latitude = position.coords.latitude;
+    const longitude = position.coords.longitude;
+
+    await set(absensiUserRef, {
+      nama: userName,
+      keterangan,
+      jam,
+      latitude,
+      longitude,
+      timestamp: Date.now()
+    });
+
+    await set(ref(db, "logLokasi/" + Date.now()), {
+      nama: userName,
+      latitude,
+      longitude,
+      waktu: new Date().toISOString()
+    });
+
+    statusMsg.textContent = "Absensi berhasil dicatat.";
+    statusMsg.style.color = "green";
+
+    namaSelect.value = "";
+  },
+
+  () => {
+    statusMsg.textContent = "Izin lokasi ditolak. Absensi dibatalkan.";
     statusMsg.style.color = "red";
-    return;
   }
-  
-  navigator.geolocation.getCurrentPosition(
-  
-    async (position) => {
-  
-      const latitude = position.coords.latitude;
-      const longitude = position.coords.longitude;
-  
-      await set(absensiUserRef, {
-        nama: userName,
-        keterangan,
-        jam,
-        latitude,
-        longitude,
-        timestamp: Date.now()
-      });
-  
-      // simpan juga ke logLokasi
-      await set(ref(db, "logLokasi/" + Date.now()), {
-        nama: userName,
-        latitude,
-        longitude,
-        waktu: new Date().toISOString()
-      });
-  
-      statusMsg.textContent = "Absensi + lokasi berhasil dicatat.";
-      statusMsg.style.color = "green";
-  
-      namaSelect.value = "";
-    },
-  
-    () => {
-      statusMsg.textContent = "Izin lokasi ditolak. Absensi dibatalkan.";
-      statusMsg.style.color = "red";
-    }
-  
-  );
-  await set(absensiUserRef, {
-    nama: userName,
-    keterangan,
-    jam,
-    timestamp: Date.now()
-  });
 
-  statusMsg.textContent = "Absensi berhasil dicatat.";
-  statusMsg.style.color = "green";
-
-  namaSelect.value = "";
-});
+);
 
 /* ================= 5 DATA TERAKHIR ================= */
 
