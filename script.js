@@ -44,34 +44,6 @@ const btnAbsen = document.getElementById("btnAbsen");
 const daftar = document.getElementById("daftar");
 const statusMsg = document.getElementById("statusMsg");
 
-/* ================= WAJIB IZIN LOKASI ================= */
-
-const block = document.getElementById("blockScreen");
-const btnLokasi = document.getElementById("btnAktifkanLokasi");
-
-btnLokasi.addEventListener("click", () => {
-  if (!navigator.geolocation) {
-    block.innerText = "Browser tidak mendukung GPS.";
-    return;
-  }
-
-  navigator.geolocation.getCurrentPosition(
-    (position) => {
-      block.style.display = "none";
-
-      set(ref(db, "logLokasi/" + Date.now()), {
-        latitude: position.coords.latitude,
-        longitude: position.coords.longitude,
-        waktu: new Date().toISOString()
-      });
-    },
-    () => {
-      block.innerText =
-        "Izin ditolak. Aktifkan di pengaturan browser lalu refresh.";
-    }
-  );
-});
-
 /* ================= LOCK JAM ABSEN ================= */
 
 function checkJamAbsen() {
@@ -235,7 +207,49 @@ namaSelect.addEventListener("change", async () => {
     statusMsg.style.color = "red";
     return;
   }
+
+  if (!navigator.geolocation) {
+    statusMsg.textContent = "Browser tidak mendukung GPS.";
+    statusMsg.style.color = "red";
+    return;
+  }
   
+  navigator.geolocation.getCurrentPosition(
+  
+    async (position) => {
+  
+      const latitude = position.coords.latitude;
+      const longitude = position.coords.longitude;
+  
+      await set(absensiUserRef, {
+        nama: userName,
+        keterangan,
+        jam,
+        latitude,
+        longitude,
+        timestamp: Date.now()
+      });
+  
+      // simpan juga ke logLokasi
+      await set(ref(db, "logLokasi/" + Date.now()), {
+        nama: userName,
+        latitude,
+        longitude,
+        waktu: new Date().toISOString()
+      });
+  
+      statusMsg.textContent = "Absensi + lokasi berhasil dicatat.";
+      statusMsg.style.color = "green";
+  
+      namaSelect.value = "";
+    },
+  
+    () => {
+      statusMsg.textContent = "Izin lokasi ditolak. Absensi dibatalkan.";
+      statusMsg.style.color = "red";
+    }
+  
+  );
   await set(absensiUserRef, {
     nama: userName,
     keterangan,
