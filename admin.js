@@ -33,14 +33,18 @@ const tabelUser = document.getElementById("tabelUser");
 
 onValue(ref(db, "users"), snapshot => {
   tabelUser.innerHTML = "";
-  if (!snapshot.exists()) return;
+
+  if (!snapshot.exists()) {
+    tabelUser.innerHTML = `<tr><td colspan="2">Belum ada anggota</td></tr>`;
+    return;
+  }
 
   const users = snapshot.val();
 
   Object.keys(users).forEach(uid => {
     tabelUser.innerHTML += `
       <tr>
-        <td>${users[uid].nama}</td>
+        <td>${users[uid]?.nama || "-"}</td>
         <td>
           <button onclick="hapusUser('${uid}')">Hapus</button>
         </td>
@@ -54,6 +58,7 @@ onValue(ref(db, "users"), snapshot => {
 window.tambahUser = function () {
   const namaInput = document.getElementById("namaUser");
   const nama = namaInput.value.trim();
+
   if (!nama) return alert("Isi nama dulu");
 
   const newUserRef = push(ref(db, "users"));
@@ -95,18 +100,20 @@ window.handleFilter = async function () {
   }
 
   const data = snapshot.val();
-  const users = usersSnapshot.val();
+  const users = usersSnapshot.exists() ? usersSnapshot.val() : {};
 
   Object.keys(data).forEach(uid => {
 
     const absen = data[uid];
 
+    /* ===== SAFE TIMESTAMP ===== */
+    const rawTime = absen.timestamp || absen.waktu || null;
+
     let tanggalLengkap = "-";
 
-    if (absen.waktu) {
-      const waktuObj = new Date(absen.waktu);
-    
-      if (!isNaN(waktuObj)) {
+    if (rawTime) {
+      const waktuObj = new Date(rawTime);
+      if (!isNaN(waktuObj.getTime())) {
         tanggalLengkap = waktuObj.toLocaleString("id-ID", {
           timeZone: "Asia/Makassar",
           year: "numeric",
@@ -117,6 +124,7 @@ window.handleFilter = async function () {
         });
       }
     }
+
     const lat = absen.latitude;
     const lng = absen.longitude;
 
@@ -126,7 +134,7 @@ window.handleFilter = async function () {
 
     tabelAbsensi.innerHTML += `
       <tr>
-        <td>${users[uid]?.nama || "-"}</td>
+        <td>${users[uid]?.nama || absen.nama || "-"}</td>
         <td>${tanggalLengkap}</td>
         <td>${absen.keterangan || "-"}</td>
         <td>
@@ -159,7 +167,10 @@ window.handleValidasi = async function () {
   const absSnapshot = await get(ref(db, "absensi/" + bulan));
   const userSnapshot = await get(ref(db, "users"));
 
-  if (!absSnapshot.exists() || !userSnapshot.exists()) return;
+  if (!absSnapshot.exists() || !userSnapshot.exists()) {
+    alert("Data tidak ditemukan");
+    return;
+  }
 
   const absData = absSnapshot.val();
   const users = userSnapshot.val();
@@ -171,13 +182,11 @@ window.handleValidasi = async function () {
 
     let total = 0;
 
-    if (absData) {
-      Object.keys(absData).forEach(tanggal => {
-        if (absData[tanggal][uid]) {
-          total++;
-        }
-      });
-    }
+    Object.keys(absData).forEach(tanggal => {
+      if (absData[tanggal] && absData[tanggal][uid]) {
+        total++;
+      }
+    });
 
     let status =
       total >= 4 ? "Lengkap" :
@@ -186,7 +195,7 @@ window.handleValidasi = async function () {
 
     tabel.innerHTML += `
       <tr>
-        <td>${users[uid].nama}</td>
+        <td>${users[uid]?.nama || "-"}</td>
         <td>${total}</td>
         <td>${status}</td>
       </tr>
@@ -235,6 +244,7 @@ window.handleExport = async function () {
     Object.keys(absData[tanggal]).forEach(uid => {
 
       const item = absData[tanggal][uid];
+      const rawTime = item.timestamp || item.waktu || null;
 
       if (!rekap[uid]) {
         rekap[uid] = {
@@ -245,7 +255,7 @@ window.handleExport = async function () {
 
       rekap[uid].list.push({
         keterangan: item.keterangan || "Hadir",
-        waktu: item.waktu
+        waktu: rawTime
       });
     });
   });
@@ -272,7 +282,7 @@ function exportToExcel(rekap, periodeText) {
 
       const user = rekap[uid];
 
-      user.list.sort((a, b) => a.waktu - b.waktu);
+      user.list.sort((a, b) => (a.waktu || 0) - (b.waktu || 0));
 
       const keter = [];
       const tanggal = [];
@@ -280,7 +290,11 @@ function exportToExcel(rekap, periodeText) {
 
       user.list.slice(0, 4).forEach(item => {
 
+        if (!item.waktu) return;
+
         const date = new Date(item.waktu);
+
+        if (isNaN(date.getTime())) return;
 
         keter.push(item.keterangan);
 
