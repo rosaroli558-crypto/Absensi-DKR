@@ -157,6 +157,28 @@ window.hapusAbsen = async function (tanggal, uid) {
   handleFilter();
 };
 
+/* ================= KIRIM NOTIF ================= */
+
+async function kirimNotif(){
+
+const judul = document.getElementById("judul").value
+const pesan = document.getElementById("pesan").value
+
+await fetch("/kirim-notif",{
+method:"POST",
+headers:{
+"Content-Type":"application/json"
+},
+body:JSON.stringify({
+title:judul,
+body:pesan
+})
+})
+
+alert("Notifikasi terkirim")
+
+}
+
 /* ================= VALIDASI BULANAN ================= */
 
 window.handleValidasi = async function () {
