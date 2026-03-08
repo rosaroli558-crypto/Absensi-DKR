@@ -11,6 +11,19 @@ body{
   padding:40px;
 }
 
+/* ================= LOGO ================= */
+
+.logo-container{
+  margin-bottom:20px;
+}
+.logo-container img{
+  width:180px;
+  max-width:220px;
+  height:auto;
+  display:block;
+  margin:0 auto;
+}
+
 /* ================= TITLE ================= */
 
 h2{
