@@ -41,6 +41,8 @@ const statusMsg = document.getElementById("statusMsg");
 let jamMulai = 16;
 let jamSelesai = 18;
 
+statusMsg.textContent = "Script jalan";
+statusMsg.style.color = "yellow";
 /* ================= LOCK JAM ABSEN ================= */
 
 function checkJamAbsen() {
